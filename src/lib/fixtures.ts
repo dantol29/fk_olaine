@@ -27,14 +27,15 @@ const MONTHS: Record<string, number> = {
 };
 
 /** LFF fixtures pages carry the "which tab is this" info directly in their
- *  own URL (`?tab=content_1_2`) — the tab element's id is always "tab" plus
- *  that value, so there's nothing extra for an admin to configure. */
+ *  own URL (`?tab=content_1_2`) — the tab element's id is "tab" plus that
+ *  value with its first letter capitalized (`tabContent_1_2`), so there's
+ *  nothing extra for an admin to configure. */
 function tabIdFromUrl(url: string): string {
   const tab = new URL(url).searchParams.get("tab");
   if (!tab) {
     throw new Error(`LFF fixtures URL is missing a "tab" query parameter: ${url}`);
   }
-  return `tab${tab}`;
+  return `tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}`;
 }
 
 export async function scrapeFixtures(url: string): Promise<ScrapedFixture[]> {
