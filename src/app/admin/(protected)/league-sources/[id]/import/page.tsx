@@ -19,7 +19,24 @@ export default async function AdminLeagueSourceImportPage({
   const [source] = await db.select().from(leagueSources).where(eq(leagueSources.id, sourceId));
   if (!source) notFound();
 
-  const fixtures = await scrapeFixtures(source.url);
+  let fixtures;
+  try {
+    fixtures = await scrapeFixtures(source.url);
+  } catch (error) {
+    console.error(`Failed to fetch fixtures from ${source.url}:`, error);
+    return (
+      <div>
+        <h1 className="mb-2 text-2xl font-extrabold text-club-navy">
+          Ielādēt spēles: {source.label}
+        </h1>
+        <div className="rounded-xl border border-club-red/20 bg-club-red/5 p-4 text-sm text-club-red">
+          Neizdevās ielādēt spēles no šī URL. Pārliecinies, ka tas ir derīgs LFF spēļu saraksta
+          URL (ar norādītu &quot;Visas spēles&quot; cilni), un mēģini vēlreiz.
+        </div>
+      </div>
+    );
+  }
+
   const candidates = fixtures.filter(
     (fixture) => fixture.time !== null && (isOlaine(fixture.home) || isOlaine(fixture.away)),
   );
