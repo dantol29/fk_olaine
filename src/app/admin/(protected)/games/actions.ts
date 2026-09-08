@@ -9,32 +9,32 @@ import { games } from "@/db/schema";
 
 function parseGameInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
-  const opponent = String(formData.get("opponent") ?? "").trim();
+  const homeTeam = String(formData.get("homeTeam") ?? "").trim();
+  const awayTeam = String(formData.get("awayTeam") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
   const startTime = String(formData.get("startTime") ?? "").trim();
   const endTime = String(formData.get("endTime") ?? "").trim();
-  const homeAway = String(formData.get("homeAway") ?? "");
   const location = String(formData.get("location") ?? "").trim();
+  const league = String(formData.get("league") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
 
   if (!teamId) return { error: "Jāizvēlas komanda." } as const;
-  if (!opponent) return { error: "Pretinieks ir obligāts." } as const;
+  if (!homeTeam) return { error: "Mājinieki ir obligāti." } as const;
+  if (!awayTeam) return { error: "Viesi ir obligāti." } as const;
   if (!date) return { error: "Datums ir obligāts." } as const;
   if (!startTime) return { error: "Sākuma laiks ir obligāts." } as const;
   if (!endTime) return { error: "Beigu laiks ir obligāts." } as const;
-  if (homeAway !== "home" && homeAway !== "away") {
-    return { error: "Jāizvēlas mājas vai izbraukuma spēle." } as const;
-  }
   if (!location) return { error: "Vieta ir obligāta." } as const;
 
   return {
     teamId,
-    opponent,
+    homeTeam,
+    awayTeam,
     date,
     startTime,
     endTime,
-    homeAway: homeAway as "home" | "away",
     location,
+    league: league || null,
     notes: notes || null,
   } as const;
 }
@@ -43,7 +43,7 @@ export async function createGame(_prevState: { error?: string } | undefined, for
   const parsed = parseGameInput(formData);
   if ("error" in parsed) return parsed;
 
-  await db.insert(games).values({ ...parsed, createdAt: Date.now() });
+  await db.insert(games).values({ ...parsed, source: "manual", createdAt: Date.now() });
   revalidatePath("/admin/games");
   redirect("/admin/games");
 }

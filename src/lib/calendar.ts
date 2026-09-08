@@ -260,30 +260,24 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
   const rows = await db
     .select({
       id: games.id,
-      opponent: games.opponent,
+      homeTeam: games.homeTeam,
+      awayTeam: games.awayTeam,
       date: games.date,
       startTime: games.startTime,
       endTime: games.endTime,
-      homeAway: games.homeAway,
       location: games.location,
-      teamName: teams.name,
     })
     .from(games)
-    .innerJoin(teams, eq(games.teamId, teams.id))
     .where(and(gte(games.date, afterKey), lte(games.date, beforeKey)));
 
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
     const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
     const end = rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime));
-    const opponentLabel =
-      row.homeAway === "home"
-        ? `${row.teamName} – ${row.opponent}`
-        : `${row.opponent} – ${row.teamName}`;
 
     return {
       uid: `game-${row.id}`,
-      title: opponentLabel,
+      title: `${row.homeTeam} – ${row.awayTeam}`,
       location: row.location,
       allDay: false,
       start,

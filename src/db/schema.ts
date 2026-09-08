@@ -71,13 +71,15 @@ export const games = sqliteTable("games", {
   teamId: integer("team_id")
     .notNull()
     .references(() => teams.id, { onDelete: "cascade" }),
-  opponent: text("opponent").notNull(),
+  homeTeam: text("home_team").notNull(),
+  awayTeam: text("away_team").notNull(),
   date: text("date").notNull(),
   startTime: text("start_time").notNull(),
   endTime: text("end_time").notNull(),
-  homeAway: text("home_away", { enum: ["home", "away"] }).notNull(),
   location: text("location").notNull(),
   notes: text("notes"),
+  source: text("source", { enum: ["manual", "lff"] }).notNull().default("manual"),
+  league: text("league"),
   createdAt: integer("created_at").notNull(),
 });
 

@@ -7,12 +7,13 @@ import { createGame, updateGame } from "../actions";
 type Game = {
   id: number;
   teamId: number;
-  opponent: string;
+  homeTeam: string;
+  awayTeam: string;
   date: string;
   startTime: string;
   endTime: string;
-  homeAway: "home" | "away";
   location: string;
+  league: string | null;
   notes: string | null;
 };
 type TeamOption = { id: number; name: string };
@@ -31,9 +32,6 @@ export function GameForm(
       <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
         {props.mode === "create" ? "Jauna spēle" : "Rediģēt spēli"}
       </h1>
-      <p className="mb-4 text-sm text-slate-500">
-        Tikai neliga spēles (draudzības, kausa spēles). Oficiālās līgas spēles nāk no lff.lv.
-      </p>
 
       <label className="block text-sm font-semibold text-club-navy">
         Komanda
@@ -54,16 +52,30 @@ export function GameForm(
         </select>
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Pretinieks
-        <input
-          type="text"
-          name="opponent"
-          required
-          defaultValue={game?.opponent ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-        />
-      </label>
+      <div className="mt-4 flex gap-4">
+        <label className="flex-1 text-sm font-semibold text-club-navy">
+          Mājinieki
+          <input
+            type="text"
+            name="homeTeam"
+            required
+            placeholder="FK Olaine"
+            defaultValue={game?.homeTeam ?? ""}
+            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          />
+        </label>
+        <label className="flex-1 text-sm font-semibold text-club-navy">
+          Viesi
+          <input
+            type="text"
+            name="awayTeam"
+            required
+            placeholder="FK Ventspils"
+            defaultValue={game?.awayTeam ?? ""}
+            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          />
+        </label>
+      </div>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">
         Datums
@@ -99,29 +111,6 @@ export function GameForm(
         </label>
       </div>
 
-      <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Māja / izbraukums</legend>
-        <div className="mt-1.5 flex gap-4">
-          {(
-            [
-              { value: "home", label: "Mājās" },
-              { value: "away", label: "Izbraukumā" },
-            ] as const
-          ).map((option) => (
-            <label key={option.value} className="flex items-center gap-2 text-sm text-club-navy">
-              <input
-                type="radio"
-                name="homeAway"
-                value={option.value}
-                required
-                defaultChecked={game?.homeAway === option.value}
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
       <label className="mt-4 block text-sm font-semibold text-club-navy">
         Vieta
         <input
@@ -129,6 +118,17 @@ export function GameForm(
           name="location"
           required
           defaultValue={game?.location ?? "Olaines pilsētas stadions"}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Sacensības (nav obligāts)
+        <input
+          type="text"
+          name="league"
+          placeholder="Draudzības spēle"
+          defaultValue={game?.league ?? ""}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>
