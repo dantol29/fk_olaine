@@ -7,6 +7,10 @@ export type ScrapedFixture = {
   time: string | null;
   home: string;
   away: string;
+  /** LFF-hosted logo image URL for each side, or null if LFF has none on
+   *  file for that club. */
+  homeLogo: string | null;
+  awayLogo: string | null;
   stadium: string;
   played: boolean;
 };
@@ -60,15 +64,18 @@ export async function scrapeFixtures(url: string): Promise<ScrapedFixture[]> {
     const clubEls = $el.find(".club");
     if (clubEls.length < 2) return;
 
-    const clubNames = clubEls
-      .map((_, club) => $(club).find(".title a").text().trim())
+    const clubs = clubEls
+      .map((_, club) => ({
+        name: $(club).find(".title a").text().trim(),
+        logo: $(club).find(".logo img").attr("src") ?? null,
+      }))
       .get();
     const scores = $el
       .find(".result span")
       .map((_, s) => $(s).text().trim())
       .get();
 
-    const [home, away] = clubNames;
+    const [home, away] = clubs;
     const [homeScore, awayScore] = scores;
     const played = homeScore !== "-" && awayScore !== "-";
 
@@ -84,8 +91,10 @@ export async function scrapeFixtures(url: string): Promise<ScrapedFixture[]> {
     fixtures.push({
       date: `${year}-${String(month).padStart(2, "0")}-${day.padStart(2, "0")}`,
       time,
-      home,
-      away,
+      home: home.name,
+      away: away.name,
+      homeLogo: home.logo,
+      awayLogo: away.logo,
       stadium: $el.find(".stadium").text().trim(),
       played,
     });

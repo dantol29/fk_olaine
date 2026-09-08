@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
-import { games, leagueSources } from "@/db/schema";
+import { clubLogos, games, leagueSources } from "@/db/schema";
 import { scrapeFixtures } from "@/lib/fixtures";
 import { isOlaine } from "@/lib/games";
 
@@ -53,6 +53,25 @@ export default async function AdminLeagueSourceImportPage({
   const candidates = fixtures.filter(
     (fixture) => fixture.time !== null && (isOlaine(fixture.home) || isOlaine(fixture.away)),
   );
+
+  // Backfill any club logos LFF has on file for the clubs seen here — skips
+  // any name that already has an entry, so it never overwrites a manually
+  // uploaded logo. Runs for every candidate, not just newly-confirmed ones,
+  // so revisiting this screen for an already-fully-imported source still
+  // catches up on logos it didn't have before this existed.
+  const scrapedLogos = new Map<string, string>();
+  for (const fixture of candidates) {
+    if (fixture.homeLogo) scrapedLogos.set(fixture.home, fixture.homeLogo);
+    if (fixture.awayLogo) scrapedLogos.set(fixture.away, fixture.awayLogo);
+  }
+  if (scrapedLogos.size > 0) {
+    await db
+      .insert(clubLogos)
+      .values(
+        Array.from(scrapedLogos, ([name, logoUrl]) => ({ name, logoUrl, createdAt: Date.now() })),
+      )
+      .onConflictDoNothing({ target: clubLogos.name });
+  }
 
   const existingGames = await db
     .select({ date: games.date, homeTeam: games.homeTeam, awayTeam: games.awayTeam })
