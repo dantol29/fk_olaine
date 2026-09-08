@@ -19,6 +19,9 @@ export type CalendarEvent = {
   monthLabel: string;
   /** What kind of event this is, for at-a-glance color/icon coding. */
   eventType: "game" | "training" | "other";
+  /** Which of the club's own teams this belongs to, for the calendar's team
+   *  filter. Null for general, not-team-specific events. */
+  team: string | null;
 };
 
 function capitalize(value: string) {
@@ -155,6 +158,7 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
       start,
       end,
       eventType: "training",
+      team: row.teamName,
       ...formatLabels(start, false),
     };
   });
@@ -172,8 +176,10 @@ async function getAdminEvents(after: Date, before: Date): Promise<CalendarEvent[
       startTime: events.startTime,
       endTime: events.endTime,
       location: events.location,
+      teamName: teams.name,
     })
     .from(events)
+    .leftJoin(teams, eq(events.teamId, teams.id))
     .where(and(gte(events.date, afterKey), lte(events.date, beforeKey)));
 
   return rows.map((row) => {
@@ -189,6 +195,7 @@ async function getAdminEvents(after: Date, before: Date): Promise<CalendarEvent[
       start,
       end,
       eventType: "other",
+      team: row.teamName,
       ...formatLabels(start, false),
     };
   });
@@ -207,8 +214,10 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       startTime: games.startTime,
       endTime: games.endTime,
       location: games.location,
+      teamName: teams.name,
     })
     .from(games)
+    .innerJoin(teams, eq(games.teamId, teams.id))
     .where(and(gte(games.date, afterKey), lte(games.date, beforeKey)));
 
   return rows.map((row) => {
@@ -224,6 +233,7 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       start,
       end,
       eventType: "game",
+      team: row.teamName,
       ...formatLabels(start, false),
     };
   });
