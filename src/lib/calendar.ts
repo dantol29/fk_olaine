@@ -2,6 +2,7 @@ import { and, eq, gte, lte } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { events, games, teams, trainings } from "@/db/schema";
+import { resolveClubLogos } from "@/lib/club-logos";
 
 export type CalendarEvent = {
   uid: string;
@@ -22,6 +23,12 @@ export type CalendarEvent = {
   /** Which of the club's own teams this belongs to, for the calendar's team
    *  filter. Null for general, not-team-specific events. */
   team: string | null;
+  /** Only set for eventType "game" — the two sides' names and resolved
+   *  logo images (or null if no logo is on file for that side). */
+  homeTeam?: string;
+  awayTeam?: string;
+  homeLogo?: string | null;
+  awayLogo?: string | null;
 };
 
 function capitalize(value: string) {
@@ -220,6 +227,8 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
     .innerJoin(teams, eq(games.teamId, teams.id))
     .where(and(gte(games.date, afterKey), lte(games.date, beforeKey)));
 
+  const logos = await resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam]));
+
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
     const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
@@ -234,6 +243,10 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       end,
       eventType: "game",
       team: row.teamName,
+      homeTeam: row.homeTeam,
+      awayTeam: row.awayTeam,
+      homeLogo: logos.get(row.homeTeam) ?? null,
+      awayLogo: logos.get(row.awayTeam) ?? null,
       ...formatLabels(start, false),
     };
   });
