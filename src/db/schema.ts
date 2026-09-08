@@ -83,12 +83,23 @@ export const games = sqliteTable("games", {
   createdAt: integer("created_at").notNull(),
 });
 
+export const leagueSources = sqliteTable("league_sources", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  teamId: integer("team_id")
+    .notNull()
+    .references(() => teams.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  url: text("url").notNull(),
+  createdAt: integer("created_at").notNull(),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   players: many(players),
   coachTeams: many(coachTeams),
   trainings: many(trainings),
   events: many(events),
   games: many(games),
+  leagueSources: many(leagueSources),
 }));
 
 export const playersRelations = relations(players, ({ one }) => ({
@@ -102,4 +113,8 @@ export const coachesRelations = relations(coaches, ({ many }) => ({
 export const coachTeamsRelations = relations(coachTeams, ({ one }) => ({
   coach: one(coaches, { fields: [coachTeams.coachId], references: [coaches.id] }),
   team: one(teams, { fields: [coachTeams.teamId], references: [teams.id] }),
+}));
+
+export const leagueSourcesRelations = relations(leagueSources, ({ one }) => ({
+  team: one(teams, { fields: [leagueSources.teamId], references: [teams.id] }),
 }));

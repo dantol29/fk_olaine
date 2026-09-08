@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/admin/trainings", label: "Treniņi" },
   { href: "/admin/events", label: "Notikumi" },
   { href: "/admin/games", label: "Spēles" },
+  { href: "/admin/league-sources", label: "Līgu avoti" },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
