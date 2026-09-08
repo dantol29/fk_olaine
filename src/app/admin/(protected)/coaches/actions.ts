@@ -6,13 +6,13 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { coachTeams, coaches } from "@/db/schema";
+import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 function parseCoachInput(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const position = String(formData.get("position") ?? "").trim();
   const license = String(formData.get("license") ?? "").trim();
   const authority = String(formData.get("authority") ?? "");
-  const photoUrl = String(formData.get("photoUrl") ?? "").trim();
   const teamIds = formData.getAll("teamIds").map(Number).filter((n) => Number.isFinite(n));
 
   if (!name) return { error: "Vārds, uzvārds ir obligāts." } as const;
@@ -27,7 +27,6 @@ function parseCoachInput(formData: FormData) {
     position,
     license,
     authority: authority as "UEFA" | "LFF",
-    photoUrl: photoUrl || null,
     teamIds,
   } as const;
 }
@@ -46,10 +45,20 @@ export async function createCoach(
   const parsed = parseCoachInput(formData);
   if ("error" in parsed) return parsed;
 
+  const photo = formData.get("photo");
+  let photoUrl: string | null = null;
+  if (photo instanceof File && photo.size > 0) {
+    try {
+      photoUrl = await saveUploadedPhoto(photo, "coaches");
+    } catch (error) {
+      return { error: (error as Error).message };
+    }
+  }
+
   const { teamIds, ...coachFields } = parsed;
   const [inserted] = await db
     .insert(coaches)
-    .values({ ...coachFields, createdAt: Date.now() })
+    .values({ ...coachFields, photoUrl, createdAt: Date.now() })
     .returning({ id: coaches.id });
   await syncCoachTeams(inserted.id, teamIds);
 
@@ -66,8 +75,35 @@ export async function updateCoach(
   const parsed = parseCoachInput(formData);
   if ("error" in parsed) return parsed;
 
+  const photo = formData.get("photo");
+  const removePhoto = formData.get("removePhoto") === "on";
+
   const { teamIds, ...coachFields } = parsed;
-  await db.update(coaches).set(coachFields).where(eq(coaches.id, id));
+  const updates: typeof coachFields & { photoUrl?: string | null } = { ...coachFields };
+
+  if (photo instanceof File && photo.size > 0) {
+    let newPhotoUrl: string;
+    try {
+      newPhotoUrl = await saveUploadedPhoto(photo, "coaches");
+    } catch (error) {
+      return { error: (error as Error).message };
+    }
+    const [existing] = await db
+      .select({ photoUrl: coaches.photoUrl })
+      .from(coaches)
+      .where(eq(coaches.id, id));
+    await deleteUploadedPhoto(existing?.photoUrl ?? null);
+    updates.photoUrl = newPhotoUrl;
+  } else if (removePhoto) {
+    const [existing] = await db
+      .select({ photoUrl: coaches.photoUrl })
+      .from(coaches)
+      .where(eq(coaches.id, id));
+    await deleteUploadedPhoto(existing?.photoUrl ?? null);
+    updates.photoUrl = null;
+  }
+
+  await db.update(coaches).set(updates).where(eq(coaches.id, id));
   await syncCoachTeams(id, teamIds);
 
   revalidatePath("/admin/coaches");
@@ -76,6 +112,12 @@ export async function updateCoach(
 }
 
 export async function deleteCoach(id: number) {
+  const [existing] = await db
+    .select({ photoUrl: coaches.photoUrl })
+    .from(coaches)
+    .where(eq(coaches.id, id));
+  await deleteUploadedPhoto(existing?.photoUrl ?? null);
+
   await db.delete(coaches).where(eq(coaches.id, id));
   revalidatePath("/admin/coaches");
   revalidatePath("/treneri");

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
 
 import { createCoach, updateCoach } from "../actions";
@@ -84,16 +85,30 @@ export function CoachForm(
         </div>
       </fieldset>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Foto URL (nav obligāts)
+      <div className="mt-4">
+        <span className="block text-sm font-semibold text-club-navy">Foto (nav obligāts)</span>
+        {coach?.photoUrl && (
+          <Image
+            src={coach.photoUrl}
+            alt={coach.name}
+            width={80}
+            height={80}
+            className="mt-1.5 h-20 w-20 rounded-lg object-cover"
+          />
+        )}
         <input
-          type="text"
-          name="photoUrl"
-          placeholder="/coach-portrait.png"
-          defaultValue={coach?.photoUrl ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          type="file"
+          name="photo"
+          accept="image/*"
+          className="mt-1.5 block w-full text-sm text-club-navy file:mr-3 file:rounded-lg file:border-0 file:bg-club-gray-light file:px-3 file:py-2 file:text-sm file:font-semibold file:text-club-navy hover:file:bg-slate-200"
         />
-      </label>
+        {coach?.photoUrl && (
+          <label className="mt-2 flex items-center gap-2 text-sm text-club-navy">
+            <input type="checkbox" name="removePhoto" />
+            Noņemt foto
+          </label>
+        )}
+      </div>
 
       <fieldset className="mt-4">
         <legend className="text-sm font-semibold text-club-navy">Komandas</legend>
