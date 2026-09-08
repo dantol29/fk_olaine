@@ -3,29 +3,18 @@ import { inArray } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { clubLogos } from "@/db/schema";
-import { isOlaine } from "@/lib/games";
 
-const OLAINE_CREST = "/fk-olaine-crest-v2.png";
-
-/** Resolves a batch of club names to their logo image — FK Olaine's own
- *  crest, an admin-managed opponent logo, or null if neither matches
- *  (callers render an initials+color placeholder for null). One batched
- *  query handles every non-Olaine name at once, so calling this with a
- *  whole list of games' home/away names is a single round trip. */
+/** Resolves a batch of club names to their logo image via an exact name
+ *  match against club_logos — FK Olaine included, no special-casing.
+ *  Returns null for any name with no matching entry (callers render an
+ *  initials+color placeholder for null). One batched query handles every
+ *  name at once. */
 export async function resolveClubLogos(names: string[]): Promise<Map<string, string | null>> {
   const uniqueNames = [...new Set(names)];
-  const nonOlaineNames = uniqueNames.filter((name) => !isOlaine(name));
+  if (uniqueNames.length === 0) return new Map();
 
-  const rows =
-    nonOlaineNames.length > 0
-      ? await db.select().from(clubLogos).where(inArray(clubLogos.name, nonOlaineNames))
-      : [];
+  const rows = await db.select().from(clubLogos).where(inArray(clubLogos.name, uniqueNames));
   const logoByName = new Map(rows.map((row) => [row.name, row.logoUrl]));
 
-  return new Map(
-    uniqueNames.map((name) => [
-      name,
-      isOlaine(name) ? OLAINE_CREST : (logoByName.get(name) ?? null),
-    ]),
-  );
+  return new Map(uniqueNames.map((name) => [name, logoByName.get(name) ?? null]));
 }
