@@ -3,9 +3,6 @@ import { and, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/db/client";
 import { events, games, teams, trainings } from "@/db/schema";
 
-import { getAllFixtures, type Fixture } from "./fixtures";
-import type { Competition } from "./standings";
-
 export type CalendarEvent = {
   uid: string;
   title: string;
@@ -20,9 +17,6 @@ export type CalendarEvent = {
   timeLabel: string | null;
   dayLabel: string;
   monthLabel: string;
-  /** "calendar" = FK Olaine's own recurring training schedule.
-   *  "fixture" = pulled from the official LFF match schedule. */
-  source: "calendar" | "fixture";
   /** What kind of event this is, for at-a-glance color/icon coding. */
   eventType: "game" | "training" | "other";
 };
@@ -78,7 +72,7 @@ function formatLabels(start: Date, allDay: boolean) {
   };
 }
 
-function toDateKey(date: Date): string {
+export function toDateKey(date: Date): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Riga",
     year: "numeric",
@@ -131,57 +125,6 @@ function rigaWallClockToUtc(
   return new Date(guessUtc - (rigaAsUtc - guessUtc));
 }
 
-function fixtureToCalendarEvent(fixture: Fixture): CalendarEvent | null {
-  const match = fixture.time.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return null;
-
-  const dayDate = new Date(fixture.sortKey);
-  const start = rigaWallClockToUtc(
-    dayDate.getUTCFullYear(),
-    dayDate.getUTCMonth() + 1,
-    dayDate.getUTCDate(),
-    Number(match[1]),
-    Number(match[2]),
-  );
-  const end = new Date(start.getTime() + 90 * 60 * 1000);
-  const { weekdayLabel, dateLabel, timeLabel, dayLabel, monthLabel, dateKey } =
-    formatLabels(start, false);
-
-  return {
-    uid: `fixture-${fixture.home}-${fixture.away}-${fixture.sortKey}`,
-    title: `${fixture.home} – ${fixture.away}`,
-    location: fixture.stadium || null,
-    allDay: false,
-    start,
-    end,
-    dateKey,
-    weekdayLabel,
-    dateLabel,
-    timeLabel,
-    dayLabel,
-    monthLabel,
-    source: "fixture",
-    eventType: "game",
-  };
-}
-
-/** FK Olaine's own upcoming/played matches, pulled from the LFF schedule. */
-export async function getClubFixtureEvents(): Promise<CalendarEvent[]> {
-  const competitions: Competition[] = ["sieviesu-liga", "1-liga", "u16"];
-  const results = await Promise.allSettled(
-    competitions.map((competition) => getAllFixtures(competition)),
-  );
-
-  const fixtures = results.flatMap((result) =>
-    result.status === "fulfilled" ? result.value : [],
-  );
-
-  return fixtures
-    .filter((fixture) => fixture.isOlaine)
-    .map(fixtureToCalendarEvent)
-    .filter((event): event is CalendarEvent => event !== null);
-}
-
 async function getAdminTrainingEvents(after: Date, before: Date): Promise<CalendarEvent[]> {
   const afterKey = toDateKey(after);
   const beforeKey = toDateKey(before);
@@ -211,7 +154,6 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
       allDay: false,
       start,
       end,
-      source: "calendar",
       eventType: "training",
       ...formatLabels(start, false),
     };
@@ -246,7 +188,6 @@ async function getAdminEvents(after: Date, before: Date): Promise<CalendarEvent[
       allDay: false,
       start,
       end,
-      source: "calendar",
       eventType: "other",
       ...formatLabels(start, false),
     };
@@ -282,7 +223,6 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       allDay: false,
       start,
       end,
-      source: "calendar",
       eventType: "game",
       ...formatLabels(start, false),
     };
@@ -302,19 +242,18 @@ function weekBrowsingWindow() {
   return { after, before };
 }
 
-/** Merges FK Olaine's own training schedule with its official match
- *  fixtures, for the week-browsing calendar widget. */
+/** Merges FK Olaine's admin-managed trainings, events, and games for the
+ *  week-browsing calendar widget. */
 export async function getScheduleForWeekBrowsing(): Promise<CalendarEvent[]> {
   const { after, before } = weekBrowsingWindow();
 
-  const [fixtureEvents, trainingEvents, otherEvents, gameEvents] = await Promise.all([
-    getClubFixtureEvents().catch(() => []),
+  const [trainingEvents, otherEvents, gameEvents] = await Promise.all([
     getAdminTrainingEvents(after, before).catch(() => []),
     getAdminEvents(after, before).catch(() => []),
     getAdminGameEvents(after, before).catch(() => []),
   ]);
 
-  return [...fixtureEvents, ...trainingEvents, ...otherEvents, ...gameEvents].sort(
+  return [...trainingEvents, ...otherEvents, ...gameEvents].sort(
     (a, b) => a.start.getTime() - b.start.getTime(),
   );
 }
