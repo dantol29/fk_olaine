@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
-import { Pencil } from "lucide-react";
+import { Pencil, UserRound } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
@@ -14,6 +15,7 @@ export default async function AdminPlayersPage() {
       id: players.id,
       name: players.name,
       birthdate: players.birthdate,
+      photoUrl: players.photoUrl,
       teamName: teams.name,
     })
     .from(players)
@@ -32,23 +34,33 @@ export default async function AdminPlayersPage() {
         </Link>
       </div>
 
-      <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-slate-400">
-            <th className="p-4 font-semibold">Vārds, uzvārds</th>
-            <th className="p-4 font-semibold">Dzimšanas datums</th>
-            <th className="p-4 font-semibold">Komanda</th>
-            <th className="p-4" />
-          </tr>
-        </thead>
-        <tbody>
+      {rows.length === 0 ? (
+        <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
+          Vēl nav neviena spēlētāja.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {rows.map((player) => (
-            <tr key={player.id} className="border-b border-slate-100 last:border-0">
-              <td className="p-4 font-semibold text-club-navy">{player.name}</td>
-              <td className="p-4 text-slate-500">{player.birthdate}</td>
-              <td className="p-4 text-slate-500">{player.teamName}</td>
-              <td className="p-4 text-right">
-                <div className="flex items-center justify-end gap-4">
+            <div
+              key={player.id}
+              className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+            >
+              <div className="relative aspect-square bg-club-gray-light">
+                {player.photoUrl ? (
+                  <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <UserRound className="h-10 w-10 text-club-muted" strokeWidth={1.5} />
+                  </div>
+                )}
+              </div>
+              <div className="p-3">
+                <p className="truncate text-sm font-semibold text-club-navy">{player.name}</p>
+                <p className="text-xs text-slate-400">{player.birthdate}</p>
+                <p className="mt-1 truncate text-xs font-semibold text-club-red">
+                  {player.teamName}
+                </p>
+                <div className="mt-3 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
                   <Link
                     href={`/admin/players/${player.id}`}
                     aria-label={`Rediģēt spēlētāju "${player.name}"`}
@@ -62,18 +74,11 @@ export default async function AdminPlayersPage() {
                     confirmMessage={`Dzēst spēlētāju "${player.name}"?`}
                   />
                 </div>
-              </td>
-            </tr>
+              </div>
+            </div>
           ))}
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={4} className="p-4 text-center text-slate-400">
-                Vēl nav neviena spēlētāja.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+        </div>
+      )}
     </div>
   );
 }

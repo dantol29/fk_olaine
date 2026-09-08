@@ -1,4 +1,5 @@
-import { Pencil } from "lucide-react";
+import { Pencil, UserRound } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
@@ -24,25 +25,33 @@ export default async function AdminCoachesPage() {
         </Link>
       </div>
 
-      <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-slate-400">
-            <th className="p-4 font-semibold">Vārds, uzvārds</th>
-            <th className="p-4 font-semibold">Amats</th>
-            <th className="p-4 font-semibold">Komandas</th>
-            <th className="p-4" />
-          </tr>
-        </thead>
-        <tbody>
+      {rows.length === 0 ? (
+        <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
+          Vēl nav neviena trenera.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {rows.map((coach) => (
-            <tr key={coach.id} className="border-b border-slate-100 last:border-0">
-              <td className="p-4 font-semibold text-club-navy">{coach.name}</td>
-              <td className="p-4 text-slate-500">{coach.position}</td>
-              <td className="p-4 text-slate-500">
-                {coach.coachTeams.map((ct) => ct.team.name).join(", ") || "—"}
-              </td>
-              <td className="p-4 text-right">
-                <div className="flex items-center justify-end gap-4">
+            <div
+              key={coach.id}
+              className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+            >
+              <div className="relative aspect-square bg-club-gray-light">
+                {coach.photoUrl ? (
+                  <Image src={coach.photoUrl} alt={coach.name} fill className="object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <UserRound className="h-10 w-10 text-club-muted" strokeWidth={1.5} />
+                  </div>
+                )}
+              </div>
+              <div className="p-3">
+                <p className="truncate text-sm font-semibold text-club-navy">{coach.name}</p>
+                <p className="text-xs text-slate-400">{coach.position}</p>
+                <p className="mt-1 truncate text-xs font-semibold text-club-red">
+                  {coach.coachTeams.map((ct) => ct.team.name).join(", ") || "—"}
+                </p>
+                <div className="mt-3 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
                   <Link
                     href={`/admin/coaches/${coach.id}`}
                     aria-label={`Rediģēt treneri "${coach.name}"`}
@@ -56,18 +65,11 @@ export default async function AdminCoachesPage() {
                     confirmMessage={`Dzēst treneri "${coach.name}"?`}
                   />
                 </div>
-              </td>
-            </tr>
+              </div>
+            </div>
           ))}
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={4} className="p-4 text-center text-slate-400">
-                Vēl nav neviena trenera.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+        </div>
+      )}
     </div>
   );
 }
