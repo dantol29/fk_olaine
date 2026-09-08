@@ -201,11 +201,8 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
 
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
-    const [startHour, startMinute] = timeToParts(row.startTime);
-    const start = rigaWallClockToUtc(year, month, day, startHour, startMinute);
-    const end = row.endTime
-      ? rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime))
-      : new Date(start.getTime() + 60 * 60 * 1000);
+    const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
+    const end = rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime));
 
     return {
       uid: `training-${row.id}`,
@@ -231,6 +228,7 @@ async function getAdminEvents(after: Date, before: Date): Promise<CalendarEvent[
       title: events.title,
       date: events.date,
       startTime: events.startTime,
+      endTime: events.endTime,
       location: events.location,
     })
     .from(events)
@@ -238,22 +236,19 @@ async function getAdminEvents(after: Date, before: Date): Promise<CalendarEvent[
 
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
-    const allDay = !row.startTime;
-    const start = row.startTime
-      ? rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime))
-      : rigaWallClockToUtc(year, month, day, 0, 0);
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
+    const end = rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime));
 
     return {
       uid: `event-${row.id}`,
       title: row.title,
       location: row.location,
-      allDay,
+      allDay: false,
       start,
       end,
       source: "calendar",
       eventType: "other",
-      ...formatLabels(start, allDay),
+      ...formatLabels(start, false),
     };
   });
 }
@@ -267,7 +262,8 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       id: games.id,
       opponent: games.opponent,
       date: games.date,
-      time: games.time,
+      startTime: games.startTime,
+      endTime: games.endTime,
       homeAway: games.homeAway,
       location: games.location,
       teamName: teams.name,
@@ -278,9 +274,8 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
 
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
-    const [hour, minute] = row.time ? timeToParts(row.time) : [12, 0];
-    const start = rigaWallClockToUtc(year, month, day, hour, minute);
-    const end = new Date(start.getTime() + 90 * 60 * 1000);
+    const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
+    const end = rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime));
     const opponentLabel =
       row.homeAway === "home"
         ? `${row.teamName} – ${row.opponent}`

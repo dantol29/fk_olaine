@@ -11,7 +11,8 @@ function parseGameInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
   const opponent = String(formData.get("opponent") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
-  const time = String(formData.get("time") ?? "").trim();
+  const startTime = String(formData.get("startTime") ?? "").trim();
+  const endTime = String(formData.get("endTime") ?? "").trim();
   const homeAway = String(formData.get("homeAway") ?? "");
   const location = String(formData.get("location") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
@@ -19,6 +20,8 @@ function parseGameInput(formData: FormData) {
   if (!teamId) return { error: "Jāizvēlas komanda." } as const;
   if (!opponent) return { error: "Pretinieks ir obligāts." } as const;
   if (!date) return { error: "Datums ir obligāts." } as const;
+  if (!startTime) return { error: "Sākuma laiks ir obligāts." } as const;
+  if (!endTime) return { error: "Beigu laiks ir obligāts." } as const;
   if (homeAway !== "home" && homeAway !== "away") {
     return { error: "Jāizvēlas mājas vai izbraukuma spēle." } as const;
   }
@@ -27,7 +30,8 @@ function parseGameInput(formData: FormData) {
     teamId,
     opponent,
     date,
-    time: time || null,
+    startTime,
+    endTime,
     homeAway: homeAway as "home" | "away",
     location: location || null,
     notes: notes || null,

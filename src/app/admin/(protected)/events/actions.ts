@@ -19,13 +19,16 @@ function parseEventInput(formData: FormData) {
 
   if (!title) return { error: "Nosaukums ir obligāts." } as const;
   if (!date) return { error: "Datums ir obligāts." } as const;
+  if (!startTime) return { error: "Sākuma laiks ir obligāts." } as const;
+  if (!endTime) return { error: "Beigu laiks ir obligāts." } as const;
+  if (!location) return { error: "Vieta ir obligāta." } as const;
 
   return {
     title,
     date,
-    startTime: startTime || null,
-    endTime: endTime || null,
-    location: location || null,
+    startTime,
+    endTime,
+    location,
     notes: notes || null,
     teamId,
   } as const;

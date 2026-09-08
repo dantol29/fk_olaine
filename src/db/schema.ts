@@ -48,7 +48,7 @@ export const trainings = sqliteTable("trainings", {
     .references(() => teams.id, { onDelete: "cascade" }),
   date: text("date").notNull(), // "YYYY-MM-DD"
   startTime: text("start_time").notNull(), // "HH:MM"
-  endTime: text("end_time"), // "HH:MM" | null
+  endTime: text("end_time").notNull(), // "HH:MM"
   location: text("location").notNull(),
   notes: text("notes"),
   createdAt: integer("created_at").notNull(),
@@ -59,9 +59,9 @@ export const events = sqliteTable("events", {
   teamId: integer("team_id").references(() => teams.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   date: text("date").notNull(),
-  startTime: text("start_time"),
-  endTime: text("end_time"),
-  location: text("location"),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+  location: text("location").notNull(),
   notes: text("notes"),
   createdAt: integer("created_at").notNull(),
 });
@@ -73,7 +73,8 @@ export const games = sqliteTable("games", {
     .references(() => teams.id, { onDelete: "cascade" }),
   opponent: text("opponent").notNull(),
   date: text("date").notNull(),
-  time: text("time"),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
   homeAway: text("home_away", { enum: ["home", "away"] }).notNull(),
   location: text("location"),
   notes: text("notes"),

@@ -14,6 +14,7 @@ export default async function AdminEventsPage() {
       title: events.title,
       date: events.date,
       startTime: events.startTime,
+      endTime: events.endTime,
       teamName: teams.name,
     })
     .from(events)
@@ -47,7 +48,9 @@ export default async function AdminEventsPage() {
             <tr key={event.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 font-semibold text-club-navy">{event.title}</td>
               <td className="p-4 text-club-navy">{event.date}</td>
-              <td className="p-4 text-slate-500">{event.startTime ?? "visu dienu"}</td>
+              <td className="p-4 text-slate-500">
+                {event.startTime}–{event.endTime}
+              </td>
               <td className="p-4 text-slate-500">{event.teamName ?? "Viss klubs"}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">

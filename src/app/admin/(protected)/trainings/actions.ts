@@ -18,13 +18,14 @@ function parseTrainingInput(formData: FormData) {
   if (!teamId) return { error: "Jāizvēlas komanda." } as const;
   if (!date) return { error: "Datums ir obligāts." } as const;
   if (!startTime) return { error: "Sākuma laiks ir obligāts." } as const;
+  if (!endTime) return { error: "Beigu laiks ir obligāts." } as const;
   if (!location) return { error: "Vieta ir obligāta." } as const;
 
   return {
     teamId,
     date,
     startTime,
-    endTime: endTime || null,
+    endTime,
     location,
     notes: notes || null,
   } as const;

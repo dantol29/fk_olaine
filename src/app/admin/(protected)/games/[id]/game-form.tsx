@@ -9,7 +9,8 @@ type Game = {
   teamId: number;
   opponent: string;
   date: string;
-  time: string | null;
+  startTime: string;
+  endTime: string;
   homeAway: "home" | "away";
   location: string | null;
   notes: string | null;
@@ -64,23 +65,35 @@ export function GameForm(
         />
       </label>
 
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Datums
+        <input
+          type="date"
+          name="date"
+          required
+          defaultValue={game?.date ?? ""}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+      </label>
+
       <div className="mt-4 flex gap-4">
         <label className="flex-1 text-sm font-semibold text-club-navy">
-          Datums
+          Sākuma laiks
           <input
-            type="date"
-            name="date"
+            type="time"
+            name="startTime"
             required
-            defaultValue={game?.date ?? ""}
+            defaultValue={game?.startTime ?? ""}
             className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
           />
         </label>
         <label className="flex-1 text-sm font-semibold text-club-navy">
-          Laiks (nav obligāts)
+          Beigu laiks
           <input
             type="time"
-            name="time"
-            defaultValue={game?.time ?? ""}
+            name="endTime"
+            required
+            defaultValue={game?.endTime ?? ""}
             className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
           />
         </label>

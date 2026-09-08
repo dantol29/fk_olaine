@@ -13,6 +13,8 @@ export default async function AdminGamesPage() {
       id: games.id,
       opponent: games.opponent,
       date: games.date,
+      startTime: games.startTime,
+      endTime: games.endTime,
       homeAway: games.homeAway,
       teamName: teams.name,
     })
@@ -38,6 +40,7 @@ export default async function AdminGamesPage() {
         <thead>
           <tr className="border-b border-slate-200 text-slate-400">
             <th className="p-4 font-semibold">Datums</th>
+            <th className="p-4 font-semibold">Laiks</th>
             <th className="p-4 font-semibold">Komanda</th>
             <th className="p-4 font-semibold">Pretinieks</th>
             <th className="p-4 font-semibold">Māja / izbraukums</th>
@@ -48,6 +51,9 @@ export default async function AdminGamesPage() {
           {rows.map((game) => (
             <tr key={game.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 text-club-navy">{game.date}</td>
+              <td className="p-4 text-slate-500">
+                {game.startTime}–{game.endTime}
+              </td>
               <td className="p-4 font-semibold text-club-navy">{game.teamName}</td>
               <td className="p-4 text-slate-500">{game.opponent}</td>
               <td className="p-4 text-slate-500">
@@ -71,7 +77,7 @@ export default async function AdminGamesPage() {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={5} className="p-4 text-center text-slate-400">
+              <td colSpan={6} className="p-4 text-center text-slate-400">
                 Vēl nav nevienas spēles.
               </td>
             </tr>

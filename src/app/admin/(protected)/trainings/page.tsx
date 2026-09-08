@@ -48,8 +48,7 @@ export default async function AdminTrainingsPage() {
             <tr key={training.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 text-club-navy">{training.date}</td>
               <td className="p-4 text-slate-500">
-                {training.startTime}
-                {training.endTime ? `–${training.endTime}` : ""}
+                {training.startTime}–{training.endTime}
               </td>
               <td className="p-4 font-semibold text-club-navy">{training.teamName}</td>
               <td className="p-4 text-slate-500">{training.location}</td>

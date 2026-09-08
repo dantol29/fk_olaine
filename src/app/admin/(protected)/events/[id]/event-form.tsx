@@ -8,9 +8,9 @@ type Event = {
   id: number;
   title: string;
   date: string;
-  startTime: string | null;
-  endTime: string | null;
-  location: string | null;
+  startTime: string;
+  endTime: string;
+  location: string;
   notes: string | null;
   teamId: number | null;
 };
@@ -55,19 +55,21 @@ export function EventForm(
 
       <div className="mt-4 flex gap-4">
         <label className="flex-1 text-sm font-semibold text-club-navy">
-          Sākuma laiks (nav obligāts — tukšs nozīmē &quot;visu dienu&quot;)
+          Sākuma laiks
           <input
             type="time"
             name="startTime"
+            required
             defaultValue={event?.startTime ?? ""}
             className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
           />
         </label>
         <label className="flex-1 text-sm font-semibold text-club-navy">
-          Beigu laiks (nav obligāts)
+          Beigu laiks
           <input
             type="time"
             name="endTime"
+            required
             defaultValue={event?.endTime ?? ""}
             className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
           />
@@ -75,10 +77,11 @@ export function EventForm(
       </div>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Vieta (nav obligāta)
+        Vieta
         <input
           type="text"
           name="location"
+          required
           defaultValue={event?.location ?? ""}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
