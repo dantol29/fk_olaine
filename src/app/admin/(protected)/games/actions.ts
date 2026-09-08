@@ -25,6 +25,7 @@ function parseGameInput(formData: FormData) {
   if (homeAway !== "home" && homeAway !== "away") {
     return { error: "Jāizvēlas mājas vai izbraukuma spēle." } as const;
   }
+  if (!location) return { error: "Vieta ir obligāta." } as const;
 
   return {
     teamId,
@@ -33,7 +34,7 @@ function parseGameInput(formData: FormData) {
     startTime,
     endTime,
     homeAway: homeAway as "home" | "away",
-    location: location || null,
+    location,
     notes: notes || null,
   } as const;
 }

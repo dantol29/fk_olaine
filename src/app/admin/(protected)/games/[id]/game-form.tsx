@@ -12,7 +12,7 @@ type Game = {
   startTime: string;
   endTime: string;
   homeAway: "home" | "away";
-  location: string | null;
+  location: string;
   notes: string | null;
 };
 type TeamOption = { id: number; name: string };
@@ -123,11 +123,12 @@ export function GameForm(
       </fieldset>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Vieta (nav obligāta)
+        Vieta
         <input
           type="text"
           name="location"
-          defaultValue={game?.location ?? ""}
+          required
+          defaultValue={game?.location ?? "Olaines pilsētas stadions"}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>

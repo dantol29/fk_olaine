@@ -76,7 +76,7 @@ export const games = sqliteTable("games", {
   startTime: text("start_time").notNull(),
   endTime: text("end_time").notNull(),
   homeAway: text("home_away", { enum: ["home", "away"] }).notNull(),
-  location: text("location"),
+  location: text("location").notNull(),
   notes: text("notes"),
   createdAt: integer("created_at").notNull(),
 });

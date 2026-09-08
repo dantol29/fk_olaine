@@ -16,6 +16,7 @@ export default async function AdminGamesPage() {
       startTime: games.startTime,
       endTime: games.endTime,
       homeAway: games.homeAway,
+      location: games.location,
       teamName: teams.name,
     })
     .from(games)
@@ -44,6 +45,7 @@ export default async function AdminGamesPage() {
             <th className="p-4 font-semibold">Komanda</th>
             <th className="p-4 font-semibold">Pretinieks</th>
             <th className="p-4 font-semibold">Māja / izbraukums</th>
+            <th className="p-4 font-semibold">Vieta</th>
             <th className="p-4" />
           </tr>
         </thead>
@@ -59,6 +61,7 @@ export default async function AdminGamesPage() {
               <td className="p-4 text-slate-500">
                 {game.homeAway === "home" ? "Mājās" : "Izbraukumā"}
               </td>
+              <td className="p-4 text-slate-500">{game.location}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
                   <Link
@@ -77,7 +80,7 @@ export default async function AdminGamesPage() {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={6} className="p-4 text-center text-slate-400">
+              <td colSpan={7} className="p-4 text-center text-slate-400">
                 Vēl nav nevienas spēles.
               </td>
             </tr>
