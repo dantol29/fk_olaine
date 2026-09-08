@@ -1,8 +1,7 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
-import { players, teams } from "@/db/schema";
+import { teams } from "@/db/schema";
 
 import { PlayerForm } from "./player-form";
 
@@ -19,7 +18,10 @@ export default async function AdminPlayerFormPage({
   }
 
   const playerId = Number(id);
-  const [player] = await db.select().from(players).where(eq(players.id, playerId));
+  const player = await db.query.players.findFirst({
+    where: (players, { eq }) => eq(players.id, playerId),
+    with: { playerTeams: true },
+  });
   if (!player) notFound();
 
   return <PlayerForm mode="edit" player={player} teamOptions={teamOptions} />;

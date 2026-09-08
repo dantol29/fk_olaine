@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import { db } from "./client";
-import { coachTeams, coaches, players, teams } from "./schema";
+import { coachTeams, coaches, playerTeams, players, teams } from "./schema";
 
 const ROSTER_TEAMS = [
   {
@@ -164,13 +164,16 @@ async function main() {
     teamIdByName.set(team.name, inserted.id);
 
     for (const player of team.players) {
-      await db.insert(players).values({
-        teamId: inserted.id,
-        name: player.name,
-        birthdate: player.birthdate,
-        photoUrl: null,
-        createdAt: Date.now(),
-      });
+      const [insertedPlayer] = await db
+        .insert(players)
+        .values({
+          name: player.name,
+          birthdate: player.birthdate,
+          photoUrl: null,
+          createdAt: Date.now(),
+        })
+        .returning({ id: players.id });
+      await db.insert(playerTeams).values({ playerId: insertedPlayer.id, teamId: inserted.id });
     }
   }
 

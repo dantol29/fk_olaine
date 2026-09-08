@@ -9,14 +9,24 @@ export const teams = sqliteTable("teams", {
 
 export const players = sqliteTable("players", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  teamId: integer("team_id")
-    .notNull()
-    .references(() => teams.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   birthdate: text("birthdate").notNull(),
   photoUrl: text("photo_url"),
   createdAt: integer("created_at").notNull(),
 });
+
+export const playerTeams = sqliteTable(
+  "player_teams",
+  {
+    playerId: integer("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "cascade" }),
+    teamId: integer("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.playerId, table.teamId] })],
+);
 
 export const coaches = sqliteTable("coaches", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -94,7 +104,7 @@ export const leagueSources = sqliteTable("league_sources", {
 });
 
 export const teamsRelations = relations(teams, ({ many }) => ({
-  players: many(players),
+  playerTeams: many(playerTeams),
   coachTeams: many(coachTeams),
   trainings: many(trainings),
   events: many(events),
@@ -102,8 +112,13 @@ export const teamsRelations = relations(teams, ({ many }) => ({
   leagueSources: many(leagueSources),
 }));
 
-export const playersRelations = relations(players, ({ one }) => ({
-  team: one(teams, { fields: [players.teamId], references: [teams.id] }),
+export const playersRelations = relations(players, ({ many }) => ({
+  playerTeams: many(playerTeams),
+}));
+
+export const playerTeamsRelations = relations(playerTeams, ({ one }) => ({
+  player: one(players, { fields: [playerTeams.playerId], references: [players.id] }),
+  team: one(teams, { fields: [playerTeams.teamId], references: [teams.id] }),
 }));
 
 export const coachesRelations = relations(coaches, ({ many }) => ({

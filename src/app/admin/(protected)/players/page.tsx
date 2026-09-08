@@ -1,26 +1,17 @@
-import { eq } from "drizzle-orm";
 import { Pencil, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { db } from "@/db/client";
-import { players, teams } from "@/db/schema";
 
 import { deletePlayer } from "./actions";
 
 export default async function AdminPlayersPage() {
-  const rows = await db
-    .select({
-      id: players.id,
-      name: players.name,
-      birthdate: players.birthdate,
-      photoUrl: players.photoUrl,
-      teamName: teams.name,
-    })
-    .from(players)
-    .innerJoin(teams, eq(players.teamId, teams.id))
-    .orderBy(teams.name, players.name);
+  const rows = await db.query.players.findMany({
+    with: { playerTeams: { with: { team: true } } },
+    orderBy: (players, { asc }) => [asc(players.name)],
+  });
 
   return (
     <div>
@@ -58,7 +49,7 @@ export default async function AdminPlayersPage() {
                 <p className="truncate text-sm font-semibold text-club-navy">{player.name}</p>
                 <p className="text-xs text-slate-400">{player.birthdate}</p>
                 <p className="mt-1 truncate text-xs font-semibold text-club-red">
-                  {player.teamName}
+                  {player.playerTeams.map((pt) => pt.team.name).join(", ") || "—"}
                 </p>
                 <div className="mt-3 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
                   <Link

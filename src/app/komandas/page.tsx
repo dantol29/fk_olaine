@@ -6,13 +6,14 @@ import { db } from "@/db/client";
 
 export default async function KomandasPage() {
   const rows = await db.query.teams.findMany({
-    with: { players: true },
+    with: { playerTeams: { with: { player: true } } },
     orderBy: (teams, { asc }) => [asc(teams.name)],
   });
 
   const teams = rows.map((team) => ({
     name: team.name,
-    players: team.players
+    players: team.playerTeams
+      .map((pt) => pt.player)
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name, "lv"))
       .map((player) => ({

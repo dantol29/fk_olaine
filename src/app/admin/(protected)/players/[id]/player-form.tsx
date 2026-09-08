@@ -9,8 +9,8 @@ type Player = {
   id: number;
   name: string;
   birthdate: string;
-  teamId: number;
   photoUrl: string | null;
+  playerTeams: { teamId: number }[];
 };
 type TeamOption = { id: number; name: string };
 
@@ -22,6 +22,7 @@ export function PlayerForm(
   const action = props.mode === "create" ? createPlayer : updatePlayer.bind(null, props.player.id);
   const [state, formAction, pending] = useActionState(action, undefined);
   const player = props.mode === "edit" ? props.player : null;
+  const selectedTeamIds = new Set(player?.playerTeams.map((pt) => pt.teamId) ?? []);
 
   return (
     <form action={formAction} className="max-w-md">
@@ -52,24 +53,22 @@ export function PlayerForm(
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Komanda
-        <select
-          name="teamId"
-          required
-          defaultValue={player?.teamId ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-        >
-          <option value="" disabled>
-            Izvēlies komandu
-          </option>
+      <fieldset className="mt-4">
+        <legend className="text-sm font-semibold text-club-navy">Komandas</legend>
+        <div className="mt-1.5 flex flex-col gap-1.5">
           {props.teamOptions.map((team) => (
-            <option key={team.id} value={team.id}>
+            <label key={team.id} className="flex items-center gap-2 text-sm text-club-navy">
+              <input
+                type="checkbox"
+                name="teamIds"
+                value={team.id}
+                defaultChecked={selectedTeamIds.has(team.id)}
+              />
               {team.name}
-            </option>
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </fieldset>
 
       <div className="mt-4">
         <span className="block text-sm font-semibold text-club-navy">Foto (nav obligāts)</span>
