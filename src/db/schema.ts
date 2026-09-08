@@ -133,3 +133,10 @@ export const coachTeamsRelations = relations(coachTeams, ({ one }) => ({
 export const leagueSourcesRelations = relations(leagueSources, ({ one }) => ({
   team: one(teams, { fields: [leagueSources.teamId], references: [teams.id] }),
 }));
+
+export const clubLogos = sqliteTable("club_logos", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  logoUrl: text("logo_url").notNull(),
+  createdAt: integer("created_at").notNull(),
+});

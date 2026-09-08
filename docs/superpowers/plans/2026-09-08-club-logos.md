@@ -25,8 +25,9 @@
 - Modify: `src/db/schema.ts`
 - Modify: `src/lib/uploads.ts`
 - Modify: `src/lib/games.ts`
-- Modify: `src/lib/games-server.ts`
 - Create: `src/lib/club-logos.ts`
+
+**Note:** `src/lib/games-server.ts` is intentionally left untouched here — its `initialsFor`/`colorFor`/`teamDisplay` still reference `isOlaine` directly and would stop compiling if this task removed that import (as originally drafted) without also rewriting `teamDisplay`. Task 3 already replaces this file's full contents, so the cleanup happens there in one atomic step instead of leaving a broken intermediate state. `games.ts` and `games-server.ts` will carry duplicate (differently-scoped: exported vs. local) copies of `initialsFor`/`colorFor` for the remainder of Task 1 and Task 2 — expected and resolved by Task 3.
 
 **Interfaces:**
 - Consumes: `db` (existing), `isOlaine` (existing, from `src/lib/games.ts`).
@@ -155,23 +156,7 @@ export function colorFor(name: string) {
 
 (This file has no `"server-only"` guard and no DB import — it's safe for both server and client code, which is exactly why `initialsFor`/`colorFor` belong here rather than in `games-server.ts`.)
 
-- [ ] **Step 4: Remove the now-duplicated helpers from `games-server.ts`**
-
-In `src/lib/games-server.ts`, remove the `FALLBACK_TEAM_COLORS` constant, the `initialsFor` function, and the `colorFor` function entirely (they're superseded by Step 3's versions in `games.ts`). Update the import line:
-
-```ts
-import { isOlaine, MONTHS, type Team, type UpcomingGame } from "@/lib/games";
-```
-
-to:
-
-```ts
-import { colorFor, initialsFor, MONTHS, type Team, type UpcomingGame } from "@/lib/games";
-```
-
-(`isOlaine` is dropped from this import — Task 3 removes its only remaining use in this file.)
-
-- [ ] **Step 5: Write the logo resolver**
+- [ ] **Step 4: Write the logo resolver**
 
 Create `src/lib/club-logos.ts`:
 
@@ -209,7 +194,7 @@ export async function resolveClubLogos(names: string[]): Promise<Map<string, str
 }
 ```
 
-- [ ] **Step 6: Push the schema**
+- [ ] **Step 5: Push the schema**
 
 Run:
 ```bash
@@ -217,44 +202,17 @@ npm run db:push -- --force
 ```
 Expected: `Changes applied` (adds the new `club_logos` table; every existing table is untouched since this step only adds a table).
 
-- [ ] **Step 7: Verify**
+- [ ] **Step 6: Verify**
 
 Run: `npx tsc --noEmit`
 Expected: no errors.
 
-Run this script to exercise the resolver directly:
+`resolveClubLogos` can't be exercised directly via a standalone `tsx` script here — `club-logos.ts` imports the `"server-only"` package, which throws unconditionally outside Next's own build pipeline (it's only aliased to a no-op by Next's webpack config; a plain Node/tsx run hits the real throwing implementation regardless of whether the calling code is actually server-only). This isn't a bug — it's the package doing exactly what it's for. Its actual behavior is verified live in Task 3, once it's wired into a real page the dev server renders.
+
+- [ ] **Step 7: Commit**
 
 ```bash
-npx tsx -e "
-import { eq } from 'drizzle-orm';
-import { resolveClubLogos } from './src/lib/club-logos';
-import { db } from './src/db/client';
-import { clubLogos } from './src/db/schema';
-
-async function main() {
-  const [inserted] = await db
-    .insert(clubLogos)
-    .values({ name: 'FK Ventspils', logoUrl: '/uploads/clubs/test.png', createdAt: Date.now() })
-    .returning({ id: clubLogos.id });
-
-  const result = await resolveClubLogos(['FK Olaine', 'FK Ventspils', 'Unknown FC']);
-  console.log('FK Olaine ->', result.get('FK Olaine'));
-  console.log('FK Ventspils ->', result.get('FK Ventspils'));
-  console.log('Unknown FC ->', result.get('Unknown FC'));
-
-  await db.delete(clubLogos).where(eq(clubLogos.id, inserted.id));
-}
-
-main();
-"
-```
-
-Expected: `FK Olaine -> /fk-olaine-crest-v2.png`, `FK Ventspils -> /uploads/clubs/test.png`, `Unknown FC -> null`.
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add src/db/schema.ts src/lib/uploads.ts src/lib/games.ts src/lib/games-server.ts src/lib/club-logos.ts
+git add src/db/schema.ts src/lib/uploads.ts src/lib/games.ts src/lib/club-logos.ts
 git commit -m "feat: add club_logos table, logo resolver, and shared team-badge helpers"
 ```
 
