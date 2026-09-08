@@ -44,3 +44,6 @@ next-env.d.ts
 # local sqlite db (admin backoffice dev)
 local.db
 local.db-*
+
+# locally-uploaded photos (admin backoffice dev)
+/public/uploads/
