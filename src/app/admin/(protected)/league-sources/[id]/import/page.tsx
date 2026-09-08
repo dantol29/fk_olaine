@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
@@ -30,8 +31,20 @@ export default async function AdminLeagueSourceImportPage({
           Ielādēt spēles: {source.label}
         </h1>
         <div className="rounded-xl border border-club-red/20 bg-club-red/5 p-4 text-sm text-club-red">
-          Neizdevās ielādēt spēles no šī URL. Pārliecinies, ka tas ir derīgs LFF spēļu saraksta
-          URL (ar norādītu &quot;Visas spēles&quot; cilni), un mēģini vēlreiz.
+          <p>
+            Neizdevās ielādēt spēles no šī URL. Pārliecinies, ka tas ir derīgs LFF spēļu saraksta
+            URL — atver savu sacensību lapu lff.lv, izvēlies pareizo grupu un atver
+            &quot;Visas spēles&quot; cilni, tad kopē šo URL:
+          </p>
+          <div className="mt-4 overflow-hidden rounded-lg border border-club-red/20">
+            <Image
+              src="/lff-url-instructions.png"
+              alt='LFF vietnē izvēlies sacensības un atver "Visas spēles" cilni, tad kopē šīs lapas URL'
+              width={1200}
+              height={440}
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
     );
