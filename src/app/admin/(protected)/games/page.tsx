@@ -1,12 +1,42 @@
 import { eq } from "drizzle-orm";
 import { Pencil } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { db } from "@/db/client";
 import { games, teams } from "@/db/schema";
+import { resolveClubLogos } from "@/lib/club-logos";
+import { colorFor, initialsFor } from "@/lib/games";
+import { cn } from "@/lib/utils";
 
 import { deleteGame } from "./actions";
+
+function ClubBadge({ name, logo }: { name: string; logo: string | null }) {
+  return (
+    <span className="flex items-center gap-2">
+      {logo ? (
+        <Image
+          src={logo}
+          alt={name}
+          width={20}
+          height={20}
+          className="h-5 w-5 shrink-0 rounded-full object-contain"
+        />
+      ) : (
+        <span
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[8px] font-extrabold text-white",
+            colorFor(name),
+          )}
+        >
+          {initialsFor(name)}
+        </span>
+      )}
+      {name}
+    </span>
+  );
+}
 
 export default async function AdminGamesPage() {
   const rows = await db
@@ -24,6 +54,8 @@ export default async function AdminGamesPage() {
     .from(games)
     .innerJoin(teams, eq(games.teamId, teams.id))
     .orderBy(games.date);
+
+  const logos = await resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam]));
 
   return (
     <div>
@@ -58,8 +90,12 @@ export default async function AdminGamesPage() {
                 {game.startTime}–{game.endTime}
               </td>
               <td className="p-4 font-semibold text-club-navy">{game.teamName}</td>
-              <td className="p-4 text-slate-500">{game.homeTeam}</td>
-              <td className="p-4 text-slate-500">{game.awayTeam}</td>
+              <td className="p-4 text-slate-500">
+                <ClubBadge name={game.homeTeam} logo={logos.get(game.homeTeam) ?? null} />
+              </td>
+              <td className="p-4 text-slate-500">
+                <ClubBadge name={game.awayTeam} logo={logos.get(game.awayTeam) ?? null} />
+              </td>
               <td className="p-4 text-slate-500">{game.league ?? "Draudzības spēle"}</td>
               <td className="p-4 text-slate-500">{game.location}</td>
               <td className="p-4 text-right">
