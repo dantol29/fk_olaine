@@ -5,7 +5,7 @@ import { useActionState } from "react";
 
 import { createClubLogo, updateClubLogo } from "../actions";
 
-type ClubLogo = { id: number; name: string; logoUrl: string };
+type ClubLogo = { id: number; logoUrl: string; names: { name: string }[] };
 
 export function ClubLogoForm(props: { mode: "create" } | { mode: "edit"; club: ClubLogo }) {
   const action =
@@ -20,18 +20,19 @@ export function ClubLogoForm(props: { mode: "create" } | { mode: "edit"; club: C
       </h1>
 
       <label className="block text-sm font-semibold text-club-navy">
-        Nosaukums
-        <input
-          type="text"
-          name="name"
+        Nosaukumi (katrs savā rindā)
+        <textarea
+          name="names"
           required
-          placeholder="FK Ventspils"
-          defaultValue={club?.name ?? ""}
+          rows={4}
+          placeholder={"FK Ventspils\nFK Ventspils/DFS"}
+          defaultValue={club?.names.map((n) => n.name).join("\n") ?? ""}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>
       <p className="mt-1.5 text-xs text-slate-400">
-        Precīzi jāsakrīt ar kluba nosaukumu, kāds redzams spēlēs (Mājinieki / Viesi).
+        Katram nosaukumam precīzi jāsakrīt ar to, kāds redzams spēlēs (Mājinieki / Viesi).
+        Pievieno vairākus, ja tas pats klubs parādās ar atšķirīgu rakstību.
       </p>
 
       <div className="mt-4">
@@ -39,7 +40,7 @@ export function ClubLogoForm(props: { mode: "create" } | { mode: "edit"; club: C
         {club?.logoUrl && (
           <Image
             src={club.logoUrl}
-            alt={club.name}
+            alt={club.names[0]?.name ?? ""}
             width={80}
             height={80}
             className="mt-1.5 h-20 w-20 rounded-lg object-contain"

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
 
 import { login } from "./actions";
@@ -13,7 +14,13 @@ export default function AdminLoginPage() {
         action={formAction}
         className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
       >
-        <h1 className="text-xl font-bold text-club-navy">FK Olaine admin</h1>
+        <Image
+          src="/fk-olaine-crest-v2.png"
+          alt="FK Olaine"
+          width={80}
+          height={83}
+          className="h-20 w-auto"
+        />
         <p className="mt-1 text-sm text-slate-500">
           Ievadi administratora paroli, lai turpinātu.
         </p>

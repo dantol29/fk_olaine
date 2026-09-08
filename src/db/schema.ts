@@ -136,7 +136,24 @@ export const leagueSourcesRelations = relations(leagueSources, ({ one }) => ({
 
 export const clubLogos = sqliteTable("club_logos", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull().unique(),
   logoUrl: text("logo_url").notNull(),
   createdAt: integer("created_at").notNull(),
 });
+
+/** One logo can be known by several exact-match names — the same club
+ *  often appears spelled differently across competitions/seasons. */
+export const clubLogoNames = sqliteTable("club_logo_names", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  clubLogoId: integer("club_logo_id")
+    .notNull()
+    .references(() => clubLogos.id, { onDelete: "cascade" }),
+  name: text("name").notNull().unique(),
+});
+
+export const clubLogosRelations = relations(clubLogos, ({ many }) => ({
+  names: many(clubLogoNames),
+}));
+
+export const clubLogoNamesRelations = relations(clubLogoNames, ({ one }) => ({
+  clubLogo: one(clubLogos, { fields: [clubLogoNames.clubLogoId], references: [clubLogos.id] }),
+}));

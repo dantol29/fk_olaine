@@ -92,40 +92,30 @@ export function CoachesDirectory({ coaches }: { coaches: Coach[] }) {
 
   return (
     <>
-      <div className="relative h-[240px] overflow-hidden sm:h-[280px]">
-        <Image
-          src="/tactics-board-dusk.png"
-          alt="FK Olaine treneri"
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25" />
+      <section className="px-6 pt-4">
+        <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[280px]">
+          <Image
+            src="/tactics-board-dusk.png"
+            alt="FK Olaine treneri"
+            fill
+            priority
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25" />
 
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-6">
-          <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-white/60">
-            <Link href="/" className="hover:text-white">
-              Sākums
-            </Link>
-            <span>&gt;</span>
-            <Link href="/klubs" className="hover:text-white">
-              Klubs
-            </Link>
-            <span>&gt;</span>
-            <span className="text-white">Treneri</span>
-          </nav>
+          <div className="relative z-10 flex h-full w-full flex-col justify-center px-6 sm:px-10">
+            <h1 className="text-5xl text-white sm:text-6xl">
+              Treneri
+            </h1>
 
-          <h1 className="text-5xl text-white sm:text-6xl">
-            Treneri
-          </h1>
-
-          <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">
-            Profesionāla un aizrautīga treneru komanda, kas ikdienā strādā,
-            lai palīdzētu mūsu spēlētājiem attīstīties un sasniegt savus
-            mērķus.
-          </p>
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">
+              Profesionāla un aizrautīga treneru komanda, kas ikdienā strādā,
+              lai palīdzētu mūsu spēlētājiem attīstīties un sasniegt savus
+              mērķus.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <section className="px-6 py-8">
         <div className="mx-auto max-w-[1440px]">

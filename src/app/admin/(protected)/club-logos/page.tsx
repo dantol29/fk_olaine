@@ -4,12 +4,14 @@ import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { db } from "@/db/client";
-import { clubLogos } from "@/db/schema";
 
 import { deleteClubLogo } from "./actions";
 
 export default async function AdminClubLogosPage() {
-  const rows = await db.select().from(clubLogos).orderBy(clubLogos.name);
+  const rows = await db.query.clubLogos.findMany({
+    with: { names: true },
+    orderBy: (clubLogos, { asc }) => [asc(clubLogos.id)],
+  });
 
   return (
     <div>
@@ -32,41 +34,48 @@ export default async function AdminClubLogosPage() {
           <thead>
             <tr className="border-b border-slate-200 text-slate-400">
               <th className="p-4" />
-              <th className="p-4 font-semibold">Nosaukums</th>
+              <th className="p-4 font-semibold">Nosaukumi</th>
               <th className="p-4" />
             </tr>
           </thead>
           <tbody>
-            {rows.map((club) => (
-              <tr key={club.id} className="border-b border-slate-100 last:border-0">
-                <td className="p-4">
-                  <Image
-                    src={club.logoUrl}
-                    alt={club.name}
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 rounded-full object-contain"
-                  />
-                </td>
-                <td className="p-4 font-semibold text-club-navy">{club.name}</td>
-                <td className="p-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link
-                      href={`/admin/club-logos/${club.id}`}
-                      aria-label={`Rediģēt klubu "${club.name}"`}
-                      title="Rediģēt"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Link>
-                    <DeleteButton
-                      action={deleteClubLogo.bind(null, club.id)}
-                      confirmMessage={`Dzēst kluba "${club.name}" logo?`}
+            {rows.map((club) => {
+              const namesLabel =
+                club.names
+                  .map((n) => n.name)
+                  .sort((a, b) => a.localeCompare(b, "lv"))
+                  .join(", ") || "—";
+              return (
+                <tr key={club.id} className="border-b border-slate-100 last:border-0">
+                  <td className="p-4">
+                    <Image
+                      src={club.logoUrl}
+                      alt={namesLabel}
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 rounded-full object-contain"
                     />
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="p-4 font-semibold text-club-navy">{namesLabel}</td>
+                  <td className="p-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/club-logos/${club.id}`}
+                        aria-label={`Rediģēt klubu "${namesLabel}"`}
+                        title="Rediģēt"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                      <DeleteButton
+                        action={deleteClubLogo.bind(null, club.id)}
+                        confirmMessage={`Dzēst kluba "${namesLabel}" logo?`}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

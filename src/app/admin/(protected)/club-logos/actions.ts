@@ -5,15 +5,34 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
-import { clubLogos } from "@/db/schema";
+import { clubLogoNames, clubLogos } from "@/db/schema";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
+
+function parseNames(formData: FormData): string[] {
+  const raw = String(formData.get("names") ?? "");
+  return [
+    ...new Set(
+      raw
+        .split("\n")
+        .map((name) => name.trim())
+        .filter(Boolean),
+    ),
+  ];
+}
+
+async function syncClubLogoNames(clubLogoId: number, names: string[]) {
+  await db.delete(clubLogoNames).where(eq(clubLogoNames.clubLogoId, clubLogoId));
+  if (names.length > 0) {
+    await db.insert(clubLogoNames).values(names.map((name) => ({ clubLogoId, name })));
+  }
+}
 
 export async function createClubLogo(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
-  const name = String(formData.get("name") ?? "").trim();
-  if (!name) return { error: "Nosaukums ir obligāts." };
+  const names = parseNames(formData);
+  if (names.length === 0) return { error: "Jānorāda vismaz viens nosaukums." };
 
   const photo = formData.get("photo");
   if (!(photo instanceof File) || photo.size === 0) {
@@ -27,7 +46,12 @@ export async function createClubLogo(
     return { error: (error as Error).message };
   }
 
-  await db.insert(clubLogos).values({ name, logoUrl, createdAt: Date.now() });
+  const [inserted] = await db
+    .insert(clubLogos)
+    .values({ logoUrl, createdAt: Date.now() })
+    .returning({ id: clubLogos.id });
+  await syncClubLogoNames(inserted.id, names);
+
   revalidatePath("/admin/club-logos");
   redirect("/admin/club-logos");
 }
@@ -37,11 +61,10 @@ export async function updateClubLogo(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
-  const name = String(formData.get("name") ?? "").trim();
-  if (!name) return { error: "Nosaukums ir obligāts." };
+  const names = parseNames(formData);
+  if (names.length === 0) return { error: "Jānorāda vismaz viens nosaukums." };
 
   const photo = formData.get("photo");
-  const updates: { name: string; logoUrl?: string } = { name };
 
   if (photo instanceof File && photo.size > 0) {
     let newLogoUrl: string;
@@ -55,10 +78,11 @@ export async function updateClubLogo(
       .from(clubLogos)
       .where(eq(clubLogos.id, id));
     await deleteUploadedPhoto(existing?.logoUrl ?? null);
-    updates.logoUrl = newLogoUrl;
+    await db.update(clubLogos).set({ logoUrl: newLogoUrl }).where(eq(clubLogos.id, id));
   }
 
-  await db.update(clubLogos).set(updates).where(eq(clubLogos.id, id));
+  await syncClubLogoNames(id, names);
+
   revalidatePath("/admin/club-logos");
   redirect("/admin/club-logos");
 }

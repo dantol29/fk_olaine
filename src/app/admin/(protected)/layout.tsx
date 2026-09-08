@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -19,9 +20,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen bg-club-gray-light">
       <aside className="flex w-56 shrink-0 flex-col justify-between border-r border-slate-200 bg-white p-6">
         <div>
-          <p className="text-sm font-extrabold text-club-navy uppercase">
-            FK Olaine admin
-          </p>
+          <Image
+            src="/fk-olaine-crest-v2.png"
+            alt="FK Olaine"
+            width={80}
+            height={83}
+            className="h-20 w-auto"
+          />
           <nav className="mt-6 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <Link

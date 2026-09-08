@@ -1,8 +1,6 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
-import { clubLogos } from "@/db/schema";
 
 import { ClubLogoForm } from "./club-logo-form";
 
@@ -18,7 +16,10 @@ export default async function AdminClubLogoFormPage({
   }
 
   const clubId = Number(id);
-  const [club] = await db.select().from(clubLogos).where(eq(clubLogos.id, clubId));
+  const club = await db.query.clubLogos.findFirst({
+    where: (clubLogos, { eq }) => eq(clubLogos.id, clubId),
+    with: { names: true },
+  });
   if (!club) notFound();
 
   return <ClubLogoForm mode="edit" club={club} />;

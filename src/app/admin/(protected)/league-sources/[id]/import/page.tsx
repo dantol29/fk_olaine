@@ -1,9 +1,9 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
-import { clubLogos, games, leagueSources } from "@/db/schema";
+import { clubLogoNames, clubLogos, games, leagueSources } from "@/db/schema";
 import { scrapeFixtures } from "@/lib/fixtures";
 import { isOlaine } from "@/lib/games";
 
@@ -55,22 +55,32 @@ export default async function AdminLeagueSourceImportPage({
   );
 
   // Backfill any club logos LFF has on file for the clubs seen here — skips
-  // any name that already has an entry, so it never overwrites a manually
-  // uploaded logo. Runs for every candidate, not just newly-confirmed ones,
-  // so revisiting this screen for an already-fully-imported source still
-  // catches up on logos it didn't have before this existed.
+  // any name that already has an entry (under any of its logo's names), so
+  // it never overwrites a manually uploaded logo or creates a duplicate for
+  // a name the admin already merged into an existing entry. Runs for every
+  // candidate, not just newly-confirmed ones, so revisiting this screen for
+  // an already-fully-imported source still catches up on logos it didn't
+  // have before this existed.
   const scrapedLogos = new Map<string, string>();
   for (const fixture of candidates) {
     if (fixture.homeLogo) scrapedLogos.set(fixture.home, fixture.homeLogo);
     if (fixture.awayLogo) scrapedLogos.set(fixture.away, fixture.awayLogo);
   }
   if (scrapedLogos.size > 0) {
-    await db
-      .insert(clubLogos)
-      .values(
-        Array.from(scrapedLogos, ([name, logoUrl]) => ({ name, logoUrl, createdAt: Date.now() })),
-      )
-      .onConflictDoNothing({ target: clubLogos.name });
+    const existingNames = await db
+      .select({ name: clubLogoNames.name })
+      .from(clubLogoNames)
+      .where(inArray(clubLogoNames.name, Array.from(scrapedLogos.keys())));
+    const existingNameSet = new Set(existingNames.map((row) => row.name));
+
+    for (const [name, logoUrl] of scrapedLogos) {
+      if (existingNameSet.has(name)) continue;
+      const [inserted] = await db
+        .insert(clubLogos)
+        .values({ logoUrl, createdAt: Date.now() })
+        .returning({ id: clubLogos.id });
+      await db.insert(clubLogoNames).values({ clubLogoId: inserted.id, name });
+    }
   }
 
   const existingGames = await db

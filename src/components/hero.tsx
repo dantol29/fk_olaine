@@ -1,10 +1,6 @@
-import { gte } from "drizzle-orm";
-
-import { db } from "@/db/client";
-import { games } from "@/db/schema";
-import { toDateKey } from "@/lib/calendar";
 import { getStandings, type StandingRow } from "@/lib/standings";
-import { isOlaine, type Team, type UpcomingGame } from "@/lib/games";
+import { getUpcomingGamesFromDb } from "@/lib/games-server";
+import type { UpcomingGame } from "@/lib/games";
 import { LeagueSelector } from "@/components/league-selector";
 import { MatchesShowcase } from "@/components/matches-showcase";
 import { WideScreenFillers } from "@/components/wide-screen-fillers";
@@ -80,75 +76,6 @@ const FALLBACK_UPCOMING_GAMES: UpcomingGame[] = [
   },
 ];
 
-const WEEKDAY_ABBR: Record<string, string> = {
-  pirmdiena: "PIRMD.",
-  otrdiena: "OTRD.",
-  trešdiena: "TREŠD.",
-  ceturtdiena: "CETURTD.",
-  piektdiena: "PIEKTD.",
-  sestdiena: "SESTD.",
-  svētdiena: "SVĒTD.",
-};
-
-const MONTHS = [
-  "JAN",
-  "FEB",
-  "MAR",
-  "APR",
-  "MAI",
-  "JŪN",
-  "JŪL",
-  "AUG",
-  "SEP",
-  "OKT",
-  "NOV",
-  "DEC",
-];
-
-const FALLBACK_TEAM_COLORS = [
-  "bg-club-navy",
-  "bg-club-red",
-  "bg-[#167c4c]",
-  "bg-[#1687c9]",
-  "bg-[#7c3aed]",
-];
-
-function initialsFor(name: string) {
-  return name
-    .split(/[\s/]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-}
-
-function colorFor(name: string) {
-  let hash = 0;
-  for (const char of name) {
-    hash = (hash * 31 + char.charCodeAt(0)) % FALLBACK_TEAM_COLORS.length;
-  }
-  return FALLBACK_TEAM_COLORS[hash];
-}
-
-function teamDisplay(name: string): Team {
-  return isOlaine(name)
-    ? { name, logo: "/fk-olaine-crest-v2.png" }
-    : { name, initials: initialsFor(name), color: colorFor(name) };
-}
-
-function weekdayAbbrFor(dateKey: string): string {
-  const [year, month, day] = dateKey.split("-").map(Number);
-  const noonUtc = new Date(Date.UTC(year, month - 1, day, 12));
-  const weekday = new Intl.DateTimeFormat("lv-LV", {
-    timeZone: "Europe/Riga",
-    weekday: "long",
-  })
-    .format(noonUtc)
-    .toLowerCase();
-  return WEEKDAY_ABBR[weekday] ?? "";
-}
-
 async function fetchStandings(
   competition: Parameters<typeof getStandings>[0],
   fallback: StandingRow[] = [],
@@ -161,34 +88,8 @@ async function fetchStandings(
 }
 
 async function fetchUpcomingGames(): Promise<UpcomingGame[]> {
-  try {
-    const todayKey = toDateKey(new Date());
-    const rows = await db
-      .select()
-      .from(games)
-      .where(gte(games.date, todayKey))
-      .orderBy(games.date, games.startTime)
-      .limit(5);
-
-    if (rows.length === 0) return FALLBACK_UPCOMING_GAMES;
-
-    return rows.map((row) => {
-      const [year, month, day] = row.date.split("-").map(Number);
-      return {
-        day: String(day).padStart(2, "0"),
-        month: MONTHS[month - 1] ?? "",
-        year: String(year),
-        weekday: weekdayAbbrFor(row.date),
-        time: row.startTime,
-        league: row.league ?? "Draudzības spēle",
-        home: teamDisplay(row.homeTeam),
-        away: teamDisplay(row.awayTeam),
-        venue: row.location,
-      };
-    });
-  } catch {
-    return FALLBACK_UPCOMING_GAMES;
-  }
+  const rows = await getUpcomingGamesFromDb(5);
+  return rows.length > 0 ? rows : FALLBACK_UPCOMING_GAMES;
 }
 
 export async function Hero() {
