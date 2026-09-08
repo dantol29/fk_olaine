@@ -1,3 +1,4 @@
+import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
@@ -36,9 +37,11 @@ export default async function AdminTeamsPage() {
                 <div className="flex items-center justify-end gap-4">
                   <Link
                     href={`/admin/teams/${team.id}`}
-                    className="text-sm font-semibold text-club-navy hover:underline"
+                    aria-label={`Rediģēt komandu "${team.name}"`}
+                    title="Rediģēt"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
                   >
-                    Rediģēt
+                    <Pencil className="h-4 w-4" />
                   </Link>
                   <DeleteButton
                     action={deleteTeam.bind(null, team.id)}
