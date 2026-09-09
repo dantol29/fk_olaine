@@ -37,7 +37,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
       <div className="league-card relative flex flex-1 flex-col overflow-hidden rounded-[1.5rem] bg-white px-4 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6">
         <div className="mb-4 flex items-start justify-between gap-3 sm:mb-6">
           <div className="min-w-0">
-            <h3 className="text-2xl font-extrabold uppercase text-club-navy sm:text-3xl">
+            <h3 className="text-2xl uppercase text-club-navy sm:text-3xl">
               {leagues[activeLeague]?.label ?? ""}
             </h3>
             <p className="mt-1 text-sm text-slate-400">Turnīra tabula {currentYear}</p>
@@ -117,7 +117,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       )}
                       style={{ animationDelay: `${enterDelay}ms` }}
                     >
-                      <td className="py-4 pr-3 sm:py-5">
+                      <td className={cn("py-4 pr-3 pl-2 sm:py-5", row.isOlaine && "rounded-l-xl")}>
                         <span
                           className={cn(
                             "flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs font-bold tabular-nums",
@@ -156,8 +156,8 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       </td>
                       <td
                         className={cn(
-                          "py-4 pr-1 text-center font-mono text-base font-bold tabular-nums sm:py-5",
-                          row.isOlaine ? "text-club-red" : "text-club-navy",
+                          "py-4 pr-2 text-center font-mono text-base font-bold tabular-nums sm:py-5",
+                          row.isOlaine ? "text-club-red rounded-r-xl" : "text-club-navy",
                         )}
                       >
                         {row.points}
