@@ -114,6 +114,7 @@ export const teamsRelations = relations(teams, ({ many }) => ({
   events: many(events),
   games: many(games),
   leagueSources: many(leagueSources),
+  articles: many(articles),
 }));
 
 export const playersRelations = relations(players, ({ many }) => ({
@@ -160,4 +161,32 @@ export const clubLogosRelations = relations(clubLogos, ({ many }) => ({
 
 export const clubLogoNamesRelations = relations(clubLogoNames, ({ one }) => ({
   clubLogo: one(clubLogos, { fields: [clubLogoNames.clubLogoId], references: [clubLogos.id] }),
+}));
+
+export const articles = sqliteTable("articles", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  excerpt: text("excerpt").notNull(),
+  date: text("date").notNull(), // "YYYY-MM-DD"
+  category: text("category", {
+    enum: ["Klubs", "Komandas", "Spēles", "Treniņi", "Pasākumi"],
+  }).notNull(),
+  teamId: integer("team_id").references(() => teams.id, { onDelete: "set null" }),
+  image: text("image").notNull(),
+  // Paragraphs, one per line.
+  body: text("body").notNull(),
+  quoteText: text("quote_text"),
+  quoteAuthor: text("quote_author"),
+  quoteRole: text("quote_role"),
+  // Highlight image URLs, one per line.
+  highlights: text("highlights"),
+  closing: text("closing"),
+  signature: text("signature"),
+  featured: integer("featured", { mode: "boolean" }).notNull().default(false),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const articlesRelations = relations(articles, ({ one }) => ({
+  team: one(teams, { fields: [articles.teamId], references: [teams.id] }),
 }));

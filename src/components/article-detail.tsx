@@ -15,7 +15,7 @@ import {
 import { FacebookIcon } from "@/components/social-icons";
 import { MatchCard } from "@/components/matches-showcase";
 import type { UpcomingGame } from "@/lib/games";
-import type { Article } from "@/lib/jaunumi-articles";
+import type { Article } from "@/lib/jaunumi";
 
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -54,6 +54,7 @@ function CopyLinkButton() {
 }
 
 type RelatedItem = {
+  slug: string;
   title: string;
   date: string;
   image: string;
@@ -72,57 +73,59 @@ export function ArticleDetail({
     <>
       {/* Header band */}
       <section className="px-6 pt-4">
-        <div className="relative mx-auto h-[320px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[360px]">
-          <Image src={article.image} alt="" fill priority className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-background/10" />
+        <div className="relative mx-auto h-[260px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[300px]">
+          <Image
+            src={article.image}
+            alt=""
+            fill
+            priority
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/40 to-transparent" />
 
           <div className="relative z-10 flex h-full w-full flex-col justify-end px-6 pb-8 sm:px-10">
-            <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
-              <Link href="/" className="hover:text-club-red">
+            <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-white/70">
+              <Link href="/" className="hover:text-white">
                 Sākums
               </Link>
               <span>›</span>
-              <Link href="/jaunumi" className="hover:text-club-red">
+              <Link href="/jaunumi" className="hover:text-white">
                 Jaunumi
               </Link>
               <span>›</span>
-              <span className="max-w-[240px] truncate text-club-navy">
+              <span className="max-w-[240px] truncate text-white">
                 {article.title}
               </span>
             </nav>
 
-            <h1 className="max-w-3xl text-3xl font-extrabold text-club-navy sm:text-4xl">
-              {article.title}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm text-slate-500 sm:text-base">
-              {article.excerpt}
-            </p>
-
             <div className="mt-4 flex items-center gap-3">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                <Calendar className="h-3.5 w-3.5" />
-                {article.date}
+              <span className="rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
+                {article.category}
               </span>
               {article.team && (
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-club-navy">
                   {article.team}
                 </span>
               )}
+              <span className="flex items-center gap-1.5 text-xs font-medium text-white/80">
+                <Calendar className="h-3.5 w-3.5" />
+                {article.date}
+              </span>
             </div>
-          </div>
 
-          <div className="absolute top-6 right-6 z-10 hidden text-right text-xs leading-tight tracking-[0.2em] text-club-navy uppercase sm:block">
-            <p>Attīstība</p>
-            <p>Komanda</p>
-            <p>Raksturs</p>
-            <p>Izaugsme</p>
+            <h1 className="mt-3 max-w-3xl text-3xl text-white sm:text-4xl">
+              {article.title}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm text-white/80 sm:text-base">
+              {article.excerpt}
+            </p>
           </div>
         </div>
       </section>
 
       {/* Main content */}
       <section className="px-6 py-8">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr]">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[3fr_1fr]">
           <div className="min-w-0">
             <div className="relative h-[280px] overflow-hidden rounded-[2rem] sm:h-[420px]">
               <Image src={article.image} alt="" fill className="object-cover" />
@@ -151,7 +154,9 @@ export function ArticleDetail({
                     <p className="text-sm font-semibold text-club-navy">
                       {article.quote.author}
                     </p>
-                    <p className="text-xs text-slate-400">{article.quote.role}</p>
+                    <p className="text-xs text-slate-400">
+                      {article.quote.role}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -159,7 +164,7 @@ export function ArticleDetail({
 
             {article.highlights && article.highlights.length > 0 && (
               <div className="mt-8">
-                <h2 className="text-xl font-bold text-club-navy">
+                <h2 className="text-xl text-club-navy">
                   Spilgtākie momenti
                 </h2>
                 <div className="mt-4 grid grid-cols-3 gap-4">
@@ -181,13 +186,15 @@ export function ArticleDetail({
               </p>
             )}
             {article.signature && (
-              <p className="mt-4 font-bold text-club-navy">{article.signature}</p>
+              <p className="mt-4 font-bold text-club-navy">
+                {article.signature}
+              </p>
             )}
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
               <Link
                 href="/jaunumi"
-                className="flex items-center gap-2 text-sm font-semibold text-club-navy transition hover:text-club-red"
+                className="flex items-center gap-2 text-sm text-club-navy transition hover:text-club-red"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Atpakaļ uz jaunumiem
@@ -198,18 +205,17 @@ export function ArticleDetail({
                   <a
                     href="#"
                     aria-label="Dalīties X"
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-club-navy transition hover:bg-club-red hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-club-navy"
                   >
-                    <XIcon className="h-3.5 w-3.5" />
+                    <XIcon className="h-6 w-6" />
                   </a>
                   <a
                     href="#"
                     aria-label="Dalīties Facebook"
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-club-navy transition hover:bg-club-red hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-club-navy"
                   >
-                    <FacebookIcon className="h-3.5 w-3.5" />
+                    <FacebookIcon className="h-7 w-7" />
                   </a>
-                  <CopyLinkButton />
                 </div>
               </div>
             </div>
@@ -218,36 +224,43 @@ export function ArticleDetail({
           {/* Sidebar */}
           <div className="flex flex-col gap-6">
             {nextGame && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-sm font-bold text-club-navy">
-                  Nākamā spēle
-                </h3>
-                <div className="mt-3">
-                  <MatchCard game={nextGame} isActive />
+              <div>
+                <div className="mb-3 flex items-center justify-between gap-3 px-3">
+                  <h3 className="text-md text-club-navy">
+                    Nākamā spēle
+                  </h3>
+                  <Link
+                    href="/#kalendars"
+                    className="flex items-center gap-1 text-sm text-club-red transition hover:text-club-red-dark"
+                  >
+                    Skatīt kalendāru
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
-                <Link
-                  href="/#kalendars"
-                  className="mt-4 flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-club-navy transition hover:bg-slate-200"
-                >
-                  Skatīt kalendāru
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+                <div className="h-[300px]">
+                  <MatchCard
+                    game={nextGame}
+                    isActive
+                    elevated={false}
+                    className="rounded-2xl bg-white shadow-sm"
+                  />
+                </div>
               </div>
             )}
 
             {related.length > 0 && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <span className="text-xs font-bold tracking-[0.15em] text-club-red uppercase">
+              <div className="rounded-2xl bg-white p-5 shadow-sm">
+                <span className="text-sm text-club-red uppercase">
                   Saistītie raksti
                 </span>
                 <div className="mt-4 flex flex-col divide-y divide-slate-100">
                   {related.map((item) => (
                     <Link
-                      key={item.title}
+                      key={item.slug}
                       href="/jaunumi"
                       className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
                     >
-                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
                         <Image
                           src={item.image}
                           alt=""
@@ -267,31 +280,6 @@ export function ArticleDetail({
                 </div>
               </div>
             )}
-
-            <div className="relative overflow-hidden rounded-2xl bg-club-navy p-6">
-              <Image
-                src="/stadium-corner-flag.png"
-                alt=""
-                fill
-                className="object-cover opacity-30"
-              />
-              <div className="absolute inset-0 bg-club-navy/70" />
-              <div className="relative z-10">
-                <h3 className="text-lg font-bold text-white">
-                  Pievienojies FK Olaine
-                </h3>
-                <p className="mt-2 text-sm text-white/70">
-                  Vairāk nekā futbols. Tava izaugsme sākas šeit.
-                </p>
-                <Link
-                  href="/klubs"
-                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-club-navy transition hover:bg-slate-100"
-                >
-                  Uzzināt vairāk
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </section>

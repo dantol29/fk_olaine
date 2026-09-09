@@ -5,10 +5,18 @@ import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { ARTICLES, FEATURED_ARTICLES } from "@/lib/jaunumi-articles";
+import type { Article } from "@/lib/jaunumi";
 
-export function JaunumiDirectory() {
-  const [featured, ...rest] = ARTICLES;
+type FeaturedItem = { title: string; date: string; image: string };
+
+export function JaunumiDirectory({
+  articles,
+  featuredArticles,
+}: {
+  articles: Article[];
+  featuredArticles: FeaturedItem[];
+}) {
+  const [featured, ...rest] = articles;
 
   return (
     <>
@@ -111,10 +119,11 @@ export function JaunumiDirectory() {
           </div>
 
           {/* Sidebar */}
+          {featuredArticles.length > 0 && (
           <div className="h-fit rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-2xl text-club-navy sm:text-3xl">Izceltie raksti</h2>
             <div className="mt-4 flex flex-col divide-y divide-slate-100">
-              {FEATURED_ARTICLES.map((item) => (
+              {featuredArticles.map((item) => (
                 <Link
                   key={item.title}
                   href="/jaunumi"
@@ -139,6 +148,7 @@ export function JaunumiDirectory() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </section>
 
