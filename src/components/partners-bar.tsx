@@ -104,10 +104,14 @@ export function PartnersBar() {
           {/* Mobile: an edge-to-edge running line instead of a wrapped,
            *  padded grid — the negative margin cancels the bar's own
            *  px-6 so the track can bleed to the rounded card's edges. */}
-          <div className="-mx-6 w-full overflow-hidden sm:hidden">
-            <div className="partners-marquee-track flex w-max items-center gap-x-10">
-              {[...PARTNERS, ...PARTNERS].map((partner, index) => (
-                <PartnerLogo key={`${partner.alt}-${index}`} partner={partner} />
+          <div className="partners-marquee-mask -mx-6 w-full overflow-hidden sm:hidden">
+            <div className="partners-marquee-track flex w-max items-center">
+              {[0, 1].map((copy) => (
+                <div key={copy} className="flex items-center gap-x-10 pr-10">
+                  {PARTNERS.map((partner) => (
+                    <PartnerLogo key={`${partner.alt}-${copy}`} partner={partner} />
+                  ))}
+                </div>
               ))}
             </div>
           </div>

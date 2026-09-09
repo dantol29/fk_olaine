@@ -180,6 +180,13 @@
   animation: partners-marquee 18s linear infinite;
 }
 
+/** Fades logos out at the edges instead of hard-clipping them mid-logo
+ *  as they scroll in and out of view. */
+.partners-marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .partners-marquee-track {
     animation: none;
