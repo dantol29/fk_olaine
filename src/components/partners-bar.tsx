@@ -94,7 +94,7 @@ export function PartnersBar() {
         </div>
 
         <div className="relative z-10 flex w-full flex-col items-start gap-7 sm:flex-row sm:items-center sm:gap-8">
-          <div className="flex w-full shrink-0 items-center justify-center gap-5 sm:w-auto sm:justify-start">
+          <div className="hidden w-full shrink-0 items-center justify-center gap-5 sm:flex sm:w-auto sm:justify-start">
             <span className="text-2xl text-white uppercase sm:text-sm">
               Mūsu partneri
             </span>
