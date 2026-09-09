@@ -90,7 +90,8 @@ async function fetchLeagueStandings(): Promise<{ label: string; standings: Stand
     const sources = await db
       .select({ label: leagueSources.label, standingsUrl: leagueSources.standingsUrl })
       .from(leagueSources)
-      .where(isNotNull(leagueSources.standingsUrl));
+      .where(isNotNull(leagueSources.standingsUrl))
+      .orderBy(leagueSources.displayOrder, leagueSources.label);
 
     if (sources.length === 0) {
       return [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS }];

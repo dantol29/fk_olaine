@@ -10,6 +10,7 @@ type LeagueSource = {
   label: string;
   url: string;
   standingsUrl: string | null;
+  displayOrder: number;
 };
 type TeamOption = { id: number; name: string };
 
@@ -85,6 +86,20 @@ export function LeagueSourceForm(
       <p className="mt-1.5 text-xs text-slate-400">
         Tas pats sacensību lapā, bet uz &quot;Tabula&quot; cilnes. Ja aizpildīts, šī liga parādās
         mājaslapas galvenajā tabulā.
+      </p>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Secība mājaslapā
+        <input
+          type="number"
+          name="displayOrder"
+          step={1}
+          defaultValue={source?.displayOrder ?? 0}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+      </label>
+      <p className="mt-1.5 text-xs text-slate-400">
+        Mazāks skaitlis parādās pirmais mājaslapas līgu tabulā.
       </p>
 
       {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}

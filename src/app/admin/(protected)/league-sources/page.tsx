@@ -15,11 +15,12 @@ export default async function AdminLeagueSourcesPage() {
       label: leagueSources.label,
       url: leagueSources.url,
       standingsUrl: leagueSources.standingsUrl,
+      displayOrder: leagueSources.displayOrder,
       teamName: teams.name,
     })
     .from(leagueSources)
     .innerJoin(teams, eq(leagueSources.teamId, teams.id))
-    .orderBy(leagueSources.label);
+    .orderBy(leagueSources.displayOrder, leagueSources.label);
 
   return (
     <div>
@@ -36,6 +37,7 @@ export default async function AdminLeagueSourcesPage() {
       <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
         <thead>
           <tr className="border-b border-slate-200 text-slate-400">
+            <th className="p-4 font-semibold">Secība</th>
             <th className="p-4 font-semibold">Nosaukums</th>
             <th className="p-4 font-semibold">Komanda</th>
             <th className="p-4 font-semibold">URL</th>
@@ -45,6 +47,7 @@ export default async function AdminLeagueSourcesPage() {
         <tbody>
           {rows.map((source) => (
             <tr key={source.id} className="border-b border-slate-100 last:border-0">
+              <td className="p-4 text-slate-500">{source.displayOrder}</td>
               <td className="p-4 font-semibold text-club-navy">{source.label}</td>
               <td className="p-4 text-slate-500">{source.teamName}</td>
               <td className="max-w-xs truncate p-4 text-slate-500">{source.url}</td>
@@ -82,7 +85,7 @@ export default async function AdminLeagueSourcesPage() {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={4} className="p-4 text-center text-slate-400">
+              <td colSpan={5} className="p-4 text-center text-slate-400">
                 Vēl nav neviena līgas avota.
               </td>
             </tr>

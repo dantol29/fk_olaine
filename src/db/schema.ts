@@ -104,6 +104,8 @@ export const leagueSources = sqliteTable("league_sources", {
    *  same LFF competition). Optional — a source with none set never shows
    *  up in the homepage league table. */
   standingsUrl: text("standings_url"),
+  /** Lower shows first in the homepage league tabs. */
+  displayOrder: integer("display_order").notNull().default(0),
   createdAt: integer("created_at").notNull(),
 });
 
