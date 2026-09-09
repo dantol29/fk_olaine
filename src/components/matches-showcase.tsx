@@ -81,7 +81,7 @@ export function MatchCard({
           : undefined
       }
       className={cn(
-        "mx-auto flex h-full flex-col rounded-xl p-5 sm:p-6",
+        "mx-auto flex h-full flex-col rounded-xl p-5 pt-8 sm:p-6",
         onClick && "cursor-pointer",
         isActive
           ? cn(
@@ -191,7 +191,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
   }));
 
   return (
-    <div className="relative h-[640px] min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm">
+    <div className="relative h-[520px] min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm sm:h-[640px]">
       <Image
         src="/stadium-flag-dusk.jpg"
         alt="Olaines stadions"
@@ -227,8 +227,8 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
             ref={carouselRef}
             className="px-1 sm:px-2"
             slides={slides}
-            cardWidth="300px"
-            cardHeight="300px"
+            cardWidth="clamp(200px, 60vw, 300px)"
+            cardHeight="clamp(200px, 60vw, 300px)"
             rotate={-11}
             depth={0.32}
             perspective={3.2}
