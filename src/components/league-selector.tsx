@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Info, Trophy } from "lucide-react";
+import { ArrowRight, Trophy } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -10,21 +10,6 @@ import type { StandingRow } from "@/lib/standings";
 type LeagueSelectorProps = {
   leagues: { label: string; standings: StandingRow[]; url: string }[];
 };
-
-function formatUpdatedDate(): string {
-  const now = new Date();
-  const day = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", day: "numeric" }).format(
-    now,
-  );
-  const month = new Intl.DateTimeFormat("lv-LV", {
-    timeZone: "Europe/Riga",
-    month: "short",
-  }).format(now);
-  const year = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", year: "numeric" }).format(
-    now,
-  );
-  return `${day}. ${month} ${year}`;
-}
 
 export function LeagueSelector({ leagues }: LeagueSelectorProps) {
   const [activeLeague, setActiveLeague] = useState(0);
@@ -55,7 +40,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           </a>
         </div>
 
-        <div className="mb-4 flex flex-wrap gap-2 sm:mb-6">
+        <div className="mb-4 flex flex-wrap gap-2 sm:mb-2">
           {leagues.map((league, index) => (
             <button
               key={league.label}
@@ -168,11 +153,6 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               )}
             </tbody>
           </table>
-        </div>
-
-        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-400 sm:mt-6 sm:pt-5">
-          <Info className="h-4 w-4 shrink-0" />
-          Pēdējais atjauninājums: {formatUpdatedDate()}
         </div>
       </div>
     </div>
