@@ -28,7 +28,7 @@ export default function StadionsPage() {
         <section className="px-6 pt-4">
           <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[280px]">
             <Image
-              src="/stadium-sunset.png"
+              src="/stadions.jpg"
               alt="Olaines pilsētas stadions"
               fill
               priority
