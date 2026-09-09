@@ -2,6 +2,8 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home3/afaolain/repositories/fk_olaine_code/
-    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.env' --exclude='node_modules' --exclude='.next' ./ $DEPLOYPATH
+    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.env' --exclude='node_modules' --exclude='.next' --exclude='public/uploads' ./ $DEPLOYPATH
+    - mkdir -p /home3/afaolain/fk_olaine-data/uploads
+    - ln -sfn /home3/afaolain/fk_olaine-data/uploads $DEPLOYPATH/public/uploads
     - source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24.20.0/bin/activate && cd $DEPLOYPATH && npm install --omit=dev && npm run build
     - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt
