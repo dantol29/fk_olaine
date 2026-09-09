@@ -22,7 +22,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
       <div className="relative flex flex-1 flex-col overflow-hidden px-4 pt-6 pb-4 sm:rounded-[1.5rem] sm:bg-white sm:px-8 sm:pt-8 sm:pb-6">
         <div className="mb-4 flex items-start justify-between gap-3 sm:mb-6">
           <div className="min-w-0">
-            <h3 className="text-2xl uppercase text-club-navy sm:text-3xl">
+            <h3 className="text-3xl text-club-navy sm:text-4xl">
               {leagues[activeLeague]?.label ?? ""}
             </h3>
             <p className="mt-1 text-sm text-slate-400">Turnīra tabula {currentYear}</p>

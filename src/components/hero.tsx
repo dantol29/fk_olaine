@@ -136,7 +136,7 @@ export async function Hero() {
       <div className="relative mx-auto max-w-[1440px]">
         <WideScreenFillers />
 
-        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[1.2fr_1fr]">
           {/* Left column: full-height matches showcase */}
           <MatchesShowcase games={upcomingGames} />
 
