@@ -21,7 +21,9 @@ function PartnerLogo({ partner }: { partner: Partner }) {
       height={partner.height}
       className={cn(
         "w-auto object-contain",
-        partner.size === "lg" ? "h-14 sm:h-16" : "h-9 sm:h-10",
+        partner.size === "lg"
+          ? "h-14 sm:h-16 sm:max-[1342px]:h-11"
+          : "h-9 sm:h-10 sm:max-[1342px]:h-8",
         partner.needsWhite && "brightness-0 invert",
       )}
     />
@@ -99,13 +101,13 @@ export function PartnersBar() {
             <span className="hidden h-9 w-px shrink-0 bg-white/40 sm:block" />
           </div>
 
-          <div className="flex w-full min-w-0 flex-wrap items-center gap-x-8 gap-y-3 sm:w-auto sm:flex-1 sm:gap-x-12">
+          <div className="flex w-full min-w-0 flex-wrap items-center gap-x-8 gap-y-3 sm:w-auto sm:flex-1 sm:gap-x-12 sm:max-[1342px]:gap-x-5">
             {PARTNERS.slice(0, -2).map((partner) => (
               <PartnerLogo key={partner.alt} partner={partner} />
             ))}
             {/* Joma + Daily stay on the same row as each other, even when
              *  wrapping — never split across two lines. */}
-            <div className="flex shrink-0 items-center gap-x-8 sm:gap-x-12">
+            <div className="flex shrink-0 items-center gap-x-8 sm:gap-x-12 sm:max-[1342px]:gap-x-5">
               {PARTNERS.slice(-2).map((partner) => (
                 <PartnerLogo key={partner.alt} partner={partner} />
               ))}
