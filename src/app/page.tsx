@@ -33,7 +33,7 @@ export default function Home() {
               <HomeNewsCarousel />
             </div>
             <h2 className="order-2 text-3xl text-club-navy sm:text-4xl lg:hidden pt-4">
-              Ātrās saites
+              Informācija
             </h2>
             <div className="order-3 h-full lg:order-1">
               <QuickLinksSection />
