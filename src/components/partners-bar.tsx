@@ -54,7 +54,7 @@ export function PartnersBar() {
     <footer className="pt-3 pb-6">
         <div className="relative flex w-full items-center overflow-hidden rounded-[1.5rem] bg-club-navy px-6 py-4 sm:px-10 sm:py-5">
         <div
-          className="pointer-events-none absolute inset-y-0 right-0 w-[320px] sm:w-[420px]"
+          className="pointer-events-none absolute inset-y-0 right-0 w-[160px] sm:w-[420px]"
           style={{ clipPath: "polygon(26% 0, 100% 0, 100% 100%, 10% 100%)" }}
         >
           <Image
@@ -66,15 +66,15 @@ export function PartnersBar() {
           <div className="absolute inset-0 bg-club-navy/75" />
         </div>
 
-        <div className="relative z-10 flex w-full items-center gap-6 sm:gap-8">
+        <div className="relative z-10 flex w-full flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-8">
           <div className="flex shrink-0 items-center gap-5">
             <span className="text-xs text-white uppercase sm:text-sm">
               Mūsu partneri
             </span>
-            <span className=" h-9 w-px shrink-0 bg-white/40" />
+            <span className="hidden h-9 w-px shrink-0 bg-white/40 sm:block" />
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-8 gap-y-3 sm:gap-x-12">
+          <div className="flex w-full min-w-0 flex-wrap items-center gap-x-8 gap-y-3 sm:w-auto sm:flex-1 sm:gap-x-12">
             {PARTNERS.map((partner) => (
               <Image
                 key={partner.alt}
@@ -91,7 +91,7 @@ export function PartnersBar() {
             ))}
           </div>
 
-          <div className="flex shrink-0 items-center gap-4 pl-16 sm:pl-24">
+          <div className="flex shrink-0 items-center gap-4 sm:pl-24">
             <span className="hidden text-right text-xs leading-tight  text-white uppercase sm:block sm:text-sm">
               Kopā augam
               <br />
