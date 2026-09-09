@@ -31,6 +31,8 @@ function SocialLink({
   return (
     <a
       href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={label}
       className="flex items-center justify-center text-white/70 transition hover:text-white"
     >
@@ -94,11 +96,17 @@ export function SiteFooter() {
           </p>
 
           <div className="mt-5 flex items-center gap-4">
-            <SocialLink href="#" label="Instagram">
-              <InstagramIcon className="h-7 w-7" />
+            <SocialLink
+              href="https://www.instagram.com/fkolaine_sievietes/"
+              label="Instagram"
+            >
+              <InstagramIcon className="h-9 w-9" />
             </SocialLink>
-            <SocialLink href="#" label="Facebook">
-              <FacebookIcon className="h-6 w-6" />
+            <SocialLink
+              href="https://www.facebook.com/afaolaine.sievietes/"
+              label="Facebook"
+            >
+              <FacebookIcon className="h-8 w-8" />
             </SocialLink>
           </div>
         </div>

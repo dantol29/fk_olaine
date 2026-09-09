@@ -107,14 +107,18 @@ export function SiteHeader() {
 
           <div className="mt-4 flex items-center justify-end gap-2 pr-2 sm:gap-3 sm:pr-4 lg:mt-0">
             <a
-              href="#"
+              href="https://www.instagram.com/fkolaine_sievietes/"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Instagram"
               className="flex items-center justify-center text-club-navy transition-colors hover:text-club-red"
             >
               <InstagramIcon className="h-8 w-8" />
             </a>
             <a
-              href="#"
+              href="https://www.facebook.com/afaolaine.sievietes/"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Facebook"
               className="flex items-center justify-center text-club-navy transition-colors hover:text-club-red"
             >

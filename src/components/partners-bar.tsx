@@ -138,14 +138,18 @@ export function PartnersBar() {
             </span>
             <div className="flex items-center gap-2">
               <a
-                href="#"
+                href="https://www.instagram.com/fkolaine_sievietes/"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
                 className="flex items-center justify-center text-white/90 transition-colors hover:text-white"
               >
                 <InstagramIcon className="h-8 w-8" />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/afaolaine.sievietes/"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
                 className="flex items-center justify-center text-white/90 transition-colors hover:text-white"
               >
