@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home3/afaolain/repositories/fk_olaine_code/
+    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.env' --exclude='node_modules' --exclude='.next' ./ $DEPLOYPATH
+    - source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24.20.0/bin/activate && cd $DEPLOYPATH && npm install --omit=dev && npm run build
+    - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt
