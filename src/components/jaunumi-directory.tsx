@@ -142,7 +142,7 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-[2fr_1fr]">
                 <Link
                   href={`/jaunumi/${featured.slug}`}
-                  className="group relative flex h-[360px] flex-col justify-end overflow-hidden rounded-[2rem] p-6 sm:p-8"
+                  className="group relative flex h-[280px] flex-col justify-end overflow-hidden rounded-[2rem] p-6 sm:h-[360px] sm:p-8"
                 >
                   <Image
                     src={featured.image}
@@ -172,12 +172,12 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
                 </Link>
 
                 {sideArticles.length > 0 && (
-                  <div className="flex h-[360px] flex-col gap-5">
+                  <div className="flex flex-col gap-4 sm:h-[360px] sm:gap-5">
                     {sideArticles.map((article) => (
                       <Link
                         key={article.slug}
                         href={`/jaunumi/${article.slug}`}
-                        className="group relative flex flex-1 flex-col justify-end overflow-hidden rounded-2xl p-4"
+                        className="group relative flex h-36 flex-col justify-end overflow-hidden rounded-2xl p-4 sm:h-auto sm:flex-1"
                       >
                         <Image
                           src={article.image}
