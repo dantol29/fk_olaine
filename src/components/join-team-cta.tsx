@@ -5,7 +5,7 @@ import { JoinClubDrawer } from "@/components/join-club-drawer";
 
 export function JoinTeamCta() {
   return (
-    <section className="sm:px-6 sm:pb-8">
+    <section className="sm:px-6">
       <div className="mx-auto max-w-[1440px]">
         <JoinClubDrawer triggerClassName="group relative flex min-h-[130px] w-full items-center justify-between overflow-hidden rounded-t-[1.5rem] px-8 py-8 text-left sm:rounded-[1.5rem] sm:px-12">
           <Image
