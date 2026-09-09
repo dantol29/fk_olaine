@@ -19,7 +19,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="league-card relative flex-1 overflow-hidden rounded-[1.5rem] bg-white px-6 pt-8 pb-4 sm:px-8 sm:pt-10 sm:pb-5">
-        <div className="mb-5 flex items-center justify-between gap-2">
+        <div className="mb-5 flex items-center gap-3">
           <h3 className="text-2xl uppercase text-club-navy sm:text-3xl">
             {leagues[activeLeague]?.label ?? ""}
           </h3>
@@ -27,12 +27,10 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
             href={leagues[activeLeague]?.url ?? "https://lff.lv/"}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex shrink-0 items-center gap-3 rounded-full border border-slate-200 py-1.5 pr-1.5 pl-5 text-sm text-club-navy transition hover:border-slate-300"
+            aria-label="Skatīt visas"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-club-navy transition hover:bg-slate-200"
           >
-            Skatīt visas
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
-              <ArrowRight className="h-4 w-4" />
-            </span>
+            <ArrowRight className="h-4 w-4" />
           </a>
         </div>
 
