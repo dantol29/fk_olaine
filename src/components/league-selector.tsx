@@ -45,7 +45,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               onClick={() => setActiveLeague(index)}
               aria-pressed={index === activeLeague}
               className={cn(
-                "truncate rounded-xl px-2 py-2 text-[10px] uppercase transition sm:px-4 sm:py-3 sm:text-sm",
+                "truncate rounded-xl px-3 py-2.5 text-xs uppercase transition sm:px-4 sm:py-3 sm:text-sm",
                 index === activeLeague
                   ? "bg-club-red text-white"
                   : "bg-slate-100 text-club-navy hover:bg-slate-200",
