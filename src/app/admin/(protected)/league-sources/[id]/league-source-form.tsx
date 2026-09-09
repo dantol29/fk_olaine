@@ -4,7 +4,13 @@ import { useActionState } from "react";
 
 import { createLeagueSource, updateLeagueSource } from "../actions";
 
-type LeagueSource = { id: number; teamId: number; label: string; url: string };
+type LeagueSource = {
+  id: number;
+  teamId: number;
+  label: string;
+  url: string;
+  standingsUrl: string | null;
+};
 type TeamOption = { id: number; name: string };
 
 export function LeagueSourceForm(
@@ -65,6 +71,21 @@ export function LeagueSourceForm(
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        LFF tabulas URL (nav obligāts)
+        <input
+          type="url"
+          name="standingsUrl"
+          placeholder="https://lff.lv/sacensibas/sievietes/sieviesu-futbola-liga/?tab=content_1_4"
+          defaultValue={source?.standingsUrl ?? ""}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+      </label>
+      <p className="mt-1.5 text-xs text-slate-400">
+        Tas pats sacensību lapā, bet uz &quot;Tabula&quot; cilnes. Ja aizpildīts, šī liga parādās
+        mājaslapas galvenajā tabulā.
+      </p>
 
       {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}
 

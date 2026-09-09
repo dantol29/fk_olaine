@@ -8,23 +8,21 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { StandingRow } from "@/lib/standings";
 
-const LEAGUES = ["Sieviešu līga", "1. līga", "U16"] as const;
-
 type LeagueSelectorProps = {
-  leagues: StandingRow[][];
+  leagues: { label: string; standings: StandingRow[] }[];
 };
 
 export function LeagueSelector({ leagues }: LeagueSelectorProps) {
   const [activeLeague, setActiveLeague] = useState(0);
 
-  const standings = leagues[activeLeague] ?? [];
+  const standings = leagues[activeLeague]?.standings ?? [];
 
   return (
     <div className="flex h-full flex-col">
       <div className="league-card relative flex-1 overflow-hidden rounded-[1.5rem] bg-white px-6 pt-8 pb-4 sm:px-8 sm:pt-10 sm:pb-5">
         <div className="mb-5 flex items-center justify-between gap-2">
           <h3 className="text-2xl uppercase text-club-navy sm:text-3xl">
-            {LEAGUES[activeLeague]}
+            {leagues[activeLeague]?.label ?? ""}
           </h3>
           <Link
             href="/speles"
@@ -37,10 +35,13 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           </Link>
         </div>
 
-        <div className="mb-5 grid grid-cols-3 gap-2">
-          {LEAGUES.map((league, index) => (
+        <div
+          className="mb-5 grid gap-2"
+          style={{ gridTemplateColumns: `repeat(${leagues.length}, minmax(0, 1fr))` }}
+        >
+          {leagues.map((league, index) => (
             <button
-              key={league}
+              key={league.label}
               type="button"
               onClick={() => setActiveLeague(index)}
               aria-pressed={index === activeLeague}
@@ -51,7 +52,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                   : "bg-slate-100 text-club-navy hover:bg-slate-200",
               )}
             >
-              {league}
+              {league.label}
             </button>
           ))}
         </div>

@@ -100,6 +100,10 @@ export const leagueSources = sqliteTable("league_sources", {
     .references(() => teams.id, { onDelete: "cascade" }),
   label: text("label").notNull(),
   url: text("url").notNull(),
+  /** The same competition's standings-table page (a different tab of the
+   *  same LFF competition). Optional — a source with none set never shows
+   *  up in the homepage league table. */
+  standingsUrl: text("standings_url"),
   createdAt: integer("created_at").notNull(),
 });
 

@@ -11,6 +11,7 @@ function parseLeagueSourceInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
   const label = String(formData.get("label") ?? "").trim();
   const url = String(formData.get("url") ?? "").trim();
+  const standingsUrl = String(formData.get("standingsUrl") ?? "").trim();
 
   if (!teamId) return { error: "Jāizvēlas komanda." } as const;
   if (!label) return { error: "Nosaukums ir obligāts." } as const;
@@ -19,10 +20,18 @@ function parseLeagueSourceInput(formData: FormData) {
   try {
     new URL(url);
   } catch {
-    return { error: "Nederīgs URL." } as const;
+    return { error: "Nederīgs spēļu saraksta URL." } as const;
   }
 
-  return { teamId, label, url } as const;
+  if (standingsUrl) {
+    try {
+      new URL(standingsUrl);
+    } catch {
+      return { error: "Nederīgs tabulas URL." } as const;
+    }
+  }
+
+  return { teamId, label, url, standingsUrl: standingsUrl || null } as const;
 }
 
 export async function createLeagueSource(

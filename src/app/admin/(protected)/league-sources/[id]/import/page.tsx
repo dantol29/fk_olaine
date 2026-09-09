@@ -1,9 +1,10 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
-import { clubLogoNames, clubLogos, games, leagueSources } from "@/db/schema";
+import { games, leagueSources } from "@/db/schema";
+import { backfillClubLogos } from "@/lib/club-logos";
 import { scrapeFixtures } from "@/lib/fixtures";
 import { isOlaine } from "@/lib/games";
 
@@ -66,22 +67,7 @@ export default async function AdminLeagueSourceImportPage({
     if (fixture.homeLogo) scrapedLogos.set(fixture.home, fixture.homeLogo);
     if (fixture.awayLogo) scrapedLogos.set(fixture.away, fixture.awayLogo);
   }
-  if (scrapedLogos.size > 0) {
-    const existingNames = await db
-      .select({ name: clubLogoNames.name })
-      .from(clubLogoNames)
-      .where(inArray(clubLogoNames.name, Array.from(scrapedLogos.keys())));
-    const existingNameSet = new Set(existingNames.map((row) => row.name));
-
-    for (const [name, logoUrl] of scrapedLogos) {
-      if (existingNameSet.has(name)) continue;
-      const [inserted] = await db
-        .insert(clubLogos)
-        .values({ logoUrl, createdAt: Date.now() })
-        .returning({ id: clubLogos.id });
-      await db.insert(clubLogoNames).values({ clubLogoId: inserted.id, name });
-    }
-  }
+  await backfillClubLogos(scrapedLogos);
 
   const existingGames = await db
     .select({ date: games.date, homeTeam: games.homeTeam, awayTeam: games.awayTeam })

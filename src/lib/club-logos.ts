@@ -24,3 +24,27 @@ export async function resolveClubLogos(names: string[]): Promise<Map<string, str
 
   return new Map(uniqueNames.map((name) => [name, logoByName.get(name) ?? null]));
 }
+
+/** Backfills a club_logos entry for any (name -> logoUrl) pair seen here
+ *  that doesn't already have one under any of its logo's names — never
+ *  overwrites a manually-uploaded logo or creates a duplicate for a name
+ *  the admin already merged into an existing entry. Safe to call
+ *  repeatedly (idempotent): already-known names are always skipped. */
+export async function backfillClubLogos(scrapedLogos: Map<string, string>): Promise<void> {
+  if (scrapedLogos.size === 0) return;
+
+  const existingNames = await db
+    .select({ name: clubLogoNames.name })
+    .from(clubLogoNames)
+    .where(inArray(clubLogoNames.name, Array.from(scrapedLogos.keys())));
+  const existingNameSet = new Set(existingNames.map((row) => row.name));
+
+  for (const [name, logoUrl] of scrapedLogos) {
+    if (existingNameSet.has(name)) continue;
+    const [inserted] = await db
+      .insert(clubLogos)
+      .values({ logoUrl, createdAt: Date.now() })
+      .returning({ id: clubLogos.id });
+    await db.insert(clubLogoNames).values({ clubLogoId: inserted.id, name });
+  }
+}

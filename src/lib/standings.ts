@@ -15,31 +15,24 @@ export type StandingRow = {
   isOlaine: boolean;
 };
 
-export type Competition = "sieviesu-liga" | "1-liga" | "u16";
-
-const COMPETITIONS: Record<Competition, { url: string; tabId: string }> = {
-  "sieviesu-liga": {
-    url: "https://lff.lv/sacensibas/sievietes/sieviesu-futbola-liga/?tab=content_1_4",
-    tabId: "tabContent_1_4",
-  },
-  "1-liga": {
-    url: "https://lff.lv/sacensibas/sievietes/sieviesu-futbola-1-liga/?tab=content_1_6",
-    tabId: "tabContent_1_6",
-  },
-  u16: {
-    url: "https://lff.lv/sacensibas/sievietes/meitenu-cempionats/?tab=content_1_4",
-    tabId: "tabContent_1_4",
-  },
-};
-
 function toInt(value: string) {
   return parseInt(value.replace("+", "").trim(), 10);
 }
 
-export async function getStandings(
-  competition: Competition = "sieviesu-liga"
-): Promise<StandingRow[]> {
-  const { url, tabId } = COMPETITIONS[competition];
+/** LFF pages carry the "which tab is this" info directly in their own URL
+ *  (`?tab=content_1_4`) — the tab element's id is "tab" plus that value
+ *  with its first letter capitalized (`tabContent_1_4`), so there's
+ *  nothing extra for an admin to configure. */
+function tabIdFromUrl(url: string): string {
+  const tab = new URL(url).searchParams.get("tab");
+  if (!tab) {
+    throw new Error(`LFF standings URL is missing a "tab" query parameter: ${url}`);
+  }
+  return `tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}`;
+}
+
+export async function getStandings(url: string): Promise<StandingRow[]> {
+  const tabId = tabIdFromUrl(url);
 
   const res = await fetch(url, {
     next: { revalidate: 3600 },
@@ -49,7 +42,7 @@ export async function getStandings(
   });
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch LFF standings (${competition}): ${res.status}`);
+    throw new Error(`Failed to fetch LFF standings: ${res.status}`);
   }
 
   const $ = cheerio.load(await res.text());

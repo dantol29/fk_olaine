@@ -1,3 +1,7 @@
+import { isNotNull } from "drizzle-orm";
+
+import { db } from "@/db/client";
+import { leagueSources } from "@/db/schema";
 import { getStandings, type StandingRow } from "@/lib/standings";
 import { getUpcomingGamesFromDb } from "@/lib/games-server";
 import type { UpcomingGame } from "@/lib/games";
@@ -76,14 +80,34 @@ const FALLBACK_UPCOMING_GAMES: UpcomingGame[] = [
   },
 ];
 
-async function fetchStandings(
-  competition: Parameters<typeof getStandings>[0],
-  fallback: StandingRow[] = [],
-): Promise<StandingRow[]> {
+/** Every league source the admin has given a standings URL, live-fetched.
+ *  Falls back to a single placeholder league only when none are configured
+ *  yet — a per-source fetch failure just shows that one league empty
+ *  (LeagueSelector already renders "Tabula pašlaik nav pieejama." for an
+ *  empty list), not the whole homepage falling back. */
+async function fetchLeagueStandings(): Promise<{ label: string; standings: StandingRow[] }[]> {
   try {
-    return await getStandings(competition);
+    const sources = await db
+      .select({ label: leagueSources.label, standingsUrl: leagueSources.standingsUrl })
+      .from(leagueSources)
+      .where(isNotNull(leagueSources.standingsUrl));
+
+    if (sources.length === 0) {
+      return [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS }];
+    }
+
+    return await Promise.all(
+      sources.map(async (source) => {
+        try {
+          const standings = await getStandings(source.standingsUrl as string);
+          return { label: source.label, standings };
+        } catch {
+          return { label: source.label, standings: [] };
+        }
+      }),
+    );
   } catch {
-    return fallback;
+    return [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS }];
   }
 }
 
@@ -93,10 +117,8 @@ async function fetchUpcomingGames(): Promise<UpcomingGame[]> {
 }
 
 export async function Hero() {
-  const [sieviesuLiga, liga1, u16, upcomingGames] = await Promise.all([
-    fetchStandings("sieviesu-liga", FALLBACK_STANDINGS),
-    fetchStandings("1-liga"),
-    fetchStandings("u16"),
+  const [leagues, upcomingGames] = await Promise.all([
+    fetchLeagueStandings(),
     fetchUpcomingGames(),
   ]);
 
@@ -111,7 +133,7 @@ export async function Hero() {
 
           {/* League table card */}
           <div className="relative flex h-[640px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-background shadow-sm">
-            <LeagueSelector leagues={[sieviesuLiga, liga1, u16]} />
+            <LeagueSelector leagues={leagues} />
           </div>
         </div>
       </div>
