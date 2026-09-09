@@ -141,7 +141,7 @@ export async function Hero() {
           <MatchesShowcase games={upcomingGames} />
 
           {/* League table card */}
-          <div className="relative flex h-[640px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-background shadow-sm">
+          <div className="relative flex h-[760px] flex-col overflow-hidden sm:h-[640px] sm:rounded-[2rem] sm:border sm:border-slate-200 sm:bg-background sm:shadow-sm">
             <LeagueSelector leagues={leagues} />
           </div>
         </div>

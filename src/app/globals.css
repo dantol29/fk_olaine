@@ -142,10 +142,6 @@
   }
 }
 
-.league-card {
-  background: var(--card);
-}
-
 @keyframes league-row-enter {
   from {
     opacity: 0;
