@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, MoveRight, X } from "lucide-react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { JoinClubDrawer } from "@/components/join-club-drawer";
@@ -22,7 +21,6 @@ import { FacebookIcon, InstagramIcon } from "@/components/social-icons";
 type NavItem = {
   title: string;
   href?: string;
-  description?: string;
   items?: { title: string; href: string }[];
 };
 
@@ -30,27 +28,14 @@ const NAV_ITEMS: NavItem[] = [
   { title: "Sākums", href: "/" },
   {
     title: "Klubs",
-    description:
-      "FK Olaine kopš 2008. gada — vēsture, stadions un cilvēki aiz komandas.",
     items: [
-      { title: "Par mums", href: "/klubs" },
-      { title: "Vēsture", href: "/klubs/vesture" },
+      { title: "Komandas", href: "/komandas" },
+      { title: "Treneri", href: "/treneri" },
       { title: "Stadions", href: "/klubs/stadions" },
-      { title: "Kontakti", href: "#footer" },
     ],
   },
-  {
-    title: "Komandas",
-    description:
-      "No akadēmijas līdz pirmajai komandai — visas FK Olaine komandas.",
-    items: [
-      { title: "Sieviešu komanda", href: "/komandas/sievietes" },
-      { title: "Vīriešu komanda", href: "/komandas/viriesi" },
-      { title: "U16 akadēmija", href: "/komandas/u16" },
-      { title: "Veterāni", href: "/komandas/veterani" },
-    ],
-  },
-  { title: "Spēles", href: "/speles" },
+  { title: "Treniņi", href: "/?type=training#kalendars" },
+  { title: "Spēles", href: "/?type=game#kalendars" },
   { title: "Jaunumi", href: "/jaunumi" },
   { title: "Kontakti", href: "#footer" },
 ];
@@ -80,36 +65,18 @@ export function SiteHeader() {
                   <NavigationMenuTrigger className="text-base font-semibold text-black hover:text-club-red data-popup-open:text-club-red">
                     {item.title}
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="w-[420px] p-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col justify-between">
-                        <div>
-                          <p className="font-bold text-club-navy">
-                            {item.title}
-                          </p>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {item.description}
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          className="mt-6 self-start bg-club-red text-white hover:bg-club-red-dark"
+                  <NavigationMenuContent className="w-56 p-2">
+                    <div className="flex flex-col text-sm">
+                      {item.items.map((sub) => (
+                        <NavigationMenuLink
+                          key={sub.title}
+                          href={sub.href}
+                          className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted"
                         >
-                          Sazināties
-                        </Button>
-                      </div>
-                      <div className="flex flex-col justify-end text-sm">
-                        {item.items.map((sub) => (
-                          <NavigationMenuLink
-                            key={sub.title}
-                            href={sub.href}
-                            className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted"
-                          >
-                            <span>{sub.title}</span>
-                            <MoveRight className="h-4 w-4 text-muted-foreground" />
-                          </NavigationMenuLink>
-                        ))}
-                      </div>
+                          <span>{sub.title}</span>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                        </NavigationMenuLink>
+                      ))}
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -179,7 +146,7 @@ export function SiteHeader() {
                   className="flex items-center justify-between text-black"
                 >
                   <span className="text-sm font-semibold">{item.title}</span>
-                  <MoveRight className="h-4 w-4 text-muted-foreground" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
               ) : (
                 <p className="text-sm font-semibold text-black">{item.title}</p>
@@ -193,7 +160,7 @@ export function SiteHeader() {
                       className="flex items-center justify-between py-1 text-sm text-muted-foreground"
                     >
                       <span>{sub.title}</span>
-                      <MoveRight className="h-3.5 w-3.5" />
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   ))}
                 </div>
