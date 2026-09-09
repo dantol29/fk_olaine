@@ -17,6 +17,13 @@ import { OPEN_CALENDAR_EVENT_NAME } from "@/lib/calendar-bridge";
 import { cn } from "@/lib/utils";
 import type { CalendarEvent } from "@/lib/calendar";
 import { colorFor, initialsFor } from "@/lib/games";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type EventType = CalendarEvent["eventType"];
 
@@ -515,19 +522,19 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   // event-type chips at sm and up — so it's built once and dropped into
   // whichever wrapper is visible at the current breakpoint.
   const teamFilterSelect = teamOptions.length > 0 && (
-    <select
-      value={activeTeam}
-      onChange={(event) => setActiveTeam(event.target.value)}
-      aria-label="Filtrēt pēc komandas"
-      className="rounded-full border border-transparent bg-slate-100 px-4 py-2 text-sm font-semibold text-club-navy transition hover:bg-slate-200 focus:outline-none"
-    >
-      <option value="all">Visas komandas</option>
-      {teamOptions.map((team) => (
-        <option key={team} value={team}>
-          {team}
-        </option>
-      ))}
-    </select>
+    <Select<string> value={activeTeam} onValueChange={(value) => setActiveTeam(value ?? "all")}>
+      <SelectTrigger aria-label="Filtrēt pēc komandas">
+        <SelectValue>{(value: string) => (value === "all" ? "Visas komandas" : value)}</SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">Visas komandas</SelectItem>
+        {teamOptions.map((team) => (
+          <SelectItem key={team} value={team}>
+            {team}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 
   const navigateDays = (direction: "prev" | "next") => {

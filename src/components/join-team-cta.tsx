@@ -5,9 +5,9 @@ import { JoinClubDrawer } from "@/components/join-club-drawer";
 
 export function JoinTeamCta() {
   return (
-    <section className="px-6 pb-8">
+    <section className="pb-8 sm:px-6">
       <div className="mx-auto max-w-[1440px]">
-        <JoinClubDrawer triggerClassName="group relative flex min-h-[130px] w-full items-center justify-between overflow-hidden rounded-[1.5rem] px-8 py-8 text-left sm:px-12">
+        <JoinClubDrawer triggerClassName="group relative flex min-h-[130px] w-full items-center justify-between overflow-hidden rounded-none px-8 py-8 text-left sm:rounded-[1.5rem] sm:px-12">
           <Image
             src="/player-shooting.png"
             alt=""
@@ -17,9 +17,6 @@ export function JoinTeamCta() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/10" />
 
           <div className="relative z-10">
-            <span className="text-xs tracking-[0.2em] text-white/70 uppercase">
-              Attīstība sākas šeit
-            </span>
             <div className="mt-2 flex items-center gap-4">
               <h2 className="text-2xl text-white sm:text-3xl">
                 Pievienojies mūsu komandai
