@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Lightbulb, MapPin, ParkingSquare, Shirt, Sprout, Users } from "lucide-react";
+import { LandPlot, Lightbulb, MapPin, ParkingSquare, Shirt, Users } from "lucide-react";
 
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
@@ -12,7 +12,7 @@ function mapsUrl(query: string) {
 }
 
 const FACTS = [
-  { icon: Sprout, label: "Segums", value: "Dabiskā zāle" },
+  { icon: LandPlot, label: "Segums", value: "Mākslīgais zālājs" },
   { icon: Lightbulb, label: "Apgaismojums", value: "Ir, iespējamas vakara spēles" },
   { icon: Shirt, label: "Ģērbtuves", value: "Spēlētājiem un tiesnešiem" },
   { icon: Users, label: "Skatītāju vietas", value: "Sēdvietas un stāvvietas gar malu" },
