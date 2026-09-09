@@ -18,9 +18,9 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="league-card relative flex-1 overflow-hidden rounded-[1.5rem] bg-white px-6 pt-8 pb-4 sm:px-8 sm:pt-10 sm:pb-5">
-        <div className="mb-5 flex items-center gap-3">
-          <h3 className="text-2xl uppercase text-club-navy sm:text-3xl">
+      <div className="league-card relative flex flex-1 flex-col overflow-hidden rounded-[1.5rem] bg-white px-4 pt-6 pb-3 sm:px-8 sm:pt-10 sm:pb-5">
+        <div className="mb-3 flex w-full items-center justify-center gap-3 sm:mb-5 sm:w-auto sm:justify-start">
+          <h3 className="text-xl uppercase text-club-navy sm:text-3xl">
             {leagues[activeLeague]?.label ?? ""}
           </h3>
           <a
@@ -35,7 +35,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
         </div>
 
         <div
-          className="mb-5 grid gap-2"
+          className="mb-3 grid gap-1.5 sm:mb-5 sm:gap-2"
           style={{ gridTemplateColumns: `repeat(${leagues.length}, minmax(0, 1fr))` }}
         >
           {leagues.map((league, index) => (
@@ -45,7 +45,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               onClick={() => setActiveLeague(index)}
               aria-pressed={index === activeLeague}
               className={cn(
-                "rounded-xl px-4 py-3 text-xs uppercase transition sm:text-sm",
+                "truncate rounded-xl px-2 py-2 text-[10px] uppercase transition sm:px-4 sm:py-3 sm:text-sm",
                 index === activeLeague
                   ? "bg-club-red text-white"
                   : "bg-slate-100 text-club-navy hover:bg-slate-200",
@@ -56,87 +56,98 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           ))}
         </div>
 
-        <table
-          key={`table-${activeLeague}`}
-          className="w-full border-collapse text-sm"
-        >
-          <thead>
-            <tr className="text-left text-xs text-slate-400">
-              <th className="w-10 pr-3 pb-2">#</th>
-              <th className="pb-2">Komanda</th>
-              <th className="pb-2 text-center">Spēles</th>
-              <th className="pb-2 text-center">Vārti</th>
-              <th className="pb-2 pr-1 text-center">Punkti</th>
-            </tr>
-          </thead>
-          <tbody>
-            {standings.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="py-6 text-center text-sm text-slate-400"
-                >
-                  Tabula pašlaik nav pieejama.
-                </td>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <table
+            key={`table-${activeLeague}`}
+            className="w-full border-collapse text-sm"
+          >
+            <thead>
+              <tr className="text-left text-xs text-slate-400">
+                <th className="w-10 pr-3 pb-2">#</th>
+                <th className="pb-2">Komanda</th>
+                <th className="pb-2 text-center">
+                  <span className="sm:hidden">S</span>
+                  <span className="hidden sm:inline">Spēles</span>
+                </th>
+                <th className="pb-2 text-center">
+                  <span className="sm:hidden">+/-</span>
+                  <span className="hidden sm:inline">Vārti</span>
+                </th>
+                <th className="pb-2 pr-1 text-center">
+                  <span className="sm:hidden">P</span>
+                  <span className="hidden sm:inline">Punkti</span>
+                </th>
               </tr>
-            ) : (
-              standings.map((row, index) => {
-                const enterDelay = index * 40;
-                return (
-                  <tr
-                    key={row.pos}
-                    className="league-row-enter border-t border-slate-100"
-                    style={{ animationDelay: `${enterDelay}ms` }}
+            </thead>
+            <tbody>
+              {standings.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="py-6 text-center text-sm text-slate-400"
                   >
-                    <td className="py-2.5 pr-3">
-                      <span
+                    Tabula pašlaik nav pieejama.
+                  </td>
+                </tr>
+              ) : (
+                standings.map((row, index) => {
+                  const enterDelay = index * 40;
+                  return (
+                    <tr
+                      key={row.pos}
+                      className="league-row-enter border-t border-slate-100"
+                      style={{ animationDelay: `${enterDelay}ms` }}
+                    >
+                      <td className="py-2.5 pr-3">
+                        <span
+                          className={cn(
+                            "flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 font-mono text-xs tabular-nums",
+                            row.isOlaine ? "text-club-red" : "text-slate-600",
+                          )}
+                        >
+                          {row.pos}
+                        </span>
+                      </td>
+                      <td
                         className={cn(
-                          "flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 font-mono text-xs tabular-nums",
-                          row.isOlaine ? "text-club-red" : "text-slate-600",
+                          "py-2.5 pr-2",
+                          row.isOlaine ? "text-club-red font-semibold" : "text-club-navy",
                         )}
                       >
-                        {row.pos}
-                      </span>
-                    </td>
-                    <td
-                      className={cn(
-                        "py-2.5 pr-2 ",
-                        row.isOlaine ? "text-club-red font-semibold" : "text-club-navy",
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        {row.logo && (
-                          <Image
-                            src={row.logo}
-                            alt=""
-                            width={38}
-                            height={38}
-                            className="h-9.5 w-9.5 shrink-0 rounded-full bg-white object-contain ring-1 ring-black/5"
-                          />
+                        <div className="flex items-center gap-3">
+                          {row.logo && (
+                            <Image
+                              src={row.logo}
+                              alt=""
+                              width={38}
+                              height={38}
+                              className="h-9.5 w-9.5 shrink-0 rounded-full bg-white object-contain ring-1 ring-black/5"
+                            />
+                          )}
+                          <span className="truncate">{row.team}</span>
+                        </div>
+                      </td>
+                      <td className="py-2.5 text-center font-mono text-sm tabular-nums text-slate-600">
+                        {row.played}
+                      </td>
+                      <td className="py-2.5 text-center font-mono text-sm tabular-nums text-slate-600">
+                        {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
+                      </td>
+                      <td
+                        className={cn(
+                          "py-2.5 pr-1 text-center font-mono text-sm font-bold tabular-nums",
+                          row.isOlaine ? "text-club-red" : "text-club-navy",
                         )}
-                        <span className="truncate">{row.team}</span>
-                      </div>
-                    </td>
-                    <td className="py-2.5 text-center font-mono text-sm tabular-nums text-slate-600">
-                      {row.played}
-                    </td>
-                    <td className="py-2.5 text-center font-mono text-sm tabular-nums text-slate-600">
-                      {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
-                    </td>
-                    <td
-                      className={cn(
-                        "py-2.5 pr-1 text-center font-mono text-sm font-bold tabular-nums",
-                        row.isOlaine ? "text-club-red" : "text-club-navy",
-                      )}
-                    >
-                      {row.points}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                      >
+                        {row.points}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
