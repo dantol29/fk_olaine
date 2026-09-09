@@ -159,10 +159,10 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
                   <span className="relative z-10 text-xs font-medium text-white/70">
                     {featured.date}
                   </span>
-                  <h2 className="relative z-10 mt-3 max-w-2xl text-2xl text-white sm:text-3xl">
+                  <h2 className="relative z-10 mt-3 max-w-2xl pr-14 text-2xl text-white sm:text-3xl lg:pr-0">
                     {featured.title}
                   </h2>
-                  <p className="relative z-10 mt-2 max-w-xl text-sm text-white/70">
+                  <p className="relative z-10 mt-2 max-w-xl pr-14 text-sm text-white/70 lg:pr-0">
                     {featured.excerpt}
                   </p>
 
