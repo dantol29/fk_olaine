@@ -29,8 +29,11 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploying on cPanel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This app is deployed via cPanel's "Setup Node.js App" (Phusion Passenger), running `next start` as a persistent process — not a static export or serverless functions. Two things need somewhere to live outside the deployed app folder so a redeploy never wipes them:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Database** (`TURSO_DATABASE_URL`) — a local SQLite file works fine (no Turso account needed) since the process is long-running. Point it at an absolute path in a sibling folder, e.g. `file:/home/youruser/fk_olaine-data/app.db`; the parent directory is created automatically on startup if missing. Leave `TURSO_AUTH_TOKEN` empty. Back the file up yourself (e.g. a cPanel cron job copying it out on a schedule) — a local file has no built-in replication. See `.env.example` for the full comment.
+- **Uploaded photos** (`UPLOADS_DIR`) — same idea: an absolute path outside the app folder, ideally inside `public_html/` so Apache/LiteSpeed can serve the files directly. See `.env.example`.
+
+Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`) in the Node.js App's environment variable UI, then run `npm run db:push` once against production to create the schema.
