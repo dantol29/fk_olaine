@@ -3,6 +3,31 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { FacebookIcon, InstagramIcon } from "@/components/social-icons";
 
+type Partner = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  size: string;
+  needsWhite?: boolean;
+};
+
+function PartnerLogo({ partner }: { partner: Partner }) {
+  return (
+    <Image
+      src={partner.src}
+      alt={partner.alt}
+      width={partner.width}
+      height={partner.height}
+      className={cn(
+        "w-auto object-contain",
+        partner.size === "lg" ? "h-14 sm:h-16" : "h-9 sm:h-10",
+        partner.needsWhite && "brightness-0 invert",
+      )}
+    />
+  );
+}
+
 export const PARTNERS = [
   {
     src: "/partners/lff.png",
@@ -75,20 +100,16 @@ export function PartnersBar() {
           </div>
 
           <div className="flex w-full min-w-0 flex-wrap items-center gap-x-8 gap-y-3 sm:w-auto sm:flex-1 sm:gap-x-12">
-            {PARTNERS.map((partner) => (
-              <Image
-                key={partner.alt}
-                src={partner.src}
-                alt={partner.alt}
-                width={partner.width}
-                height={partner.height}
-                className={cn(
-                  "w-auto object-contain",
-                  partner.size === "lg" ? "h-14 sm:h-16" : "h-9 sm:h-10",
-                  partner.needsWhite && "brightness-0 invert",
-                )}
-              />
+            {PARTNERS.slice(0, -2).map((partner) => (
+              <PartnerLogo key={partner.alt} partner={partner} />
             ))}
+            {/* Joma + Daily stay on the same row as each other, even when
+             *  wrapping — never split across two lines. */}
+            <div className="flex shrink-0 items-center gap-x-8 sm:gap-x-12">
+              {PARTNERS.slice(-2).map((partner) => (
+                <PartnerLogo key={partner.alt} partner={partner} />
+              ))}
+            </div>
           </div>
 
           <div className="flex shrink-0 items-center gap-4 sm:pl-24">
