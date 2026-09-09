@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Info, Trophy } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -11,33 +11,51 @@ type LeagueSelectorProps = {
   leagues: { label: string; standings: StandingRow[]; url: string }[];
 };
 
+function formatUpdatedDate(): string {
+  const now = new Date();
+  const day = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", day: "numeric" }).format(
+    now,
+  );
+  const month = new Intl.DateTimeFormat("lv-LV", {
+    timeZone: "Europe/Riga",
+    month: "short",
+  }).format(now);
+  const year = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", year: "numeric" }).format(
+    now,
+  );
+  return `${day}. ${month} ${year}`;
+}
+
 export function LeagueSelector({ leagues }: LeagueSelectorProps) {
   const [activeLeague, setActiveLeague] = useState(0);
 
   const standings = leagues[activeLeague]?.standings ?? [];
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="flex h-full flex-col">
-      <div className="league-card relative flex flex-1 flex-col overflow-hidden rounded-[1.5rem] bg-white px-4 pt-6 pb-3 sm:px-8 sm:pt-10 sm:pb-5">
-        <div className="mb-3 flex w-full items-center justify-center gap-3 sm:mb-5">
-          <h3 className="text-xl uppercase text-club-navy sm:text-3xl">
-            {leagues[activeLeague]?.label ?? ""}
-          </h3>
+      <div className="league-card relative flex flex-1 flex-col overflow-hidden rounded-[1.5rem] bg-white px-4 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6">
+        <div className="mb-4 flex items-start justify-between gap-3 sm:mb-6">
+          <div className="min-w-0">
+            <h3 className="text-2xl font-extrabold uppercase text-club-navy sm:text-3xl">
+              {leagues[activeLeague]?.label ?? ""}
+            </h3>
+            <p className="mt-1 text-sm text-slate-400">Turnīra tabula {currentYear}</p>
+          </div>
           <a
             href={leagues[activeLeague]?.url ?? "https://lff.lv/"}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Skatīt visas"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-club-navy transition hover:bg-slate-200"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-slate-200 py-1.5 pr-1.5 pl-4 text-xs font-semibold text-club-navy transition hover:border-slate-300 sm:gap-3 sm:pl-5 sm:text-sm"
           >
-            <ArrowRight className="h-4 w-4" />
+            Skatīt visas
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 sm:h-8 sm:w-8">
+              <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </span>
           </a>
         </div>
 
-        <div
-          className="mb-3 grid gap-1.5 sm:mb-5 sm:gap-2"
-          style={{ gridTemplateColumns: `repeat(${leagues.length}, minmax(0, 1fr))` }}
-        >
+        <div className="mb-4 flex flex-wrap gap-2 sm:mb-6">
           {leagues.map((league, index) => (
             <button
               key={league.label}
@@ -45,12 +63,13 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               onClick={() => setActiveLeague(index)}
               aria-pressed={index === activeLeague}
               className={cn(
-                "truncate rounded-xl px-3 py-2.5 text-xs uppercase transition sm:px-4 sm:py-3 sm:text-sm",
+                "flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold uppercase transition sm:px-5 sm:py-3 sm:text-sm",
                 index === activeLeague
                   ? "bg-club-red text-white"
                   : "bg-slate-100 text-club-navy hover:bg-slate-200",
               )}
             >
+              {index === activeLeague && <Trophy className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />}
               {league.label}
             </button>
           ))}
@@ -63,14 +82,14 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           >
             <thead>
               <tr className="text-left text-xs text-slate-400">
-                <th className="w-10 pr-3 pb-2">#</th>
-                <th className="pb-2">Komanda</th>
-                <th className="pr-3 pb-2 text-center sm:pr-0">
+                <th className="w-10 pr-3 pb-3">#</th>
+                <th className="pb-3">Komanda</th>
+                <th className="pr-3 pb-3 text-center sm:pr-0">
                   <span className="sm:hidden">S</span>
                   <span className="hidden sm:inline">Spēles</span>
                 </th>
-                <th className="hidden pb-2 text-center sm:table-cell">Vārti</th>
-                <th className="pb-2 pr-1 text-center">
+                <th className="hidden pb-3 text-center sm:table-cell">Vārti</th>
+                <th className="pb-3 pr-1 text-center">
                   <span className="sm:hidden">P</span>
                   <span className="hidden sm:inline">Punkti</span>
                 </th>
@@ -92,14 +111,19 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                   return (
                     <tr
                       key={row.pos}
-                      className="league-row-enter border-t border-slate-100"
+                      className={cn(
+                        "league-row-enter border-t border-slate-100",
+                        row.isOlaine && "bg-club-red/5",
+                      )}
                       style={{ animationDelay: `${enterDelay}ms` }}
                     >
-                      <td className="py-2.5 pr-3">
+                      <td className="py-4 pr-3 sm:py-5">
                         <span
                           className={cn(
-                            "flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 font-mono text-xs tabular-nums",
-                            row.isOlaine ? "text-club-red" : "text-slate-600",
+                            "flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs font-bold tabular-nums",
+                            row.isOlaine
+                              ? "bg-club-red/10 text-club-red"
+                              : "bg-slate-100 text-slate-600",
                           )}
                         >
                           {row.pos}
@@ -107,7 +131,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       </td>
                       <td
                         className={cn(
-                          "py-2.5 pr-2",
+                          "py-4 pr-2 sm:py-5",
                           row.isOlaine ? "text-club-red font-semibold" : "text-club-navy",
                         )}
                       >
@@ -124,15 +148,15 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                           <span className="truncate text-base sm:text-sm">{row.team}</span>
                         </div>
                       </td>
-                      <td className="py-2.5 pr-3 text-center font-mono text-sm tabular-nums text-slate-600 sm:pr-0">
+                      <td className="py-4 pr-3 text-center font-mono text-sm tabular-nums text-slate-600 sm:py-5 sm:pr-0">
                         {row.played}
                       </td>
-                      <td className="hidden py-2.5 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell">
+                      <td className="hidden py-4 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell sm:py-5">
                         {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
                       </td>
                       <td
                         className={cn(
-                          "py-2.5 pr-1 text-center font-mono text-sm font-bold tabular-nums",
+                          "py-4 pr-1 text-center font-mono text-base font-bold tabular-nums sm:py-5",
                           row.isOlaine ? "text-club-red" : "text-club-navy",
                         )}
                       >
@@ -144,6 +168,11 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-400 sm:mt-6 sm:pt-5">
+          <Info className="h-4 w-4 shrink-0" />
+          Pēdējais atjauninājums: {formatUpdatedDate()}
         </div>
       </div>
     </div>
