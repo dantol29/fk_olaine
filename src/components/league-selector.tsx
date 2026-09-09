@@ -40,7 +40,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           </a>
         </div>
 
-        <div className="mb-4 flex flex-wrap gap-2 sm:mb-2">
+        <div className="mb-4 flex flex-wrap gap-2 sm:mb-4">
           {leagues.map((league, index) => (
             <button
               key={league.label}
@@ -48,7 +48,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               onClick={() => setActiveLeague(index)}
               aria-pressed={index === activeLeague}
               className={cn(
-                "flex items-center gap-2 rounded-[1.5rem] px-4 py-2.5 text-xs font-semibold uppercase transition sm:px-5 sm:py-3 sm:text-sm",
+                "flex items-center gap-2 rounded-[1rem] px-4 py-2.5 text-xs font-semibold uppercase transition sm:px-5 sm:py-3 sm:text-sm",
                 index === activeLeague
                   ? "bg-club-red text-white"
                   : "bg-slate-100 text-club-navy hover:bg-slate-200",
@@ -67,7 +67,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           >
             <thead>
               <tr className="text-left text-xs text-slate-400">
-                <th className="w-10 pr-3 pb-3">#</th>
+                <th className="w-10 pr-3 pb-3 pl-2">#</th>
                 <th className="pb-3">Komanda</th>
                 <th className="pr-3 pb-3 text-center sm:pr-0">
                   <span className="sm:hidden">S</span>
