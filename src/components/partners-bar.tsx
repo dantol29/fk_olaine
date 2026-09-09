@@ -101,7 +101,18 @@ export function PartnersBar() {
             <span className="hidden h-9 w-px shrink-0 bg-white/40 sm:block" />
           </div>
 
-          <div className="flex w-full min-w-0 flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:w-auto sm:flex-1 sm:justify-start sm:gap-x-12 sm:max-[1342px]:min-[1079px]:gap-x-5 sm:max-[1079px]:gap-x-3">
+          {/* Mobile: an edge-to-edge running line instead of a wrapped,
+           *  padded grid — the negative margin cancels the bar's own
+           *  px-6 so the track can bleed to the rounded card's edges. */}
+          <div className="-mx-6 w-full overflow-hidden sm:hidden">
+            <div className="partners-marquee-track flex w-max items-center gap-x-10">
+              {[...PARTNERS, ...PARTNERS].map((partner, index) => (
+                <PartnerLogo key={`${partner.alt}-${index}`} partner={partner} />
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden min-w-0 flex-wrap items-center gap-x-8 gap-y-3 sm:flex sm:w-auto sm:flex-1 sm:gap-x-12 sm:max-[1342px]:min-[1079px]:gap-x-5 sm:max-[1079px]:gap-x-3">
             {PARTNERS.slice(0, -2).map((partner) => (
               <PartnerLogo key={partner.alt} partner={partner} />
             ))}
