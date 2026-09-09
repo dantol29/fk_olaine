@@ -364,6 +364,20 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   );
   const [activeTeam, setActiveTeam] = useState("all");
 
+  /** A header nav link like "/?type=training#kalendars" pre-selects that
+   *  event type filter when the calendar first comes into view. `window` is
+   *  only available post-mount, so this can't be a lazy useState initializer
+   *  without breaking SSR — an effect reading an external browser API on
+   *  mount is the legitimate case the set-state-in-effect rule can't tell
+   *  apart from deriving state from props. */
+  useEffect(() => {
+    const type = new URLSearchParams(window.location.search).get("type");
+    if (type === "training" || type === "game" || type === "other") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTypes(new Set([type]));
+    }
+  }, []);
+
   const teamOptions = useMemo(() => {
     const names = new Set<string>();
     for (const event of events) {
