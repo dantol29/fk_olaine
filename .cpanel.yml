@@ -5,5 +5,5 @@ deployment:
     - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.env' --exclude='node_modules' --exclude='.next' --exclude='public/uploads' ./ $DEPLOYPATH
     - mkdir -p /home3/afaolain/fk_olaine-data/uploads
     - ln -sfn /home3/afaolain/fk_olaine-data/uploads $DEPLOYPATH/public/uploads
-    - source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd $DEPLOYPATH && npm ci --omit=dev && npm run build -- --webpack
+    - source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd $DEPLOYPATH && rm -rf node_modules && npm install && npm run build -- --webpack
     - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt
