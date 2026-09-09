@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock, MapPin } from "lucide-react";
 import { useRef, useState } from "react";
 
+import { dispatchOpenCalendarEvent } from "@/lib/calendar-bridge";
 import { cn } from "@/lib/utils";
 import { gameDate, type Team, type UpcomingGame } from "@/lib/games";
 import {
@@ -57,22 +57,38 @@ export function MatchCard({
   isActive,
   elevated = true,
   className,
+  onClick,
 }: {
   game: UpcomingGame;
   isActive: boolean;
   elevated?: boolean;
   className?: string;
+  onClick?: () => void;
 }) {
   return (
     <div
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
       className={cn(
         "mx-auto flex h-full flex-col rounded-xl p-5 sm:p-6",
+        onClick && "cursor-pointer",
         isActive
           ? cn(
               "w-full border border-black/5 bg-club-gray-light",
               elevated && "shadow-[0_16px_32px_-16px_rgba(11,41,64,0.35)]",
             )
-          : "w-[82%] cursor-pointer border border-white/15 bg-club-navy/85 backdrop-blur-lg",
+          : "w-[82%] border border-white/15 bg-club-navy/85 backdrop-blur-lg",
         className,
       )}
     >
@@ -152,13 +168,12 @@ export function MatchCard({
           </span>
         </div>
         {isActive && (
-          <Link
-            href="/speles"
-            aria-label="Spēles centrs"
+          <span
+            aria-hidden="true"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-club-red bg-club-red text-white transition"
           >
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </span>
         )}
       </div>
     </div>
@@ -196,7 +211,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
           className="gap-4"
           separator={<span className="inline-block h-9 w-px bg-white/40" />}
           valueClassName="text-4xl font-extrabold tracking-tight text-white sm:text-5xl"
-          labelClassName="mt-1.5 text-[9px] text-white/50 uppercase"
+          labelClassName="mt-1.5 text-[12px] text-white/80 uppercase"
           labels={{
             days: "Dienas",
             hours: "Stundas",
@@ -206,7 +221,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
         />
       </div>
 
-      <div className="absolute inset-x-0 bottom-12 sm:bottom-16">
+      <div className="absolute inset-x-0 bottom-12 sm:bottom-14">
         <div className="relative">
           <CoverflowCarousel
             ref={carouselRef}
@@ -224,7 +239,20 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
             activeLift={14}
             onSelectedChange={setIndex}
             renderSlide={(_, i, isActive) => (
-              <MatchCard game={games[i]} isActive={isActive} />
+              <MatchCard
+                game={games[i]}
+                isActive={isActive}
+                onClick={
+                  isActive
+                    ? () => {
+                        dispatchOpenCalendarEvent(`game-${games[i].id}`);
+                        document
+                          .getElementById("kalendars")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }
+                    : () => carouselRef.current?.goTo(i)
+                }
+              />
             )}
           />
         </div>

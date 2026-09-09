@@ -54,6 +54,7 @@ export async function getUpcomingGamesFromDb(
     return rows.map((row) => {
       const [year, month, day] = row.date.split("-").map(Number);
       return {
+        id: row.id,
         day: String(day).padStart(2, "0"),
         month: MONTHS[month - 1] ?? "",
         year: String(year),

@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 
+import { OPEN_CALENDAR_EVENT_NAME } from "@/lib/calendar-bridge";
 import { cn } from "@/lib/utils";
 import type { CalendarEvent } from "@/lib/calendar";
 import { colorFor, initialsFor } from "@/lib/games";
@@ -365,18 +366,38 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   const [activeTeam, setActiveTeam] = useState("all");
 
   /** A header nav link like "/?type=training#kalendars" pre-selects that
-   *  event type filter when the calendar first comes into view. `window` is
+   *  event type filter when the calendar first comes into view, and a
+   *  "?event=<uid>" param (or a same-page "open this event" signal from
+   *  e.g. the homepage matches carousel — see calendar-bridge.ts) jumps
+   *  straight to that event's week/half and opens its popup. `window` is
    *  only available post-mount, so this can't be a lazy useState initializer
    *  without breaking SSR — an effect reading an external browser API on
    *  mount is the legitimate case the set-state-in-effect rule can't tell
    *  apart from deriving state from props. */
   useEffect(() => {
-    const type = new URLSearchParams(window.location.search).get("type");
+    const openEventByUid = (uid: string | null) => {
+      if (!uid) return;
+      const match = events.find((event) => event.uid === uid);
+      if (!match) return;
+      setWeekStart(getMonday(match.start));
+      setHalf(getHalfForDate(match.start));
+      setSelectedEvent(match);
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type");
     if (type === "training" || type === "game" || type === "other") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTypes(new Set([type]));
     }
-  }, []);
+    openEventByUid(params.get("event"));
+
+    const handleOpenEvent = (event: Event) => {
+      openEventByUid((event as CustomEvent<{ uid: string }>).detail?.uid ?? null);
+    };
+    window.addEventListener(OPEN_CALENDAR_EVENT_NAME, handleOpenEvent);
+    return () => window.removeEventListener(OPEN_CALENDAR_EVENT_NAME, handleOpenEvent);
+  }, [events]);
 
   const teamOptions = useMemo(() => {
     const names = new Set<string>();

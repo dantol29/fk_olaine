@@ -6,6 +6,11 @@ export type Team = {
 };
 
 export type UpcomingGame = {
+  /** The games-table row id — used to deep-link to this game's entry in
+   *  the homepage calendar (see MatchesShowcase / WeekCalendar's "event"
+   *  URL param). Fallback/placeholder games use a negative id that will
+   *  never match a real calendar event. */
+  id: number;
   day: string;
   month: string;
   year: string;

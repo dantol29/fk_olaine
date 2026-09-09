@@ -42,6 +42,7 @@ const FALLBACK_STANDINGS: StandingRow[] = [
 
 const FALLBACK_UPCOMING_GAMES: UpcomingGame[] = [
   {
+    id: -1,
     day: "07",
     month: "SEP",
     year: "2026",
@@ -53,6 +54,7 @@ const FALLBACK_UPCOMING_GAMES: UpcomingGame[] = [
     league: "Sieviešu līga",
   },
   {
+    id: -2,
     day: "14",
     month: "SEP",
     year: "2026",
@@ -64,6 +66,7 @@ const FALLBACK_UPCOMING_GAMES: UpcomingGame[] = [
     league: "Sieviešu līga",
   },
   {
+    id: -3,
     day: "21",
     month: "SEP",
     year: "2026",
@@ -85,7 +88,11 @@ const FALLBACK_UPCOMING_GAMES: UpcomingGame[] = [
  *  yet — a per-source fetch failure just shows that one league empty
  *  (LeagueSelector already renders "Tabula pašlaik nav pieejama." for an
  *  empty list), not the whole homepage falling back. */
-async function fetchLeagueStandings(): Promise<{ label: string; standings: StandingRow[] }[]> {
+async function fetchLeagueStandings(): Promise<
+  { label: string; standings: StandingRow[]; url: string }[]
+> {
+  const fallback = [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS, url: "https://lff.lv/" }];
+
   try {
     const sources = await db
       .select({ label: leagueSources.label, standingsUrl: leagueSources.standingsUrl })
@@ -94,21 +101,22 @@ async function fetchLeagueStandings(): Promise<{ label: string; standings: Stand
       .orderBy(leagueSources.displayOrder, leagueSources.label);
 
     if (sources.length === 0) {
-      return [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS }];
+      return fallback;
     }
 
     return await Promise.all(
       sources.map(async (source) => {
+        const url = source.standingsUrl as string;
         try {
-          const standings = await getStandings(source.standingsUrl as string);
-          return { label: source.label, standings };
+          const standings = await getStandings(url);
+          return { label: source.label, standings, url };
         } catch {
-          return { label: source.label, standings: [] };
+          return { label: source.label, standings: [], url };
         }
       }),
     );
   } catch {
-    return [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS }];
+    return fallback;
   }
 }
 

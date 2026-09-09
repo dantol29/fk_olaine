@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
@@ -9,7 +8,7 @@ import { cn } from "@/lib/utils";
 import type { StandingRow } from "@/lib/standings";
 
 type LeagueSelectorProps = {
-  leagues: { label: string; standings: StandingRow[] }[];
+  leagues: { label: string; standings: StandingRow[]; url: string }[];
 };
 
 export function LeagueSelector({ leagues }: LeagueSelectorProps) {
@@ -24,15 +23,17 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           <h3 className="text-2xl uppercase text-club-navy sm:text-3xl">
             {leagues[activeLeague]?.label ?? ""}
           </h3>
-          <Link
-            href="/speles"
+          <a
+            href={leagues[activeLeague]?.url ?? "https://lff.lv/"}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex shrink-0 items-center gap-3 rounded-full border border-slate-200 py-1.5 pr-1.5 pl-5 text-sm text-club-navy transition hover:border-slate-300"
           >
             Skatīt visas
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
               <ArrowRight className="h-4 w-4" />
             </span>
-          </Link>
+          </a>
         </div>
 
         <div
