@@ -19,7 +19,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="league-card relative flex flex-1 flex-col overflow-hidden rounded-[1.5rem] bg-white px-4 pt-6 pb-3 sm:px-8 sm:pt-10 sm:pb-5">
-        <div className="mb-3 flex w-full items-center justify-center gap-3 sm:mb-5 sm:w-auto sm:justify-start">
+        <div className="mb-3 flex w-full items-center justify-center gap-3 sm:mb-5">
           <h3 className="text-xl uppercase text-club-navy sm:text-3xl">
             {leagues[activeLeague]?.label ?? ""}
           </h3>
