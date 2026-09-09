@@ -192,3 +192,20 @@ export const articles = sqliteTable("articles", {
 export const articlesRelations = relations(articles, ({ one }) => ({
   team: one(teams, { fields: [articles.teamId], references: [teams.id] }),
 }));
+
+/** Singleton — always exactly one row (id 1). Lets the club admin update
+ *  its own legal/bank/contact details shown in the site footer without
+ *  needing a code change. */
+export const siteSettings = sqliteTable("site_settings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  legalName: text("legal_name").notNull(),
+  legalAddress: text("legal_address").notNull(),
+  regNr: text("reg_nr").notNull(),
+  bankName: text("bank_name").notNull(),
+  bankAccount: text("bank_account").notNull(),
+  bankCode: text("bank_code").notNull(),
+  stadiumAddress: text("stadium_address").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});

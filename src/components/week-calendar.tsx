@@ -106,8 +106,8 @@ const CHUNK_SIZES = [3, 4] as const;
 /** Tailwind needs both literal class strings present in source to
  *  generate them, so this can't be built from CHUNK_SIZES at runtime. */
 const GRID_COLS_CLASS = [
-  "grid-cols-[64px_repeat(3,1fr)]",
-  "grid-cols-[64px_repeat(4,1fr)]",
+  "grid-cols-[44px_repeat(3,1fr)] sm:grid-cols-[64px_repeat(3,1fr)]",
+  "grid-cols-[44px_repeat(4,1fr)] sm:grid-cols-[64px_repeat(4,1fr)]",
 ] as const;
 /** Beyond this many simultaneous events, the extra ones collapse into a
  *  "+N" chip rather than squeezing into an unreadably thin column. */
@@ -134,6 +134,25 @@ function getMonday(date: Date) {
       date.getUTCDate() + mondayOffset,
     ),
   );
+}
+
+/** Strips the time-of-day, keeping only the UTC calendar date. */
+function toUtcMidnight(date: Date) {
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+  );
+}
+
+/** The day-label info for a single date, in the shape `getVisibleDays`
+ *  produces per day — used by the single-day mobile view. */
+function toDayInfo(date: Date) {
+  return {
+    dateKey: toDateKey(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    dayNumber: date.getUTCDate(),
+    monthNumber: date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
+    weekdayIndex: date.getUTCDay(),
+  };
 }
 
 /** 0 if `date` falls Mon–Wed of its week, 1 if Thu–Sun. */
@@ -354,6 +373,7 @@ type WeekCalendarProps = {
 export function WeekCalendar({ events }: WeekCalendarProps) {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
   const [half, setHalf] = useState<0 | 1>(() => getHalfForDate(new Date()));
+  const [mobileDate, setMobileDate] = useState(() => toUtcMidnight(new Date()));
   const todayKey = useMemo(() => todayKeyInRiga(), []);
   const [openOverflow, setOpenOverflow] = useState<string | null>(null);
   const overflowRef = useRef<HTMLDivElement>(null);
@@ -381,6 +401,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
       if (!match) return;
       setWeekStart(getMonday(match.start));
       setHalf(getHalfForDate(match.start));
+      setMobileDate(toUtcMidnight(match.start));
       setSelectedEvent(match);
     };
 
@@ -522,11 +543,31 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
     setHalf(getHalfForDate(today));
   };
 
+  const mobileDay = useMemo(() => toDayInfo(mobileDate), [mobileDate]);
+
+  const mobileDayEvents = useMemo(
+    () =>
+      [...(eventsByDay.get(mobileDay.dateKey) ?? [])].sort(
+        (a, b) => a.start.getTime() - b.start.getTime(),
+      ),
+    [eventsByDay, mobileDay.dateKey],
+  );
+
+  const navigateMobileDay = (direction: "prev" | "next") => {
+    setMobileDate((prev) => {
+      const next = new Date(prev);
+      next.setUTCDate(prev.getUTCDate() + (direction === "next" ? 1 : -1));
+      return next;
+    });
+  };
+
+  const goToTodayMobile = () => setMobileDate(toUtcMidnight(new Date()));
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2 className="text-3xl text-club-navy sm:text-4xl">Kalendārs</h2>
-        <span className="text-2xl text-club-navy sm:text-3xl">
+        <span className="hidden text-2xl text-club-navy sm:block sm:text-3xl">
           {rangeLabel}
         </span>
       </div>
@@ -572,7 +613,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="hidden items-center gap-2 sm:flex">
           <button
             type="button"
             onClick={() => navigateDays("prev")}
@@ -599,9 +640,103 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-100">
+      {/* Single-day view — the multi-column grid below doesn't leave enough
+       *  room per day to stay readable on a phone, so mobile gets its own
+       *  day-at-a-time list instead. */}
+      <div className="sm:hidden">
+        <div className="mb-3 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigateMobileDay("prev")}
+            aria-label="Iepriekšējā diena"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-club-navy transition hover:bg-slate-200"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={goToTodayMobile}
+            className="flex flex-1 flex-col items-center rounded-lg bg-slate-100 px-2 py-2 transition hover:bg-slate-200"
+          >
+            <span
+              className={cn(
+                "text-base font-bold",
+                mobileDay.dateKey === todayKey
+                  ? "text-club-red"
+                  : "text-club-navy",
+              )}
+            >
+              {WEEKDAY_LABELS[mobileDay.weekdayIndex]}
+            </span>
+            <span className="text-xs text-slate-400">
+              {mobileDay.dayNumber}. {MONTH_LABELS[mobileDay.monthNumber - 1]}{" "}
+              {mobileDay.year}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigateMobileDay("next")}
+            aria-label="Nākamā diena"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-club-navy transition hover:bg-slate-200"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-2 rounded-2xl border border-slate-100 p-2">
+          {mobileDayEvents.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-400">
+              Šajā dienā nav ieplānotu notikumu.
+            </p>
+          ) : (
+            mobileDayEvents.map((event) => {
+              const style = EVENT_TYPE_STYLES[event.eventType];
+              const Icon = style.icon;
+              return (
+                <button
+                  key={event.uid}
+                  type="button"
+                  onClick={() => setSelectedEvent(event)}
+                  className="flex items-center gap-3 rounded-xl border border-slate-100 p-3 text-left transition hover:bg-slate-50"
+                >
+                  <span
+                    className={cn(
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white",
+                      style.accent,
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-club-navy">
+                      {event.title}
+                    </p>
+                    <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
+                      <span className="flex shrink-0 items-center gap-1">
+                        <Clock className="h-3 w-3 shrink-0" />
+                        {formatClockTime(event.start)}–
+                        {formatClockTime(event.end)}
+                      </span>
+                      {event.location && (
+                        <span className="flex min-w-0 items-center gap-1">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{event.location}</span>
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      <div className="hidden overflow-hidden rounded-2xl border border-slate-100 sm:block">
         <div className="overflow-x-auto">
-          <div className="min-w-[560px]">
+          <div className="min-w-0 sm:min-w-[560px]">
             <div className="max-h-[560px] overflow-y-auto">
               {/* Header row */}
               <div
@@ -610,7 +745,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
                   GRID_COLS_CLASS[half],
                 )}
               >
-                <div className="flex items-center justify-center p-3 text-xs text-slate-400 uppercase">
+                <div className="flex items-center justify-center p-1 text-[10px] text-slate-400 uppercase sm:p-3 sm:text-xs">
                   Laiks
                 </div>
                 {visibleDays.map((day) => {
@@ -618,23 +753,23 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
                   return (
                     <div
                       key={day.dateKey}
-                      className="border-l border-slate-100 p-2 text-center"
+                      className="border-l border-slate-100 p-1 text-center sm:p-2"
                     >
                       <div
                         className={cn(
-                          "inline-flex flex-col items-center rounded-xl px-3 py-1.5",
+                          "inline-flex flex-col items-center rounded-xl px-1 py-1 sm:px-3 sm:py-1.5",
                           isToday && "bg-club-red/5",
                         )}
                       >
                         <span
                           className={cn(
-                            "text-base font-bold",
+                            "truncate text-[11px] font-bold sm:text-base",
                             isToday ? "text-club-red" : "text-club-navy",
                           )}
                         >
                           {WEEKDAY_LABELS[day.weekdayIndex]}
                         </span>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-[10px] text-slate-400 sm:text-xs">
                           {MONTH_LABELS[day.monthNumber - 1]} {day.dayNumber}
                         </span>
                       </div>
@@ -652,7 +787,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
                   {hours.map((hour) => (
                     <div
                       key={hour}
-                      className="absolute inset-x-0 border-b border-slate-50 px-2 pt-1 text-xs text-slate-400"
+                      className="absolute inset-x-0 border-b border-slate-50 px-1 pt-1 text-[10px] text-slate-400 sm:px-2 sm:text-xs"
                       style={{
                         top: (hour - startHour) * ROW_HEIGHT,
                         height: ROW_HEIGHT,

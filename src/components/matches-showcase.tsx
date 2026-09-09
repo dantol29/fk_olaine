@@ -81,7 +81,7 @@ export function MatchCard({
           : undefined
       }
       className={cn(
-        "mx-auto flex h-full flex-col rounded-xl p-5 pt-8 sm:p-6",
+        "mx-auto flex h-full flex-col rounded-xl p-5  sm:p-6",
         onClick && "cursor-pointer",
         isActive
           ? cn(
@@ -191,7 +191,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
   }));
 
   return (
-    <div className="relative h-[520px] min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm sm:h-[640px]">
+    <div className="relative h-[580px] min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm sm:h-[640px]">
       <Image
         src="/stadium-flag-dusk.jpg"
         alt="Olaines stadions"
@@ -202,8 +202,8 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
 
       <div className="absolute inset-x-0 top-0 z-10 h-56 bg-gradient-to-b from-black/65 via-black/30 to-transparent" />
 
-      <div className="absolute inset-x-0 top-12 z-20 flex flex-col items-center">
-        <span className="mb-3 text-[20px] text-white/70 uppercase">
+      <div className="absolute inset-x-0 top-8 z-20 flex flex-col items-center sm:top-12">
+        <span className="mb-3 text-[20px] text-white/70 uppercase ">
           Līdz nākamajai spēlei
         </span>
         <AnimatedNumberCountdown
@@ -221,7 +221,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
         />
       </div>
 
-      <div className="absolute inset-x-0 bottom-12 sm:bottom-14">
+      <div className="absolute inset-x-0 bottom-14 sm:bottom-14">
         <div className="relative">
           <CoverflowCarousel
             ref={carouselRef}
@@ -234,7 +234,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
             perspective={3.2}
             falloff={0.6}
             fade={0}
-            gap={0.03}
+            gap={0}
             activeScale={0.1}
             activeLift={14}
             onSelectedChange={setIndex}

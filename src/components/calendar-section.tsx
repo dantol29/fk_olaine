@@ -10,7 +10,7 @@ export async function CalendarSection() {
   }
 
   return (
-    <section className="px-6 py-12 sm:py-16">
+    <section id="kalendars" className="scroll-mt-24 px-6 py-12 sm:py-16">
       <div className="mx-auto max-w-[1440px]">
         <WeekCalendar events={events} />
       </div>

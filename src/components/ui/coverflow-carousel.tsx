@@ -382,7 +382,13 @@ export const CoverflowCarousel = React.forwardRef<
                   !renderSlide && "bg-muted",
                   cardClassName,
                 )}
-                style={{ width: "var(--cf-card)", height: "var(--cf-card-h)" }}
+                style={{
+                  width: "var(--cf-card)",
+                  height: "var(--cf-card-h)",
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
+                  WebkitFontSmoothing: "antialiased",
+                }}
               >
                 {renderSlide ? (
                   renderSlide(slide, index, index === selected)

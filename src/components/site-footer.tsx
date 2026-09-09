@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { PARTNERS } from "@/components/partners-bar";
+import { getSiteSettings } from "@/lib/site-settings";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -66,7 +67,10 @@ function FieldGroup({
   );
 }
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const settings = await getSiteSettings();
+  const legalAddressFull = `${settings.legalAddress}, Latvija`;
+
   return (
     <footer
       id="footer"
@@ -114,17 +118,15 @@ export function SiteFooter() {
         {/* Biedrība */}
         <div className="lg:border-l lg:border-[#3d5570]/20 lg:pl-10">
           <ColumnLabel>Biedrība</ColumnLabel>
-          <h3 className="mt-3 text-lg text-white">
-            Biedrība &quot;Futbola klubs Olaine&quot;
-          </h3>
+          <h3 className="mt-3 text-lg text-white">{settings.legalName}</h3>
           <div className="mt-4 flex flex-col gap-4">
             <FieldGroup label="Reģistrācijas numurs">
-              <p>Reģ. Nr. 50008130491</p>
+              <p>Reģ. Nr. {settings.regNr}</p>
             </FieldGroup>
             <FieldGroup label="Bankas rekvizīti">
-              <p>AS &quot;Swedbank&quot;</p>
-              <p>Konta Nr. LV44HABA0551028093917,</p>
-              <p>Kods: HABALV22</p>
+              <p>{settings.bankName}</p>
+              <p>Konta Nr. {settings.bankAccount},</p>
+              <p>Kods: {settings.bankCode}</p>
             </FieldGroup>
           </div>
         </div>
@@ -138,14 +140,12 @@ export function SiteFooter() {
               <div>
                 <p className="text-sm text-white">Juridiskā adrese</p>
                 <a
-                  href={mapsUrl(
-                    "Parka 11 - 16, Olaine, Olaines novads, LV-2114, Latvija",
-                  )}
+                  href={mapsUrl(legalAddressFull)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-white/60 hover:text-white hover:underline"
                 >
-                  Parka 11 - 16, Olaine, Olaines novads, LV-2114, Latvija
+                  {legalAddressFull}
                 </a>
               </div>
             </li>
@@ -154,25 +154,28 @@ export function SiteFooter() {
               <div>
                 <p className="text-sm text-white">Stadiona adrese</p>
                 <a
-                  href={mapsUrl("Zeiferta iela 4, Olaine")}
+                  href={mapsUrl(settings.stadiumAddress)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-white/60 hover:text-white hover:underline"
                 >
-                  Zeiferta 4, Olaine
+                  {settings.stadiumAddress}
                 </a>
               </div>
             </li>
             <li className="flex items-center gap-2.5">
               <Phone className="h-5 w-5 shrink-0 text-white" />
-              <a href="tel:+37129332883" className="text-sm text-white">
-                +371 29332883
+              <a
+                href={`tel:${settings.phone.replace(/\s+/g, "")}`}
+                className="text-sm text-white"
+              >
+                {settings.phone}
               </a>
             </li>
             <li className="flex items-center gap-2.5">
               <Mail className="h-5 w-5 shrink-0 text-white" />
-              <a href="mailto:info@afaolaine.lv" className="text-sm text-white">
-                info@afaolaine.lv
+              <a href={`mailto:${settings.email}`} className="text-sm text-white">
+                {settings.email}
               </a>
             </li>
           </ul>
@@ -208,7 +211,7 @@ export function SiteFooter() {
           <p>
             Izstrādājis{" "}
             <a
-              href="https://42days.eu"
+              href="https://42days.eu/lv"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white"

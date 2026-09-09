@@ -60,7 +60,7 @@ function CardVisual({
   return (
     <>
       <div className="relative z-10 flex items-start justify-between gap-2">
-        <div className="flex flex-col leading-tight">
+        <div className="hidden flex-col leading-tight sm:flex">
           {eyebrow.map((line) => (
             <span
               key={line}
@@ -71,7 +71,7 @@ function CardVisual({
           ))}
           <span className="mt-2 h-px w-8 bg-white/40" />
         </div>
-        <span className="text-4xl font-extrabold text-white/15 sm:text-5xl">
+        <span className="ml-auto text-4xl font-extrabold text-white/25 sm:ml-0 sm:text-5xl">
           {number}
         </span>
       </div>
@@ -91,8 +91,8 @@ function CardVisual({
 
 export function QuickLinksSection() {
   return (
-    <section className="pb-8">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+    <section>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
         {LINKS.map((link) => (
           <Link
             key={link.title}

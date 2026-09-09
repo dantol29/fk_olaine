@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { desc, eq, ne } from "drizzle-orm";
 
 import { db } from "@/db/client";
@@ -36,13 +37,17 @@ export async function getArticles(): Promise<Article[]> {
   return rows.map((row) => rowToArticle(row, row.team?.name ?? null));
 }
 
-export async function getArticleBySlug(slug: string): Promise<Article | null> {
-  const row = await db.query.articles.findFirst({
-    where: eq(articles.slug, slug),
-    with: { team: true },
-  });
-  return row ? rowToArticle(row, row.team?.name ?? null) : null;
-}
+/** Cached per-request so generateMetadata and the page body share one
+ *  DB lookup instead of querying the same article twice. */
+export const getArticleBySlug = cache(
+  async (slug: string): Promise<Article | null> => {
+    const row = await db.query.articles.findFirst({
+      where: eq(articles.slug, slug),
+      with: { team: true },
+    });
+    return row ? rowToArticle(row, row.team?.name ?? null) : null;
+  },
+);
 
 /** Sidebar "Izceltie raksti" list — articles the admin flagged as featured. */
 export async function getFeaturedArticles(

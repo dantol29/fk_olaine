@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/admin/league-sources", label: "Līgu avoti" },
   { href: "/admin/club-logos", label: "Klubu logo" },
   { href: "/admin/jaunumi", label: "Jaunumi" },
+  { href: "/admin/site-settings", label: "Iestatījumi" },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

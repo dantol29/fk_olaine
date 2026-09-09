@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { LandPlot, Lightbulb, MapPin, ParkingSquare, Shirt, Users } from "lucide-react";
 
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+
+export const metadata: Metadata = {
+  title: "Stadions",
+  description:
+    "FK Olaine mājas stadions Zeiferta ielā 4, Olainē — mākslīgais zālājs, apgaismojums un infrastruktūra.",
+  alternates: { canonical: "/klubs/stadions" },
+};
 
 const ADDRESS = "Zeiferta iela 4, Olaine";
 
