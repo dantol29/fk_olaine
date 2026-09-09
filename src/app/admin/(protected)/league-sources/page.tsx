@@ -14,6 +14,7 @@ export default async function AdminLeagueSourcesPage() {
       id: leagueSources.id,
       label: leagueSources.label,
       url: leagueSources.url,
+      standingsUrl: leagueSources.standingsUrl,
       teamName: teams.name,
     })
     .from(leagueSources)
@@ -55,6 +56,14 @@ export default async function AdminLeagueSourcesPage() {
                   >
                     Ielādēt spēles
                   </Link>
+                  {source.standingsUrl && (
+                    <Link
+                      href={`/admin/league-sources/${source.id}/test-standings`}
+                      className="text-sm font-semibold text-club-navy hover:underline"
+                    >
+                      Testēt tabulu
+                    </Link>
+                  )}
                   <Link
                     href={`/admin/league-sources/${source.id}`}
                     aria-label={`Rediģēt līgas avotu "${source.label}"`}
