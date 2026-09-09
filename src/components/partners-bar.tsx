@@ -78,8 +78,8 @@ export const PARTNERS = [
 
 export function PartnersBar() {
   return (
-    <footer className="pt-3 pb-6">
-        <div className="relative flex w-full items-center overflow-hidden rounded-[1.5rem] bg-club-navy px-6 py-4 sm:px-10 sm:py-5">
+    <footer className="ml-[calc(50%-50vw)] w-screen pt-3 pb-6 sm:mx-0 sm:w-auto">
+        <div className="relative flex w-full items-center overflow-hidden rounded-none bg-club-navy px-6 py-4 sm:rounded-[1.5rem] sm:px-10 sm:py-5">
         <div
           className="pointer-events-none absolute inset-y-0 right-0 w-[160px] sm:w-[420px]"
           style={{ clipPath: "polygon(26% 0, 100% 0, 100% 100%, 10% 100%)" }}
