@@ -55,17 +55,25 @@ function TeamBadge({ team, isActive }: { team: Team; isActive: boolean }) {
 export function MatchCard({
   game,
   isActive,
+  elevated = true,
+  className,
 }: {
   game: UpcomingGame;
   isActive: boolean;
+  elevated?: boolean;
+  className?: string;
 }) {
   return (
     <div
       className={cn(
         "mx-auto flex h-full flex-col rounded-xl p-5 sm:p-6",
         isActive
-          ? "w-full border border-black/5 bg-club-gray-light shadow-[0_16px_32px_-16px_rgba(11,41,64,0.35)]"
+          ? cn(
+              "w-full border border-black/5 bg-club-gray-light",
+              elevated && "shadow-[0_16px_32px_-16px_rgba(11,41,64,0.35)]",
+            )
           : "w-[82%] cursor-pointer border border-white/15 bg-club-navy/85 backdrop-blur-lg",
+        className,
       )}
     >
       <div className="mb-4 flex items-start justify-between">
@@ -198,7 +206,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
         />
       </div>
 
-      <div className="absolute inset-x-0 bottom-16 sm:bottom-20">
+      <div className="absolute inset-x-0 bottom-12 sm:bottom-16">
         <div className="relative">
           <CoverflowCarousel
             ref={carouselRef}
