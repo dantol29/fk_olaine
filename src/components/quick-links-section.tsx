@@ -92,12 +92,12 @@ function CardVisual({
 export function QuickLinksSection() {
   return (
     <section className="pb-8">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
         {LINKS.map((link) => (
           <Link
             key={link.title}
             href={link.href}
-            className="group relative flex aspect-[3/4] flex-col justify-between overflow-hidden rounded-[1.5rem] p-5 sm:p-6"
+            className="group relative flex aspect-[16/9] flex-col justify-between overflow-hidden rounded-[1.5rem] p-5 sm:aspect-[3/4] sm:p-6"
           >
             <Image
               src={link.image}
@@ -110,7 +110,7 @@ export function QuickLinksSection() {
           </Link>
         ))}
 
-        <JoinClubDrawer triggerClassName="group relative flex aspect-[3/4] flex-col justify-between overflow-hidden rounded-[1.5rem] p-5 text-left sm:p-6">
+        <JoinClubDrawer triggerClassName="group relative flex aspect-[16/9] flex-col justify-between overflow-hidden rounded-[1.5rem] p-5 text-left sm:aspect-[3/4] sm:p-6">
           <Image
             src={JOIN_LINK.image}
             alt=""
