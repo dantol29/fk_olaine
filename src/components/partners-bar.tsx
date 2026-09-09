@@ -101,10 +101,11 @@ export function PartnersBar() {
             <span className="hidden h-9 w-px shrink-0 bg-white/40 sm:block" />
           </div>
 
-          {/* Mobile: an edge-to-edge running line instead of a wrapped,
-           *  padded grid — the negative margin cancels the bar's own
-           *  px-6 so the track can bleed to the rounded card's edges. */}
-          <div className="partners-marquee-mask -mx-6 w-full overflow-hidden sm:hidden">
+          {/* Below sm this bleeds edge-to-edge (negative margin cancels the
+           *  bar's own px-6); from sm up to 1000px it instead sits as a
+           *  normal flex-1 item in the row, same slot the grid below uses
+           *  above 1000px — title and the right-hand block don't move. */}
+          <div className="partners-marquee-mask -mx-6 w-full overflow-hidden min-[1001px]:hidden sm:mx-0 sm:w-auto sm:min-w-0 sm:flex-1">
             <div className="partners-marquee-track flex w-max items-center">
               {[0, 1].map((copy) => (
                 <div key={copy} className="flex items-center gap-x-10 pr-10">
@@ -116,7 +117,7 @@ export function PartnersBar() {
             </div>
           </div>
 
-          <div className="hidden min-w-0 flex-wrap items-center gap-x-8 gap-y-3 sm:flex sm:w-auto sm:flex-1 sm:gap-x-12 sm:max-[1342px]:min-[1079px]:gap-x-5 sm:max-[1079px]:gap-x-3">
+          <div className="hidden min-w-0 flex-wrap items-center gap-x-8 gap-y-3 min-[1001px]:flex sm:w-auto sm:flex-1 sm:gap-x-12 sm:max-[1342px]:min-[1079px]:gap-x-5 sm:max-[1079px]:gap-x-3">
             {PARTNERS.slice(0, -2).map((partner) => (
               <PartnerLogo key={partner.alt} partner={partner} />
             ))}
