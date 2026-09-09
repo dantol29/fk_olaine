@@ -12,8 +12,11 @@ const nextConfig: NextConfig = {
   images: {
     // Skip the image optimizer/cache in dev so edited local images (logos, etc.)
     // show up immediately on reload instead of serving a stale cached transform.
+    // Safe to cache long in production: uploaded photos always get a fresh
+    // UUID filename (see saveUploadedPhoto), so a URL is never reused for
+    // different content.
     unoptimized: process.env.NODE_ENV === "development",
-    minimumCacheTTL: 0,
+    minimumCacheTTL: process.env.NODE_ENV === "development" ? 0 : 60 * 60 * 24,
     remotePatterns: [
       {
         protocol: "https",

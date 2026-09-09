@@ -19,13 +19,13 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: "FK Olaine",
-  description: "Official website of FK Olaine football club, est. 2008.",
+  description: "FK Olaine futbola kluba oficiālā mājaslapa, dibināts 2008. gadā.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="lv"
       className={`${inter.variable} ${geistMono.variable} ${caveat.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

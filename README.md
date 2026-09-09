@@ -36,4 +36,6 @@ This app is deployed via cPanel's "Setup Node.js App" (Phusion Passenger), runni
 - **Database** (`TURSO_DATABASE_URL`) — a local SQLite file works fine (no Turso account needed) since the process is long-running. Point it at an absolute path in a sibling folder, e.g. `file:/home/youruser/fk_olaine-data/app.db`; the parent directory is created automatically on startup if missing. Leave `TURSO_AUTH_TOKEN` empty. Back the file up yourself (e.g. a cPanel cron job copying it out on a schedule) — a local file has no built-in replication. See `.env.example` for the full comment.
 - **Uploaded photos** (`UPLOADS_DIR`) — same idea: an absolute path outside the app folder, ideally inside `public_html/` so Apache/LiteSpeed can serve the files directly. See `.env.example`.
 
-Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`) in the Node.js App's environment variable UI, then run `npm run db:push` once against production to create the schema.
+Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`, `SITE_URL`) in the Node.js App's environment variable UI, then run `npm run db:push` once against production to create the schema.
+
+`SITE_URL` should be the real public domain (e.g. `https://fkolaine.lv`, no trailing slash) — `robots.txt` and `sitemap.xml` build their absolute links from it.
