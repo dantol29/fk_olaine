@@ -64,7 +64,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
         >
           <thead>
             <tr className="text-left text-xs text-slate-400">
-              <th className="w-10 pb-2">#</th>
+              <th className="w-10 pr-3 pb-2">#</th>
               <th className="pb-2">Komanda</th>
               <th className="pb-2 text-center">Spēles</th>
               <th className="pb-2 text-center">Vārti</th>
@@ -90,7 +90,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                     className="league-row-enter border-t border-slate-100"
                     style={{ animationDelay: `${enterDelay}ms` }}
                   >
-                    <td className="py-2.5">
+                    <td className="py-2.5 pr-3">
                       <span
                         className={cn(
                           "flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 font-mono text-xs tabular-nums",
