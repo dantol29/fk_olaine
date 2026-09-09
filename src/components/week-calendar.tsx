@@ -511,6 +511,25 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   const rangeEnd = visibleDays[visibleDays.length - 1];
   const rangeLabel = `${rangeStart.dayNumber}.${String(rangeStart.monthNumber).padStart(2, "0")}. – ${rangeEnd.dayNumber}.${String(rangeEnd.monthNumber).padStart(2, "0")}.${rangeEnd.year}.`;
 
+  // Rendered in two spots — next to "Kalendārs" on mobile, alongside the
+  // event-type chips at sm and up — so it's built once and dropped into
+  // whichever wrapper is visible at the current breakpoint.
+  const teamFilterSelect = teamOptions.length > 0 && (
+    <select
+      value={activeTeam}
+      onChange={(event) => setActiveTeam(event.target.value)}
+      aria-label="Filtrēt pēc komandas"
+      className="rounded-full border border-transparent bg-slate-100 px-4 py-2 text-sm font-semibold text-club-navy transition hover:bg-slate-200 focus:outline-none"
+    >
+      <option value="all">Visas komandas</option>
+      {teamOptions.map((team) => (
+        <option key={team} value={team}>
+          {team}
+        </option>
+      ))}
+    </select>
+  );
+
   const navigateDays = (direction: "prev" | "next") => {
     if (direction === "next") {
       if (half === 0) {
@@ -570,6 +589,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
         <span className="hidden text-2xl text-club-navy sm:block sm:text-3xl">
           {rangeLabel}
         </span>
+        <div className="sm:hidden">{teamFilterSelect}</div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -596,21 +616,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
               </button>
             );
           })}
-          {teamOptions.length > 0 && (
-            <select
-              value={activeTeam}
-              onChange={(event) => setActiveTeam(event.target.value)}
-              aria-label="Filtrēt pēc komandas"
-              className="rounded-full border border-transparent bg-slate-100 px-4 py-2 text-sm font-semibold text-club-navy transition hover:bg-slate-200 focus:outline-none"
-            >
-              <option value="all">Visas komandas</option>
-              {teamOptions.map((team) => (
-                <option key={team} value={team}>
-                  {team}
-                </option>
-              ))}
-            </select>
-          )}
+          <div className="hidden sm:block">{teamFilterSelect}</div>
         </div>
 
         <div className="hidden items-center gap-2 sm:flex">
