@@ -16,7 +16,7 @@ export async function HomeNewsCarousel() {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex items-center justify-between gap-3 pt-4 lg:hidden">
+      <div className="flex items-center justify-between gap-3 px-4 pt-4 sm:px-8 lg:hidden">
         <h2 className="text-3xl text-club-navy sm:text-4xl">Jaunumi</h2>
         <Link
           href="/jaunumi"
