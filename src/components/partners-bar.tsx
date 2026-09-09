@@ -93,7 +93,7 @@ export function PartnersBar() {
 
         <div className="relative z-10 flex w-full flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-8">
           <div className="flex shrink-0 items-center gap-5">
-            <span className="text-xs text-white uppercase sm:text-sm">
+            <span className="text-2xl text-white uppercase sm:text-sm">
               Mūsu partneri
             </span>
             <span className="hidden h-9 w-px shrink-0 bg-white/40 sm:block" />
