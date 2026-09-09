@@ -65,14 +65,11 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               <tr className="text-left text-xs text-slate-400">
                 <th className="w-10 pr-3 pb-2">#</th>
                 <th className="pb-2">Komanda</th>
-                <th className="pb-2 text-center">
+                <th className="pr-3 pb-2 text-center sm:pr-0">
                   <span className="sm:hidden">S</span>
                   <span className="hidden sm:inline">Spēles</span>
                 </th>
-                <th className="pb-2 text-center">
-                  <span className="sm:hidden">+/-</span>
-                  <span className="hidden sm:inline">Vārti</span>
-                </th>
+                <th className="hidden pb-2 text-center sm:table-cell">Vārti</th>
                 <th className="pb-2 pr-1 text-center">
                   <span className="sm:hidden">P</span>
                   <span className="hidden sm:inline">Punkti</span>
@@ -124,13 +121,13 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                               className="h-9.5 w-9.5 shrink-0 rounded-full bg-white object-contain ring-1 ring-black/5"
                             />
                           )}
-                          <span className="truncate">{row.team}</span>
+                          <span className="truncate text-base sm:text-sm">{row.team}</span>
                         </div>
                       </td>
-                      <td className="py-2.5 text-center font-mono text-sm tabular-nums text-slate-600">
+                      <td className="py-2.5 pr-3 text-center font-mono text-sm tabular-nums text-slate-600 sm:pr-0">
                         {row.played}
                       </td>
-                      <td className="py-2.5 text-center font-mono text-sm tabular-nums text-slate-600">
+                      <td className="hidden py-2.5 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell">
                         {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
                       </td>
                       <td
