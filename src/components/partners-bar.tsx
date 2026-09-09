@@ -112,7 +112,7 @@ export function PartnersBar() {
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-4 sm:pl-24">
+          <div className="hidden shrink-0 items-center gap-4 sm:flex sm:pl-24">
             <span className="hidden text-right text-xs leading-tight  text-white uppercase sm:block sm:text-sm">
               Kopā augam
               <br />
