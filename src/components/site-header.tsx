@@ -54,14 +54,16 @@ export function SiteHeader() {
         <div className="relative mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-6 sm:h-24">
           <div className="w-[110px] shrink-0" />
 
-          <Image
-            src="/fk-olaine-crest-v2.png"
-            alt="FK Olaine"
-            width={135}
-            height={140}
-            priority
-            className="absolute top-4 left-6 z-40 h-24 w-auto drop-shadow-lg sm:left-12 sm:h-28"
-          />
+          <Link href="/" className="absolute top-4 left-6 z-40 sm:left-12">
+            <Image
+              src="/fk-olaine-crest-v2.png"
+              alt="FK Olaine"
+              width={135}
+              height={140}
+              priority
+              className="h-24 w-auto drop-shadow-lg sm:h-28"
+            />
+          </Link>
 
           <NavigationMenu className="hidden max-w-none flex-1 justify-center px-20 lg:flex">
             <NavigationMenuList className="w-full justify-between">
@@ -146,13 +148,15 @@ export function SiteHeader() {
         <DrawerContent className="border-none bg-transparent shadow-none">
           <div className="flex h-full w-full flex-col gap-1 bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <Image
-                src="/fk-olaine-crest-v2.png"
-                alt="FK Olaine"
-                width={60}
-                height={62}
-                className="h-14 w-auto"
-              />
+              <Link href="/" onClick={() => setMobileOpen(false)}>
+                <Image
+                  src="/fk-olaine-crest-v2.png"
+                  alt="FK Olaine"
+                  width={60}
+                  height={62}
+                  className="h-14 w-auto"
+                />
+              </Link>
               <DrawerClose
                 aria-label="Aizvērt izvēlni"
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"

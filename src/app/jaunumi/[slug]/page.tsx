@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { getUpcomingGamesFromDb } from "@/lib/games-server";
-import { getArticleBySlug, getRelatedArticles } from "@/lib/jaunumi-server";
+import { getArticleBySlug } from "@/lib/jaunumi-server";
 import { ArticleDetail } from "@/components/article-detail";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
@@ -45,16 +44,11 @@ export default async function ArticlePage({
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
-  const upcomingGames = await getUpcomingGamesFromDb(1);
-  const nextGame = upcomingGames[0] ?? null;
-
-  const related = await getRelatedArticles(slug);
-
   return (
     <>
       <SiteHeader />
       <main className="bg-background">
-        <ArticleDetail article={article} related={related} nextGame={nextGame} />
+        <ArticleDetail article={article} />
       </main>
       <JoinTeamCta />
       <SiteFooter />

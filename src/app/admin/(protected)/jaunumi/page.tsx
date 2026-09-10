@@ -1,4 +1,4 @@
-import { Newspaper, Pencil, Star } from "lucide-react";
+import { Newspaper, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -43,11 +43,6 @@ export default async function AdminArticlesPage() {
                   <div className="flex h-full w-full items-center justify-center">
                     <Newspaper className="h-10 w-10 text-club-muted" strokeWidth={1.5} />
                   </div>
-                )}
-                {article.featured && (
-                  <span className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-club-red text-white">
-                    <Star className="h-3.5 w-3.5" fill="currentColor" />
-                  </span>
                 )}
               </div>
               <div className="p-3">

@@ -19,11 +19,12 @@ export type Article = {
   category: ArticleCategory;
   team?: string;
   image: string;
+  authorName?: string;
+  authorPosition?: string;
+  authorAvatar?: string;
   body: string[];
   quote?: ArticleQuote;
   highlights?: string[];
-  closing?: string;
-  signature?: string;
 };
 
 /** Formats a "YYYY-MM-DD" date into the Latvian display style used

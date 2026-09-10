@@ -37,7 +37,7 @@ const LINKS: QuickLink[] = [
     eyebrow: ["Disciplīna", "Progress", "Komanda"],
     title: "Treniņi",
     description: "Treniņu grafiks, norises vietas un vairāk informācijas.",
-    href: "/treninji",
+    href: "/?type=training#kalendars",
     image: "/player-shooting.png",
   },
 ];
@@ -91,8 +91,11 @@ function CardVisual({
 
 export function QuickLinksSection() {
   return (
-    <section>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+    <section className="flex h-full flex-col gap-3">
+      <div className="hidden items-center gap-3 pt-4 lg:flex">
+        <h2 className="text-3xl text-club-navy sm:text-4xl">Informācija</h2>
+      </div>
+      <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
         {LINKS.map((link) => (
           <Link
             key={link.title}

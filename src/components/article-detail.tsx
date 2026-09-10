@@ -2,24 +2,43 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
   Calendar,
-  ChevronRight,
-  Link2,
+  Maximize2,
   Quote,
+  Share2,
+  X,
 } from "lucide-react";
 
 import { FacebookIcon } from "@/components/social-icons";
-import { MatchCard } from "@/components/matches-showcase";
 import { cn } from "@/lib/utils";
-import type { UpcomingGame } from "@/lib/games";
 import type { Article } from "@/lib/jaunumi";
 
 function ArticleImagesCarousel({ images }: { images: string[] }) {
   const [index, setIndex] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFullscreen(false);
+      if (event.key === "ArrowLeft") go("prev");
+      if (event.key === "ArrowRight") go("next");
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fullscreen]);
 
   if (images.length === 0) return null;
 
@@ -31,57 +50,130 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
   };
 
   return (
-    <div className="relative h-[280px] overflow-hidden rounded-[2rem] sm:h-[420px]">
-      <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
+    <>
+      <div className="relative h-[280px] overflow-hidden rounded-[2rem] sm:h-[420px]">
+        <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
 
-      {images.length > 1 && (
-        <>
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
+        <button
+          type="button"
+          onClick={() => setFullscreen(true)}
+          aria-label="Skatīt pilnekrānā"
+          className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition hover:bg-black/60"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </button>
 
-          <div className="absolute bottom-8 left-8 z-20 flex items-center gap-3 sm:left-10">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => go("prev")}
-                aria-label="Iepriekšējais attēls"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => go("next")}
-                aria-label="Nākamais attēls"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
-              >
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
+        {images.length > 1 && (
+          <>
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
 
-            <span className="text-xl text-white">
-              {String(index + 1).padStart(2, "0")}
-              <span className="ml-1.5 text-sm font-medium text-white/50">
-                /{String(images.length).padStart(2, "0")}
-              </span>
-            </span>
-            <div className="flex gap-1.5">
-              {images.map((_, i) => (
+            <div className="absolute bottom-4 left-8 z-20 flex items-center gap-3 sm:left-10">
+              <div className="flex items-center gap-2">
                 <button
-                  key={i}
                   type="button"
-                  onClick={() => setIndex(i)}
-                  aria-label={`Rādīt ${i + 1}. attēlu`}
-                  className={cn(
-                    "h-[3px] w-7 rounded-full transition-colors",
-                    i === index ? "bg-club-red" : "bg-white/25",
-                  )}
-                />
-              ))}
+                  onClick={() => go("prev")}
+                  aria-label="Iepriekšējais attēls"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go("next")}
+                  aria-label="Nākamais attēls"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              <span className="text-xl text-white">
+                {String(index + 1).padStart(2, "0")}
+                <span className="ml-1.5 text-sm font-medium text-white/50">
+                  /{String(images.length).padStart(2, "0")}
+                </span>
+              </span>
+              {images.length <= 5 && (
+                <div className="flex gap-1.5">
+                  {images.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setIndex(i)}
+                      aria-label={`Rādīt ${i + 1}. attēlu`}
+                      className={cn(
+                        "h-[3px] w-7 rounded-full transition-colors",
+                        i === index ? "bg-club-red" : "bg-white/25",
+                      )}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
+          </>
+        )}
+      </div>
+
+      {fullscreen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 sm:p-10"
+          onClick={() => setFullscreen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setFullscreen(false)}
+            aria-label="Aizvērt"
+            className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="relative h-full w-full">
+            <Image
+              key={images[index]}
+              src={images[index]}
+              alt=""
+              fill
+              className="object-contain"
+            />
           </div>
-        </>
+
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  go("prev");
+                }}
+                aria-label="Iepriekšējais attēls"
+                className="absolute top-1/2 left-4 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white transition hover:bg-black/50 sm:left-8"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  go("next");
+                }}
+                aria-label="Nākamais attēls"
+                className="absolute top-1/2 right-4 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white transition hover:bg-black/50 sm:right-8"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <span className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 text-sm text-white/70 sm:bottom-8">
+                {String(index + 1).padStart(2, "0")}
+                <span className="ml-1 text-white/40">
+                  /{String(images.length).padStart(2, "0")}
+                </span>
+              </span>
+            </>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -109,9 +201,9 @@ function CopyLinkButton() {
         }
       }}
       aria-label="Kopēt saiti"
-      className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-club-navy transition hover:bg-club-red hover:text-white"
+      className="flex h-8 w-8 items-center justify-center text-club-navy transition hover:text-club-red"
     >
-      <Link2 className="h-3.5 w-3.5" />
+      <Share2 className="h-5 w-5" />
       {copied && (
         <span className="absolute mt-10 rounded-md bg-club-navy px-2 py-1 text-[10px] text-white">
           Nokopēts!
@@ -121,29 +213,14 @@ function CopyLinkButton() {
   );
 }
 
-type RelatedItem = {
-  slug: string;
-  title: string;
-  date: string;
-  image: string;
-};
-
-export function ArticleDetail({
-  article,
-  related,
-  nextGame,
-}: {
-  article: Article;
-  related: RelatedItem[];
-  nextGame: UpcomingGame | null;
-}) {
+export function ArticleDetail({ article }: { article: Article }) {
   const images = [article.image, ...(article.highlights ?? [])];
 
   return (
     <>
       {/* Header band */}
       <section className="pt-4 sm:px-6">
-        <div className="mx-auto max-w-[1440px] bg-club-red/10 px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
+        <div className="mx-auto max-w-[1440px] rounded-b-[2rem] bg-gradient-to-br from-club-red/25 via-club-red/10 to-transparent px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
           <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <Link href="/" className="hover:text-club-navy">
               Sākums
@@ -176,26 +253,61 @@ export function ArticleDetail({
           <h1 className="mt-3 max-w-3xl text-3xl text-club-navy sm:text-4xl">
             {article.title}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
-            {article.excerpt}
-          </p>
+
+          {article.authorName && (
+            <div className="mt-6 flex items-center justify-between gap-3.5">
+              <div className="flex items-center gap-4">
+                {article.authorAvatar ? (
+                  <Image
+                    src={article.authorAvatar}
+                    alt={article.authorName}
+                    width={72}
+                    height={72}
+                    className="h-18 w-18 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full bg-club-navy text-2xl font-bold text-white">
+                    {article.authorName
+                      .split(" ")
+                      .map((word) => word[0])
+                      .join("")}
+                  </span>
+                )}
+                <span className="flex flex-col leading-tight">
+                  <span className="text-lg font-semibold text-club-navy">
+                    {article.authorName}
+                  </span>
+                  {article.authorPosition && (
+                    <span className="text-base text-slate-500">
+                      {article.authorPosition}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="relative">
+                <CopyLinkButton />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Main content */}
-      <section className="px-6 py-8">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[3fr_1fr]">
+      <section className="px-6 pt-8 pb-24">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-2">
           <div className="min-w-0">
             <ArticleImagesCarousel images={images} />
+          </div>
 
-            <div className="mt-6 flex flex-col gap-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+          <div className="min-w-0">
+            <div className="flex flex-col gap-4 text-sm leading-relaxed text-slate-600 sm:text-base">
               {article.body.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
             </div>
 
             {article.quote && (
-              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <div className="mt-6">
                 <Quote className="h-6 w-6 text-club-red" />
                 <p className="mt-3 text-lg leading-relaxed text-club-navy italic">
                   &ldquo;{article.quote.text}&rdquo;
@@ -219,17 +331,6 @@ export function ArticleDetail({
               </div>
             )}
 
-            {article.closing && (
-              <p className="mt-6 text-sm leading-relaxed text-slate-600 sm:text-base">
-                {article.closing}
-              </p>
-            )}
-            {article.signature && (
-              <p className="mt-4 font-bold text-club-navy">
-                {article.signature}
-              </p>
-            )}
-
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
               <Link
                 href="/jaunumi"
@@ -241,84 +342,40 @@ export function ArticleDetail({
               <div className="flex items-center gap-3 text-sm text-slate-500">
                 Dalīties:
                 <div className="relative flex items-center gap-2">
-                  <a
-                    href="#"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = encodeURIComponent(window.location.href);
+                      const text = encodeURIComponent(article.title);
+                      window.open(
+                        `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+                        "_blank",
+                        "noopener,noreferrer,width=600,height=500",
+                      );
+                    }}
                     aria-label="Dalīties X"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-club-navy"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-club-navy transition hover:text-club-red"
                   >
                     <XIcon className="h-6 w-6" />
-                  </a>
-                  <a
-                    href="#"
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = encodeURIComponent(window.location.href);
+                      window.open(
+                        `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+                        "_blank",
+                        "noopener,noreferrer,width=600,height=500",
+                      );
+                    }}
                     aria-label="Dalīties Facebook"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-club-navy"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-club-navy transition hover:text-club-red"
                   >
                     <FacebookIcon className="h-7 w-7" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="flex flex-col gap-6">
-            {nextGame && (
-              <div>
-                <div className="mb-3 flex items-center justify-between gap-3 px-3">
-                  <h3 className="text-md text-club-navy">
-                    Nākamā spēle
-                  </h3>
-                  <Link
-                    href="/#kalendars"
-                    className="flex items-center gap-1 text-sm text-club-red transition hover:text-club-red-dark"
-                  >
-                    Skatīt kalendāru
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-                <div className="h-[300px]">
-                  <MatchCard
-                    game={nextGame}
-                    isActive
-                    elevated={false}
-                    className="rounded-2xl bg-white shadow-sm"
-                  />
-                </div>
-              </div>
-            )}
-
-            {related.length > 0 && (
-              <div className="rounded-2xl bg-white p-5 shadow-sm">
-                <span className="text-sm text-club-red uppercase">
-                  Saistītie raksti
-                </span>
-                <div className="mt-4 flex flex-col divide-y divide-slate-100">
-                  {related.map((item) => (
-                    <Link
-                      key={item.slug}
-                      href="/jaunumi"
-                      className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
-                    >
-                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
-                        <Image
-                          src={item.image}
-                          alt=""
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-slate-400">{item.date}</p>
-                        <p className="line-clamp-2 text-sm font-semibold text-club-navy">
-                          {item.title}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:text-club-red" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>

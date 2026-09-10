@@ -15,17 +15,16 @@ type Article = {
   date: string;
   category: (typeof CATEGORIES)[number];
   teamId: number | null;
+  authorCoachId: number | null;
   image: string;
   body: string;
   quoteText: string | null;
   quoteAuthor: string | null;
   quoteRole: string | null;
   highlights: string | null;
-  closing: string | null;
-  signature: string | null;
-  featured: boolean;
 };
 type TeamOption = { id: number; name: string };
+type CoachOption = { id: number; name: string };
 
 function slugify(value: string): string {
   return value
@@ -47,8 +46,8 @@ function slugify(value: string): string {
 
 export function ArticleForm(
   props:
-    | { mode: "create"; teamOptions: TeamOption[] }
-    | { mode: "edit"; article: Article; teamOptions: TeamOption[] },
+    | { mode: "create"; teamOptions: TeamOption[]; coachOptions: CoachOption[] }
+    | { mode: "edit"; article: Article; teamOptions: TeamOption[]; coachOptions: CoachOption[] },
 ) {
   const action =
     props.mode === "create" ? createArticle : updateArticle.bind(null, props.article.id);
@@ -153,6 +152,25 @@ export function ArticleForm(
         </select>
       </label>
 
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Autors (nav obligāts)
+        <select
+          name="authorCoachId"
+          defaultValue={article?.authorCoachId ?? ""}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        >
+          <option value="">—</option>
+          {props.coachOptions.map((coach) => (
+            <option key={coach.id} value={coach.id}>
+              {coach.name}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1.5 text-xs text-slate-400">
+          Autora vārds un foto rakstā tiek ņemti no izvēlētā trenera profila.
+        </p>
+      </label>
+
       <div className="mt-4">
         <span className="block text-sm font-semibold text-club-navy">Attēls</span>
         {article?.image && (
@@ -219,7 +237,7 @@ export function ArticleForm(
 
       <div className="mt-4">
         <span className="block text-sm font-semibold text-club-navy">
-          Spilgtākie momenti (nav obligāts)
+          Galerija (nav obligāts)
         </span>
         {highlightUrls.length > 0 && (
           <div className="mt-1.5 flex gap-2">
@@ -250,31 +268,6 @@ export function ArticleForm(
           </label>
         )}
       </div>
-
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Noslēgums (nav obligāts)
-        <textarea
-          name="closing"
-          rows={2}
-          defaultValue={article?.closing ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-        />
-      </label>
-
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Paraksts (nav obligāts)
-        <input
-          type="text"
-          name="signature"
-          defaultValue={article?.signature ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-        />
-      </label>
-
-      <label className="mt-4 flex items-center gap-2 text-sm font-semibold text-club-navy">
-        <input type="checkbox" name="featured" defaultChecked={article?.featured ?? false} />
-        Rādīt sadaļā &ldquo;Izceltie raksti&rdquo;
-      </label>
 
       {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}
 

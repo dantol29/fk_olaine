@@ -92,8 +92,8 @@ export function CoachesDirectory({ coaches }: { coaches: Coach[] }) {
 
   return (
     <>
-      <section className="px-6 pt-4">
-        <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[280px]">
+      <section className="pt-4 sm:px-6">
+        <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-b-[2rem] sm:h-[280px] sm:rounded-[2rem]">
           <Image
             src="/tactics-board-dusk.png"
             alt="FK Olaine treneri"

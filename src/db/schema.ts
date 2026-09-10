@@ -176,6 +176,7 @@ export const articles = sqliteTable("articles", {
   }).notNull(),
   teamId: integer("team_id").references(() => teams.id, { onDelete: "set null" }),
   image: text("image").notNull(),
+  authorCoachId: integer("author_coach_id").references(() => coaches.id, { onDelete: "set null" }),
   // Paragraphs, one per line.
   body: text("body").notNull(),
   quoteText: text("quote_text"),
@@ -183,14 +184,12 @@ export const articles = sqliteTable("articles", {
   quoteRole: text("quote_role"),
   // Highlight image URLs, one per line.
   highlights: text("highlights"),
-  closing: text("closing"),
-  signature: text("signature"),
-  featured: integer("featured", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at").notNull(),
 });
 
 export const articlesRelations = relations(articles, ({ one }) => ({
   team: one(teams, { fields: [articles.teamId], references: [teams.id] }),
+  authorCoach: one(coaches, { fields: [articles.authorCoachId], references: [coaches.id] }),
 }));
 
 /** Singleton — always exactly one row (id 1). Lets the club admin update

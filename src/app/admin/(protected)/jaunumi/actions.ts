@@ -35,13 +35,11 @@ function parseArticleInput(formData: FormData) {
   const date = String(formData.get("date") ?? "").trim();
   const category = String(formData.get("category") ?? "");
   const teamIdRaw = String(formData.get("teamId") ?? "");
+  const authorCoachIdRaw = String(formData.get("authorCoachId") ?? "");
   const body = String(formData.get("body") ?? "").trim();
-  const closing = String(formData.get("closing") ?? "").trim();
-  const signature = String(formData.get("signature") ?? "").trim();
   const quoteText = String(formData.get("quoteText") ?? "").trim();
   const quoteAuthor = String(formData.get("quoteAuthor") ?? "").trim();
   const quoteRole = String(formData.get("quoteRole") ?? "").trim();
-  const featured = formData.get("featured") === "on";
   const slug = slugify(String(formData.get("slug") ?? "") || title);
 
   if (!title) return { error: "Virsraksts ir obligāts." } as const;
@@ -65,13 +63,11 @@ function parseArticleInput(formData: FormData) {
     date,
     category: category as (typeof CATEGORIES)[number],
     teamId: teamIdRaw ? Number(teamIdRaw) : null,
+    authorCoachId: authorCoachIdRaw ? Number(authorCoachIdRaw) : null,
     body: bodyLines.join("\n"),
-    closing: closing || null,
-    signature: signature || null,
     quoteText: quoteText || null,
     quoteAuthor: quoteText ? quoteAuthor || null : null,
     quoteRole: quoteText ? quoteRole || null : null,
-    featured,
   } as const;
 }
 
