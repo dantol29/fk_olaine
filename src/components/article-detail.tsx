@@ -14,8 +14,64 @@ import {
 
 import { FacebookIcon } from "@/components/social-icons";
 import { MatchCard } from "@/components/matches-showcase";
+import { cn } from "@/lib/utils";
 import type { UpcomingGame } from "@/lib/games";
 import type { Article } from "@/lib/jaunumi";
+
+function HighlightsCarousel({ images }: { images: string[] }) {
+  const [index, setIndex] = useState(0);
+
+  if (images.length === 0) return null;
+
+  const go = (direction: "prev" | "next") => {
+    setIndex((current) => {
+      const next = direction === "next" ? current + 1 : current - 1;
+      return (next + images.length) % images.length;
+    });
+  };
+
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-2xl">
+      <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
+
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => go("prev")}
+            aria-label="Iepriekšējais attēls"
+            className="absolute top-1/2 left-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white backdrop-blur transition hover:bg-black/50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => go("next")}
+            aria-label="Nākamais attēls"
+            className="absolute top-1/2 right-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white backdrop-blur transition hover:bg-black/50"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
+
+          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setIndex(i)}
+                aria-label={`Rādīt ${i + 1}. attēlu`}
+                className={cn(
+                  "h-1.5 rounded-full transition-all",
+                  i === index ? "w-6 bg-white" : "w-1.5 bg-white/40",
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -156,15 +212,8 @@ export function ArticleDetail({
                 <h2 className="text-xl text-club-navy">
                   Spilgtākie momenti
                 </h2>
-                <div className="mt-4 grid grid-cols-3 gap-4">
-                  {article.highlights.map((src, index) => (
-                    <div
-                      key={index}
-                      className="relative aspect-square overflow-hidden rounded-2xl"
-                    >
-                      <Image src={src} alt="" fill className="object-cover" />
-                    </div>
-                  ))}
+                <div className="mt-4">
+                  <HighlightsCarousel images={article.highlights} />
                 </div>
               </div>
             )}
