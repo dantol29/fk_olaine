@@ -81,7 +81,7 @@ export function MatchCard({
           : undefined
       }
       className={cn(
-        "mx-auto flex h-full flex-col rounded-xl p-5  sm:p-6",
+        "mx-auto flex h-full flex-col rounded-xl p-4 sm:p-6",
         onClick && "cursor-pointer",
         isActive
           ? cn(
@@ -92,7 +92,7 @@ export function MatchCard({
         className,
       )}
     >
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-3 flex items-start justify-between sm:mb-4">
         <div
           className={cn(
             "flex shrink-0 flex-col leading-none",
@@ -128,7 +128,7 @@ export function MatchCard({
         </span>
       </div>
 
-      <div className="mb-5 flex flex-1 items-center justify-between gap-2">
+      <div className="mb-3 flex flex-1 items-center justify-between gap-2 sm:mb-5">
         <TeamBadge team={game.home} isActive={isActive} />
         <span
           className={cn(
@@ -191,7 +191,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
   }));
 
   return (
-    <div className="relative h-[580px] min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm sm:h-[640px]">
+    <div className="relative ml-[calc(50%-50vw)] h-[580px] w-screen min-w-0 overflow-hidden rounded-b-[1.5rem] sm:ml-0 sm:h-[640px] sm:w-full sm:rounded-[1.5rem] sm:border sm:border-slate-200 sm:shadow-sm">
       <Image
         src="/stadium-flag-dusk.jpg"
         alt="Olaines stadions"
@@ -227,8 +227,8 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
             ref={carouselRef}
             className="px-1 sm:px-2"
             slides={slides}
-            cardWidth="clamp(200px, 60vw, 300px)"
-            cardHeight="clamp(200px, 60vw, 300px)"
+            cardWidth="clamp(240px, 60vw, 300px)"
+            cardHeight="clamp(240px, 60vw, 300px)"
             rotate={-11}
             depth={0.32}
             perspective={3.2}

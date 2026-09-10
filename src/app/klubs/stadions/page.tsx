@@ -33,8 +33,8 @@ export default function StadionsPage() {
       <SiteHeader />
       <main className="bg-background">
         {/* Hero */}
-        <section className="px-6 pt-4">
-          <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[280px]">
+        <section className="pt-4 sm:px-6">
+          <div className="relative mx-auto h-[320px] max-w-[1440px] overflow-hidden rounded-b-[2rem] sm:h-[380px] sm:rounded-[2rem]">
             <Image
               src="/stadions.jpg"
               alt="Olaines pilsētas stadions"
@@ -42,21 +42,26 @@ export default function StadionsPage() {
               priority
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
 
-            <div className="relative z-10 flex h-full w-full flex-col justify-center px-6 sm:px-10">
-              <h1 className="text-5xl text-white sm:text-6xl">Stadions</h1>
-              <p className="mt-4 text-sm text-white/70 sm:text-base">
-                Olaines pilsētas stadions — mūsu komandu mājas laukums.
+            <div className="relative z-10 flex h-full w-full flex-col justify-end px-6 pb-8 sm:px-10 sm:pb-10">
+              <span className="flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 uppercase backdrop-blur-sm">
+                <MapPin className="h-3.5 w-3.5" />
+                {ADDRESS}
+              </span>
+              <h1 className="mt-3 text-5xl text-white sm:text-6xl">Stadions</h1>
+              <p className="mt-3 max-w-xl text-sm text-white/70 sm:text-base">
+                Olaines pilsētas stadions — mūsu komandu mājas laukums, mākslīgais
+                zālājs un pilna infrastruktūra spēlēm un treniņiem.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Address + map */}
+        {/* Address + facts + map */}
         <section className="px-6 pt-8 pb-8">
           <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-6 lg:grid-cols-[1fr_1.4fr]">
-            <div className="flex flex-col justify-center rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8">
+            <div className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-club-red/10 text-club-red">
                 <MapPin className="h-5 w-5" />
               </span>
@@ -70,9 +75,23 @@ export default function StadionsPage() {
               >
                 Atvērt kartē
               </a>
+
+              <div className="mt-6 divide-y divide-slate-100 border-t border-slate-100">
+                {FACTS.map((fact) => (
+                  <div key={fact.label} className="flex items-center gap-4 py-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-club-red/10 text-club-red">
+                      <fact.icon className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-club-navy">{fact.label}</p>
+                      <p className="text-sm text-slate-500">{fact.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="overflow-hidden rounded-[2rem] border border-slate-200">
+            <div className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-sm">
               <iframe
                 title="Olaines pilsētas stadiona atrašanās vieta"
                 src={`https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`}
@@ -80,29 +99,6 @@ export default function StadionsPage() {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
-            </div>
-          </div>
-        </section>
-
-        {/* Basic info */}
-        <section className="px-6 pb-12">
-          <div className="mx-auto max-w-[1440px]">
-            <h2 className="text-2xl text-club-navy sm:text-3xl">Par stadionu</h2>
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FACTS.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-club-navy">
-                    <fact.icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-club-navy">{fact.label}</p>
-                    <p className="text-sm text-slate-500">{fact.value}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>

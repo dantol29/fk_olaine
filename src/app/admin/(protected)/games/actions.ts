@@ -45,6 +45,7 @@ export async function createGame(_prevState: { error?: string } | undefined, for
 
   await db.insert(games).values({ ...parsed, source: "manual", createdAt: Date.now() });
   revalidatePath("/admin/games");
+  revalidatePath("/");
   redirect("/admin/games");
 }
 
@@ -58,10 +59,12 @@ export async function updateGame(
 
   await db.update(games).set(parsed).where(eq(games.id, id));
   revalidatePath("/admin/games");
+  revalidatePath("/");
   redirect("/admin/games");
 }
 
 export async function deleteGame(id: number) {
   await db.delete(games).where(eq(games.id, id));
   revalidatePath("/admin/games");
+  revalidatePath("/");
 }

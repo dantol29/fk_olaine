@@ -30,7 +30,7 @@ export function NewsCarousel({ articles }: { articles: NewsCarouselItem[] }) {
   };
 
   return (
-    <div className="relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm">
+    <div className="relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-[1.5rem] shadow-sm">
       <Link
         href={`/jaunumi/${article.slug}`}
         className="group relative flex flex-1 flex-col justify-end p-6 pb-20 sm:p-8 sm:pb-24"

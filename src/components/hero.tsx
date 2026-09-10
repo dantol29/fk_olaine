@@ -2,6 +2,7 @@ import { isNotNull } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { leagueSources } from "@/db/schema";
+import { backfillClubLogos } from "@/lib/club-logos";
 import { getStandings, type StandingRow } from "@/lib/standings";
 import { getUpcomingGamesFromDb } from "@/lib/games-server";
 import type { UpcomingGame } from "@/lib/games";
@@ -104,7 +105,7 @@ async function fetchLeagueStandings(): Promise<
       return fallback;
     }
 
-    return await Promise.all(
+    const results = await Promise.all(
       sources.map(async (source) => {
         const url = source.standingsUrl as string;
         try {
@@ -115,6 +116,24 @@ async function fetchLeagueStandings(): Promise<
         }
       }),
     );
+
+    // Best-effort: also catch any club logo LFF has on file for a team
+    // that only ever shows up in a standings table (not a fixtures list),
+    // same idempotent backfill the fixtures import uses. A failure here
+    // must never take down the standings themselves.
+    try {
+      const scrapedLogos = new Map<string, string>();
+      for (const { standings } of results) {
+        for (const row of standings) {
+          if (row.logo) scrapedLogos.set(row.team, row.logo);
+        }
+      }
+      await backfillClubLogos(scrapedLogos);
+    } catch {
+      // Ignore — logos will simply stay unresolved until the next successful run.
+    }
+
+    return results;
   } catch {
     return fallback;
   }
@@ -141,7 +160,7 @@ export async function Hero() {
           <MatchesShowcase games={upcomingGames} />
 
           {/* League table card */}
-          <div className="relative flex h-[760px] flex-col overflow-hidden sm:h-[640px] sm:rounded-[2rem] sm:border sm:border-slate-200 sm:bg-background sm:shadow-sm">
+          <div className="relative flex h-[760px] flex-col overflow-hidden sm:h-[640px]">
             <LeagueSelector leagues={leagues} />
           </div>
         </div>

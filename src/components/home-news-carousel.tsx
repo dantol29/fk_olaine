@@ -6,7 +6,7 @@ import { NewsCarousel } from "@/components/news-carousel";
 
 export async function HomeNewsCarousel() {
   const articles = await getArticles();
-  const items = articles.slice(0, 6).map((article) => ({
+  const items = articles.slice(0, 3).map((article) => ({
     slug: article.slug,
     title: article.title,
     excerpt: article.excerpt,

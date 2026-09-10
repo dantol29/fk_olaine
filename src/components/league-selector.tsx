@@ -102,7 +102,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       )}
                       style={{ animationDelay: `${enterDelay}ms` }}
                     >
-                      <td className={cn("py-4 pr-3 pl-2 sm:py-5", row.isOlaine && "rounded-l-xl")}>
+                      <td className={cn("py-4 pr-3 pl-0 sm:py-5", row.isOlaine && "rounded-l-xl")}>
                         <span
                           className={cn(
                             "flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs font-bold tabular-nums",

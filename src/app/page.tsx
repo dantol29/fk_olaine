@@ -8,7 +8,6 @@ import { PartnersBar } from "@/components/partners-bar";
 import { QuickLinksSection } from "@/components/quick-links-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { WideScreenFillers } from "@/components/wide-screen-fillers";
 
 export const metadata: Metadata = {
   title: "FK Olaine — Olaines futbola klubs",
@@ -24,10 +23,13 @@ export default function Home() {
       <main className="bg-background">
         <Hero />
       </main>
+      <div className="px-6 py-16">
+        <div className="relative mx-auto max-w-[1440px]">
+          <PartnersBar />
+        </div>
+      </div>
       <div className="px-6">
         <div className="relative mx-auto max-w-[1440px]">
-          <WideScreenFillers />
-          <PartnersBar />
           <div className="grid grid-cols-1 items-stretch gap-4 pb-8 lg:grid-cols-2 lg:gap-5">
             <div className="order-1 h-full lg:order-2">
               <HomeNewsCarousel />

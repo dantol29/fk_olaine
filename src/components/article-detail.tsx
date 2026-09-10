@@ -220,7 +220,7 @@ export function ArticleDetail({ article }: { article: Article }) {
     <>
       {/* Header band */}
       <section className="pt-4 sm:px-6">
-        <div className="mx-auto max-w-[1440px] rounded-b-[2rem] bg-gradient-to-br from-club-red/25 via-club-red/10 to-transparent px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
+        <div className="mx-auto max-w-[1440px] rounded-b-[2rem] bg-gradient-to-br from-club-navy/25 via-club-navy/10 to-transparent px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
           <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <Link href="/" className="hover:text-club-navy">
               Sākums

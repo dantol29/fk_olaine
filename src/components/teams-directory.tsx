@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { UserRound } from "lucide-react";
+import { Search, UserRound, X } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -65,6 +65,8 @@ function TeamSection({ team }: { team: Team }) {
 
 export function TeamsDirectory({ teams }: { teams: Team[] }) {
   const [activeCategory, setActiveCategory] = useState("Visas komandas");
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const categories = ["Visas komandas", ...teams.map((team) => team.name)];
   const totalPlayers = teams.reduce(
@@ -72,31 +74,57 @@ export function TeamsDirectory({ teams }: { teams: Team[] }) {
     0,
   );
 
-  const visible =
-    activeCategory === "Visas komandas"
-      ? teams
-      : teams.filter((team) => team.name === activeCategory);
+  const q = query.trim().toLowerCase();
+  const visible = teams
+    .filter((team) => activeCategory === "Visas komandas" || team.name === activeCategory)
+    .map((team) => ({
+      ...team,
+      players:
+        q.length === 0
+          ? team.players
+          : team.players.filter((player) => player.name.toLowerCase().includes(q)),
+    }))
+    .filter((team) => team.players.length > 0);
 
   return (
     <>
-      <section className="pt-4 sm:px-6">
-        <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-b-[2rem] sm:h-[280px] sm:rounded-[2rem]">
-          <Image
-            src="/tactics-board-dusk.png"
-            alt="FK Olaine komandas"
-            fill
-            priority
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25" />
+      <section className="px-6 pt-10 sm:pt-14">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4">
+          <h1 className="text-4xl text-club-navy sm:text-5xl">Komandas</h1>
 
-          <div className="relative z-10 flex h-full w-full flex-col justify-center px-6 sm:px-10">
-            <h1 className="text-5xl text-white sm:text-6xl">Komandas</h1>
-
-            <p className="mt-4 text-sm text-white/70 sm:text-base">
-              Dažādos vecumos. Viena komanda.
-            </p>
-          </div>
+          {searchOpen ? (
+            <label className="relative flex w-full max-w-[220px] shrink-0 items-center sm:max-w-xs">
+              <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
+              <input
+                autoFocus
+                type="text"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Meklēt spēlētājus..."
+                className="w-full rounded-full border border-slate-200 bg-white py-2 pr-9 pl-10 text-sm text-club-navy outline-none focus:border-club-red"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setSearchOpen(false);
+                }}
+                aria-label="Aizvērt meklēšanu"
+                className="absolute right-3.5 flex h-4 w-4 items-center justify-center text-slate-400 transition hover:text-club-navy"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </label>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Meklēt spēlētājus"
+              className="shrink-0 text-club-navy transition hover:text-club-red"
+            >
+              <Search className="h-7 w-7" />
+            </button>
+          )}
         </div>
       </section>
 

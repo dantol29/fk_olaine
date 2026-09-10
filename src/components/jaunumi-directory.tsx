@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { Article, ArticleCategory } from "@/lib/jaunumi";
@@ -16,8 +16,7 @@ const CATEGORIES: ArticleCategory[] = [
   "Pasākumi",
 ];
 
-// Three full lg:grid-cols-4 rows.
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 6;
 
 function getPageNumbers(current: number, total: number): (number | "…")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -40,6 +39,7 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
     ArticleCategory | "Visi"
   >("Visi");
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -76,93 +76,106 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
 
   return (
     <>
-      {/* Hero */}
-      <section className="pt-4 sm:px-6">
-        <div className="relative mx-auto h-[240px] max-w-[1440px] overflow-hidden rounded-b-[2rem] sm:h-[280px] sm:rounded-[2rem]">
-          <Image
-            src="/tactics-board-dusk.png"
-            alt="FK Olaine jaunumi"
-            fill
-            priority
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+      {/* Title */}
+      <section className="px-6 pt-14 sm:pt-14">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4">
+          <h1 className="text-4xl text-club-navy sm:text-5xl">Jaunumi</h1>
 
-          <div className="relative z-10 flex h-full w-full flex-col justify-center px-6 sm:px-10">
-            <h1 className="text-5xl text-white sm:text-6xl">Jaunumi</h1>
-            <p className="mt-4 text-sm text-white/70 sm:text-base">
-              Notikumi. Cilvēki. Attīstība.
-              <br />
-              Viss par mūsu klubu.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Main grid */}
-      <section className="px-6 pt-6 pb-8">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap gap-2">
-              {(["Visi", ...CATEGORIES] as const).map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setActiveCategory(category)}
-                  aria-pressed={activeCategory === category}
-                  className={cn(
-                    "rounded-full px-4 py-2 text-sm transition",
-                    activeCategory === category
-                      ? "bg-club-navy text-white"
-                      : "bg-slate-100 text-club-navy hover:bg-slate-200",
-                  )}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-            <label className="relative flex w-full max-w-xs shrink-0 items-center">
-              <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-black" />
+          {searchOpen ? (
+            <label className="relative flex w-full max-w-[220px] shrink-0 items-center sm:max-w-xs">
+              <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
               <input
+                autoFocus
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Meklēt rakstus..."
-                className="w-full rounded-full border border-slate-200 bg-white py-2 pr-4 pl-10 text-sm text-club-navy outline-none focus:border-club-red"
+                className="w-full rounded-full border border-slate-200 bg-white py-2 pr-9 pl-10 text-sm text-club-navy outline-none focus:border-club-red"
               />
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setSearchOpen(false);
+                }}
+                aria-label="Aizvērt meklēšanu"
+                className="absolute right-3.5 flex h-4 w-4 items-center justify-center text-slate-400 transition hover:text-club-navy"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
             </label>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Meklēt rakstus"
+              className="shrink-0 text-club-navy transition hover:text-club-red"
+            >
+              <Search className="h-7 w-7" />
+            </button>
+          )}
+        </div>
+      </section>
+
+      {/* Main list */}
+      <section className="px-6 pt-6 pb-8">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="mb-6 flex flex-wrap gap-2">
+            {(["Visi", ...CATEGORIES] as const).map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setActiveCategory(category)}
+                aria-pressed={activeCategory === category}
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm transition",
+                  activeCategory === category
+                    ? "bg-club-navy text-white"
+                    : "bg-slate-100 text-club-navy hover:bg-slate-200",
+                )}
+              >
+                {category}
+              </button>
+            ))}
           </div>
 
           {pageArticles.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            <div className="flex flex-col gap-4 sm:gap-5">
               {pageArticles.map((article) => (
                 <Link
                   key={article.slug}
                   href={`/jaunumi/${article.slug}`}
-                  className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-2xl p-3 sm:rounded-[2rem] sm:p-5"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm sm:flex-row sm:rounded-[2rem]"
                 >
-                  <Image
-                    src={article.image}
-                    alt=""
-                    fill
-                    className="object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                  <div className="relative h-56 w-full shrink-0 overflow-hidden sm:h-auto sm:w-[420px]">
+                    <Image
+                      src={article.image}
+                      alt=""
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <span className="absolute top-4 left-4 z-10 rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
+                      {article.category}
+                    </span>
+                  </div>
 
-                  <span className="absolute top-2.5 left-2.5 z-10 rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] tracking-wide text-white uppercase sm:top-4 sm:left-4 sm:px-3.5 sm:py-1.5 sm:text-xs">
-                    {article.category}
-                  </span>
-
-                  <span className="relative z-10 text-[11px] font-medium text-white/70 sm:text-xs">
-                    {article.date}
-                  </span>
-                  <h3 className="relative z-10 mt-1 max-w-[calc(100%-2rem)] line-clamp-2 text-sm font-semibold text-white sm:mt-1.5 sm:max-w-[calc(100%-2.5rem)] sm:text-xl">
-                    {article.title}
-                  </h3>
-
-                  <span className="absolute right-2.5 bottom-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/50 text-white transition group-hover:border-club-red group-hover:bg-club-red sm:right-4 sm:bottom-4 sm:h-9 sm:w-9">
-                    <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                  </span>
+                  <div className="flex flex-1 flex-col justify-center gap-2 p-6 sm:gap-3 sm:p-8">
+                    <span className="text-xs font-medium text-slate-400">
+                      {article.date}
+                    </span>
+                    <h3 className="text-xl text-club-navy sm:text-2xl">
+                      {article.title}
+                    </h3>
+                    <p className="line-clamp-2 text-sm text-slate-500 sm:text-base">
+                      {article.excerpt}
+                    </p>
+                    <span className="mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold text-club-navy transition group-hover:text-club-red">
+                      Lasīt vairāk
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 transition group-hover:border-club-red group-hover:bg-club-red group-hover:text-white">
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    </span>
+                  </div>
                 </Link>
               ))}
             </div>
