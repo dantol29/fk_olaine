@@ -72,54 +72,43 @@ export function ArticleDetail({
   return (
     <>
       {/* Header band */}
-      <section className="px-6 pt-4">
-        <div className="relative mx-auto h-[260px] max-w-[1440px] overflow-hidden rounded-[2rem] sm:h-[300px]">
-          <Image
-            src={article.image}
-            alt=""
-            fill
-            priority
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/40 to-transparent" />
-
-          <div className="relative z-10 flex h-full w-full flex-col justify-end px-6 pb-8 sm:px-10">
-            <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-white/70">
-              <Link href="/" className="hover:text-white">
-                Sākums
-              </Link>
-              <span>›</span>
-              <Link href="/jaunumi" className="hover:text-white">
-                Jaunumi
-              </Link>
-              <span>›</span>
-              <span className="max-w-[240px] truncate text-white">
-                {article.title}
-              </span>
-            </nav>
-
-            <div className="mt-4 flex items-center gap-3">
-              <span className="rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
-                {article.category}
-              </span>
-              {article.team && (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-club-navy">
-                  {article.team}
-                </span>
-              )}
-              <span className="flex items-center gap-1.5 text-xs font-medium text-white/80">
-                <Calendar className="h-3.5 w-3.5" />
-                {article.date}
-              </span>
-            </div>
-
-            <h1 className="mt-3 max-w-3xl text-3xl text-white sm:text-4xl">
+      <section className="pt-4 sm:px-6">
+        <div className="mx-auto max-w-[1440px] bg-club-gray-light px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
+          <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-400">
+            <Link href="/" className="hover:text-club-navy">
+              Sākums
+            </Link>
+            <span>›</span>
+            <Link href="/jaunumi" className="hover:text-club-navy">
+              Jaunumi
+            </Link>
+            <span>›</span>
+            <span className="max-w-[240px] truncate text-club-navy">
               {article.title}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm text-white/80 sm:text-base">
-              {article.excerpt}
-            </p>
+            </span>
+          </nav>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
+              {article.category}
+            </span>
+            {article.team && (
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-club-navy">
+                {article.team}
+              </span>
+            )}
+            <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <Calendar className="h-3.5 w-3.5" />
+              {article.date}
+            </span>
           </div>
+
+          <h1 className="mt-3 max-w-3xl text-3xl text-club-navy sm:text-4xl">
+            {article.title}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
+            {article.excerpt}
+          </p>
         </div>
       </section>
 
