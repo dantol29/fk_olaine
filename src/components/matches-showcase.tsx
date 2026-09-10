@@ -265,17 +265,17 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
               type="button"
               onClick={() => carouselRef.current?.prev()}
               aria-label="Iepriekšējā spēle"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10 backdrop-blur-xs"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
+              <ArrowLeft className="h-4.5 w-4.5" />
             </button>
             <button
               type="button"
               onClick={() => carouselRef.current?.next()}
               aria-label="Nākamā spēle"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10 backdrop-blur-xs"
             >
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-4.5 w-4.5" />
             </button>
           </div>
 

@@ -30,9 +30,15 @@ type EventType = CalendarEvent["eventType"];
 const EVENT_TYPE_STYLES: Record<
   EventType,
   {
+    /** Solid color: legend dot, mobile-list icon circle, filter-pill fill. */
     accent: string;
-    gradient: string;
-    photo: string;
+    /** Grid-card background + border. */
+    cardBg: string;
+    /** Grid-card title/time/location text colors. */
+    cardTitle: string;
+    cardMuted: string;
+    /** Grid-card small icon badge. */
+    iconBadge: string;
     icon: typeof Volleyball;
     label: string;
     singular: string;
@@ -40,24 +46,30 @@ const EVENT_TYPE_STYLES: Record<
 > = {
   game: {
     accent: "bg-club-red",
-    gradient: "bg-gradient-to-t from-club-red-dark via-club-red/85 to-club-red/45",
-    photo: "/match-action.png",
+    cardBg: "bg-club-red",
+    cardTitle: "text-white",
+    cardMuted: "text-white/75",
+    iconBadge: "bg-white/20 text-white",
     icon: Volleyball,
     label: "Spēles",
     singular: "Spēle",
   },
   training: {
     accent: "bg-club-navy-light",
-    gradient: "bg-gradient-to-t from-club-navy via-club-navy/85 to-club-navy/45",
-    photo: "/training-drill.png",
+    cardBg: "bg-club-navy/[0.06] border border-club-navy/10",
+    cardTitle: "text-club-navy",
+    cardMuted: "text-slate-500",
+    iconBadge: "bg-club-navy-light/15 text-club-navy-light",
     icon: Dumbbell,
     label: "Treniņi",
     singular: "Treniņš",
   },
   other: {
     accent: "bg-slate-400",
-    gradient: "bg-gradient-to-t from-slate-700 via-slate-600/85 to-slate-500/45",
-    photo: "/pitch-sunset-gear.png",
+    cardBg: "bg-slate-100 border border-slate-200",
+    cardTitle: "text-club-navy",
+    cardMuted: "text-slate-500",
+    iconBadge: "bg-slate-300 text-slate-600",
     icon: CalendarDays,
     label: "Cits",
     singular: "Cits",
@@ -83,6 +95,18 @@ const WEEKDAY_LABELS = [
   "Ceturtd.",
   "Piektd.",
   "Sestd.",
+];
+
+/** Full weekday names for the desktop grid's day headers — indexed the
+ *  same as WEEKDAY_LABELS (0 = Sunday). */
+const WEEKDAY_LABELS_FULL = [
+  "Svētdiena",
+  "Pirmdiena",
+  "Otrdiena",
+  "Trešdiena",
+  "Ceturtdiena",
+  "Piektdiena",
+  "Sestdiena",
 ];
 
 const MONTH_LABELS = [
@@ -113,8 +137,8 @@ const CHUNK_SIZES = [3, 4] as const;
 /** Tailwind needs both literal class strings present in source to
  *  generate them, so this can't be built from CHUNK_SIZES at runtime. */
 const GRID_COLS_CLASS = [
-  "grid-cols-[44px_repeat(3,1fr)] sm:grid-cols-[64px_repeat(3,1fr)]",
-  "grid-cols-[44px_repeat(4,1fr)] sm:grid-cols-[64px_repeat(4,1fr)]",
+  "grid-cols-[64px_repeat(3,1fr)] sm:grid-cols-[96px_repeat(3,1fr)]",
+  "grid-cols-[64px_repeat(4,1fr)] sm:grid-cols-[96px_repeat(4,1fr)]",
 ] as const;
 /** Beyond this many simultaneous events, the extra ones collapse into a
  *  "+N" chip rather than squeezing into an unreadably thin column. */
@@ -290,24 +314,31 @@ function EventCardBody({ event }: { event: CalendarEvent }) {
 
   return (
     <>
-      <p className="flex items-start gap-1.5 text-xs leading-tight font-bold">
-        <Icon className="mt-0.5 h-3 w-3 shrink-0 text-white/70" />
+      <p className={cn("flex items-center gap-1.5 text-xs leading-tight font-bold", style.cardTitle)}>
+        <span
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-md",
+            style.iconBadge,
+          )}
+        >
+          <Icon className="h-3 w-3" />
+        </span>
         <span className="line-clamp-2">{event.title}</span>
       </p>
-      {(!event.allDay || event.location) && (
-        <p className="mt-auto flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 pt-1 text-[10px] leading-tight text-white/70">
-          {!event.allDay && (
-            <span className="flex shrink-0 items-center gap-1">
-              <Clock className="h-2.5 w-2.5 shrink-0" />
-              {formatClockTime(event.start)}–{formatClockTime(event.end)}
-            </span>
+      {!event.allDay && (
+        <p className={cn("truncate pt-1 pl-[26px] text-[10px] leading-tight", style.cardMuted)}>
+          {formatClockTime(event.start)} – {formatClockTime(event.end)}
+        </p>
+      )}
+      {event.location && (
+        <p
+          className={cn(
+            "mt-auto flex min-w-0 items-center gap-1 pt-0.5 pl-[26px] text-[10px] leading-tight",
+            style.cardMuted,
           )}
-          {event.location && (
-            <span className="flex min-w-0 items-center gap-1">
-              <MapPin className="h-2.5 w-2.5 shrink-0" />
-              <span className="truncate">{event.location}</span>
-            </span>
-          )}
+        >
+          <MapPin className="h-2.5 w-2.5 shrink-0" />
+          <span className="truncate">{event.location}</span>
         </p>
       )}
     </>
@@ -333,22 +364,12 @@ function EventCard({
       onClick={onClick}
       style={style}
       className={cn(
-        "group relative flex cursor-pointer flex-col overflow-hidden rounded-lg text-left text-white shadow-sm transition hover:brightness-110",
+        "flex cursor-pointer flex-col overflow-hidden rounded-lg p-2 text-left shadow-sm transition hover:shadow-md",
+        typeStyle.cardBg,
         className,
       )}
     >
-      <Image
-        src={typeStyle.photo}
-        alt=""
-        fill
-        sizes="220px"
-        className="object-cover opacity-35 transition group-hover:opacity-45"
-      />
-      <div className={cn("absolute inset-0", typeStyle.gradient)} />
-      <span className={cn("absolute inset-y-0 left-0 w-1", typeStyle.accent)} />
-      <div className="relative z-10 flex h-full flex-col py-1.5 pr-2 pl-3">
-        <EventCardBody event={event} />
-      </div>
+      <EventCardBody event={event} />
     </button>
   );
 }
@@ -382,6 +403,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   const [half, setHalf] = useState<0 | 1>(() => getHalfForDate(new Date()));
   const [mobileDate, setMobileDate] = useState(() => toUtcMidnight(new Date()));
   const todayKey = useMemo(() => todayKeyInRiga(), []);
+  const [now, setNow] = useState(() => new Date());
   const [openOverflow, setOpenOverflow] = useState<string | null>(null);
   const overflowRef = useRef<HTMLDivElement>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
@@ -467,6 +489,11 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [selectedEvent]);
 
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
   const visibleDays = useMemo(
     () => getVisibleDays(weekStart, half),
     [weekStart, half],
@@ -513,6 +540,14 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
       Array.from({ length: END_HOUR - startHour + 1 }, (_, i) => i + startHour),
     [startHour],
   );
+
+  /** The live "current time" line in the desktop grid — only meaningful
+   *  when today is one of the currently-visible days. */
+  const nowFraction = hourFraction(now);
+  const showNowLine =
+    visibleDays.some((day) => day.dateKey === todayKey) &&
+    nowFraction >= startHour &&
+    nowFraction <= END_HOUR + 1;
 
   const rangeStart = visibleDays[0];
   const rangeEnd = visibleDays[visibleDays.length - 1];
@@ -747,52 +782,37 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
         </div>
       </div>
 
-      <div className="hidden overflow-hidden rounded-2xl border border-slate-100 sm:block">
+      <div className="hidden overflow-hidden rounded-2xl border border-slate-100 bg-white sm:block">
         <div className="overflow-x-auto">
           <div className="min-w-0 sm:min-w-[560px]">
             <div className="max-h-[560px] overflow-y-auto">
               {/* Header row */}
               <div
                 className={cn(
-                  "sticky top-0 z-10 grid border-b border-slate-100 bg-background",
+                  "sticky top-0 z-10 grid border-b border-slate-100 bg-white",
                   GRID_COLS_CLASS[half],
                 )}
               >
-                <div className="flex items-center justify-center p-1 text-[10px] text-slate-400 uppercase sm:p-3 sm:text-xs">
+                <div className="flex items-center justify-center p-1 text-[11px] font-bold text-club-navy sm:p-3 sm:text-sm">
                   Laiks
                 </div>
-                {visibleDays.map((day) => {
-                  const isToday = day.dateKey === todayKey;
-                  return (
-                    <div
-                      key={day.dateKey}
-                      className="border-l border-slate-100 p-1 text-center sm:p-2"
-                    >
-                      <div
-                        className={cn(
-                          "inline-flex flex-col items-center rounded-xl px-1 py-1 sm:px-3 sm:py-1.5",
-                          isToday && "bg-club-red/5",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "truncate text-[11px] font-bold sm:text-base",
-                            isToday ? "text-club-red" : "text-club-navy",
-                          )}
-                        >
-                          {WEEKDAY_LABELS[day.weekdayIndex]}
-                        </span>
-                        <span className="text-[10px] text-slate-400 sm:text-xs">
-                          {MONTH_LABELS[day.monthNumber - 1]} {day.dayNumber}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {visibleDays.map((day) => (
+                  <div
+                    key={day.dateKey}
+                    className="flex flex-col items-center gap-0.5 border-l border-slate-100 p-1 text-center sm:p-3"
+                  >
+                    <span className="truncate text-[11px] font-bold text-club-navy sm:text-base">
+                      {WEEKDAY_LABELS_FULL[day.weekdayIndex]}
+                    </span>
+                    <span className="text-[10px] text-slate-400 sm:text-xs">
+                      {day.dayNumber}. {MONTH_LABELS[day.monthNumber - 1]}.
+                    </span>
+                  </div>
+                ))}
               </div>
 
               {/* Hour grid */}
-              <div className={cn("grid", GRID_COLS_CLASS[half])}>
+              <div className={cn("relative grid", GRID_COLS_CLASS[half])}>
                 <div
                   className="relative"
                   style={{ height: hours.length * ROW_HEIGHT }}
@@ -800,7 +820,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
                   {hours.map((hour) => (
                     <div
                       key={hour}
-                      className="absolute inset-x-0 border-b border-slate-50 px-1 pt-1 text-[10px] text-slate-400 sm:px-2 sm:text-xs"
+                      className="absolute inset-x-0 border-b border-slate-50 px-2 pt-2 text-center text-[10px] text-slate-400 sm:px-3 sm:pt-3 sm:text-xs"
                       style={{
                         top: (hour - startHour) * ROW_HEIGHT,
                         height: ROW_HEIGHT,
@@ -968,10 +988,41 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
                     </div>
                   );
                 })}
+
+                {showNowLine && (
+                  <div
+                    className="pointer-events-none absolute inset-x-0 z-20 flex items-center"
+                    style={{ top: (nowFraction - startHour) * ROW_HEIGHT }}
+                  >
+                    <span className="flex w-16 shrink-0 justify-end pr-1 sm:w-24 sm:pr-2">
+                      <span className="rounded bg-white px-1 text-[10px] font-bold text-club-red sm:text-xs">
+                        {formatClockTime(now)}
+                      </span>
+                    </span>
+                    <span className="-ml-1 h-2 w-2 shrink-0 rounded-full bg-club-red" />
+                    <span className="h-px flex-1 bg-club-red" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="hidden flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 sm:flex">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-club-red" />
+          Šodiena
+        </span>
+        {ALL_EVENT_TYPES.map((type) => {
+          const style = EVENT_TYPE_STYLES[type];
+          return (
+            <span key={type} className="flex items-center gap-1.5">
+              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", style.accent)} />
+              {style.label}
+            </span>
+          );
+        })}
       </div>
 
       {selectedEvent && (

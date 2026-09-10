@@ -23,7 +23,7 @@ export default function Home() {
       <main className="bg-background">
         <Hero />
       </main>
-      <div className="px-6 py-16">
+      <div className="px-6 pt-4 pb-16">
         <div className="relative mx-auto max-w-[1440px]">
           <PartnersBar />
         </div>

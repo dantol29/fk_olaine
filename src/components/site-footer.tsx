@@ -14,11 +14,15 @@ function mapsUrl(query: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
-const FOOTER_PARTNERS = PARTNERS.map((partner) =>
-  partner.alt === "Daily"
-    ? { ...partner, src: "/partners/daily-logo.png", width: 368, height: 106 }
-    : partner,
-);
+// The colored logos PartnersBar uses for its white card don't have enough
+// contrast against the footer's dark background — swap in the original
+// white-on-transparent versions here instead.
+const FOOTER_PARTNERS = PARTNERS.map((partner) => {
+  if (partner.alt === "Joma") {
+    return { ...partner, src: "/partners/joma_logo.png", needsWhite: true };
+  }
+  return partner;
+});
 
 function SocialLink({
   href,
