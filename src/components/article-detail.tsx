@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import type { UpcomingGame } from "@/lib/games";
 import type { Article } from "@/lib/jaunumi";
 
-function HighlightsCarousel({ images }: { images: string[] }) {
+function ArticleImagesCarousel({ images }: { images: string[] }) {
   const [index, setIndex] = useState(0);
 
   if (images.length === 0) return null;
@@ -31,7 +31,7 @@ function HighlightsCarousel({ images }: { images: string[] }) {
   };
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-2xl">
+    <div className="relative h-[280px] overflow-hidden rounded-[2rem] sm:h-[420px]">
       <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
 
       {images.length > 1 && (
@@ -125,6 +125,8 @@ export function ArticleDetail({
   related: RelatedItem[];
   nextGame: UpcomingGame | null;
 }) {
+  const images = [article.image, ...(article.highlights ?? [])];
+
   return (
     <>
       {/* Header band */}
@@ -172,9 +174,7 @@ export function ArticleDetail({
       <section className="px-6 py-8">
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[3fr_1fr]">
           <div className="min-w-0">
-            <div className="relative h-[280px] overflow-hidden rounded-[2rem] sm:h-[420px]">
-              <Image src={article.image} alt="" fill className="object-cover" />
-            </div>
+            <ArticleImagesCarousel images={images} />
 
             <div className="mt-6 flex flex-col gap-4 text-sm leading-relaxed text-slate-600 sm:text-base">
               {article.body.map((paragraph, index) => (
@@ -203,17 +203,6 @@ export function ArticleDetail({
                       {article.quote.role}
                     </p>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {article.highlights && article.highlights.length > 0 && (
-              <div className="mt-8">
-                <h2 className="text-xl text-club-navy">
-                  Spilgtākie momenti
-                </h2>
-                <div className="mt-4">
-                  <HighlightsCarousel images={article.highlights} />
                 </div>
               </div>
             )}
