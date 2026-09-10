@@ -95,12 +95,12 @@ export function QuickLinksSection() {
       <div className="hidden items-center gap-3 pt-4 lg:flex">
         <h2 className="text-3xl text-club-navy sm:text-4xl">Informācija</h2>
       </div>
-      <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+      <div className="ml-[calc(50%-50vw)] grid w-screen flex-1 grid-cols-1 gap-0 sm:ml-0 sm:w-full sm:grid-cols-2 sm:gap-4 lg:gap-5">
         {LINKS.map((link) => (
           <Link
             key={link.title}
             href={link.href}
-            className="group relative flex aspect-[16/9] flex-col justify-between overflow-hidden rounded-[1.5rem] p-5 sm:aspect-[3/4] sm:p-6"
+            className="group relative flex aspect-[16/9] flex-col justify-between overflow-hidden p-5 sm:aspect-[3/4] sm:rounded-[1.5rem] sm:p-6"
           >
             <Image
               src={link.image}
@@ -113,7 +113,7 @@ export function QuickLinksSection() {
           </Link>
         ))}
 
-        <JoinClubDrawer triggerClassName="group relative flex aspect-[16/9] flex-col justify-between overflow-hidden rounded-[1.5rem] p-5 text-left sm:aspect-[3/4] sm:p-6">
+        <JoinClubDrawer triggerClassName="group relative flex aspect-[16/9] flex-col justify-between overflow-hidden rounded-b-[1.5rem] p-5 text-left sm:aspect-[3/4] sm:rounded-[1.5rem] sm:p-6">
           <Image
             src={JOIN_LINK.image}
             alt=""

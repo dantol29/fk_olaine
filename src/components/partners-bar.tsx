@@ -80,20 +80,20 @@ export function PartnersBar() {
   return (
     <footer className="ml-[calc(50%-50vw)] w-screen bg-club-navy pt-3 pb-6">
       <div className="relative flex w-full items-center overflow-hidden">
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 w-[160px] sm:w-[420px]"
-          style={{ clipPath: "polygon(26% 0, 100% 0, 100% 100%, 10% 100%)" }}
-        >
-          <Image
-            src="/stadium-corner-flag.png"
-            alt=""
-            fill
-            className="object-cover opacity-50"
-          />
-          <div className="absolute inset-0 bg-club-navy/75" />
-        </div>
-
         <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col items-start gap-7 px-6 py-4 sm:flex-row sm:items-center sm:gap-8 sm:px-10 sm:py-5">
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-[160px] sm:w-[420px]"
+            style={{ clipPath: "polygon(26% 0, 100% 0, 100% 100%, 10% 100%)" }}
+          >
+            <Image
+              src="/stadium-corner-flag.png"
+              alt=""
+              fill
+              className="object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-club-navy/75" />
+          </div>
+
           <div className="hidden w-full shrink-0 items-center justify-center gap-5 sm:flex sm:w-auto sm:justify-start">
             <span className="text-2xl text-white uppercase sm:text-sm">
               Mūsu partneri

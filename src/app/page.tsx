@@ -34,7 +34,7 @@ export default function Home() {
             <div className="order-1 h-full lg:order-2">
               <HomeNewsCarousel />
             </div>
-            <h2 className="order-2 text-3xl text-club-navy sm:text-4xl lg:hidden pt-4">
+            <h2 className="order-2 pt-10 text-3xl text-club-navy sm:text-4xl lg:hidden">
               Informācija
             </h2>
             <div className="order-3 h-full lg:order-1">

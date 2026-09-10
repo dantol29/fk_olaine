@@ -25,7 +25,9 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
             <h3 className="text-3xl text-club-navy sm:text-4xl">
               {leagues[activeLeague]?.label ?? ""}
             </h3>
-            <p className="mt-1 text-sm text-slate-400">Turnīra tabula {currentYear}</p>
+            <p className="mt-1 text-sm text-slate-400">
+              Turnīra tabula {currentYear}
+            </p>
           </div>
           <a
             href={leagues[activeLeague]?.url ?? "https://lff.lv/"}
@@ -54,7 +56,9 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                   : "bg-slate-100 text-club-navy hover:bg-slate-200",
               )}
             >
-              {index === activeLeague && <Trophy className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />}
+              {index === activeLeague && (
+                <Trophy className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              )}
               {league.label}
             </button>
           ))}
@@ -98,17 +102,19 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       key={row.pos}
                       className={cn(
                         "league-row-enter border-t border-slate-100",
-                        row.isOlaine && "bg-club-red/5",
                       )}
                       style={{ animationDelay: `${enterDelay}ms` }}
                     >
-                      <td className={cn("py-4 pr-3 pl-0 sm:py-5", row.isOlaine && "rounded-l-xl")}>
+                      <td
+                        className={cn(
+                          "py-4 pr-3 pl-0 sm:py-5",
+                          row.isOlaine && "rounded-l-xl",
+                        )}
+                      >
                         <span
                           className={cn(
-                            "flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs font-bold tabular-nums",
-                            row.isOlaine
-                              ? "bg-club-red/10 text-club-red"
-                              : "bg-slate-100 text-slate-600",
+                            "flex h-7 w-7 items-center justify-center font-mono text-md font-bold tabular-nums",
+                            row.isOlaine ? "text-club-red" : "text-slate-600",
                           )}
                         >
                           {row.pos}
@@ -117,7 +123,9 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       <td
                         className={cn(
                           "py-4 pr-2 sm:py-5",
-                          row.isOlaine ? "text-club-red font-semibold" : "text-club-navy",
+                          row.isOlaine
+                            ? "text-club-red font-semibold"
+                            : "text-club-navy",
                         )}
                       >
                         <div className="flex items-center gap-3">
@@ -130,7 +138,9 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                               className="h-9.5 w-9.5 shrink-0 rounded-full bg-white object-contain ring-1 ring-black/5"
                             />
                           )}
-                          <span className="truncate text-base sm:text-sm">{row.team}</span>
+                          <span className="truncate text-base sm:text-sm">
+                            {row.team}
+                          </span>
                         </div>
                       </td>
                       <td className="py-4 pr-3 text-center font-mono text-sm tabular-nums text-slate-600 sm:py-5 sm:pr-0">
@@ -142,7 +152,9 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                       <td
                         className={cn(
                           "py-4 pr-2 text-center font-mono text-base font-bold tabular-nums sm:py-5",
-                          row.isOlaine ? "text-club-red rounded-r-xl" : "text-club-navy",
+                          row.isOlaine
+                            ? "text-club-red rounded-r-xl"
+                            : "text-club-navy",
                         )}
                       >
                         {row.points}

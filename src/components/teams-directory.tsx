@@ -88,7 +88,7 @@ export function TeamsDirectory({ teams }: { teams: Team[] }) {
 
   return (
     <>
-      <section className="px-6 pt-10 sm:pt-14">
+      <section className="px-6 pt-14 sm:pt-14">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4">
           <h1 className="text-4xl text-club-navy sm:text-5xl">Komandas</h1>
 

@@ -698,7 +698,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
           </button>
         </div>
 
-        <div className="flex flex-col gap-2 rounded-2xl border border-slate-100 p-2">
+        <div className="flex min-h-[220px] flex-col gap-2 rounded-2xl border border-slate-100 p-2">
           {mobileDayEvents.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-400">
               Šajā dienā nav ieplānotu notikumu.

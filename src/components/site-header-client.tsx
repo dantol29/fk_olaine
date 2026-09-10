@@ -31,7 +31,6 @@ const NAV_ITEMS: NavItem[] = [
     items: [
       { title: "Komandas", href: "/komandas" },
       { title: "Treneri", href: "/treneri" },
-      { title: "Stadions", href: "/klubs/stadions" },
     ],
   },
   { title: "Treniņi", href: "/?type=training#kalendars" },
@@ -108,7 +107,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="mt-4 flex items-center justify-end gap-2 pr-2 sm:gap-3 sm:pr-4 lg:mt-0">
+          <div className="mt-4 flex items-center justify-end gap-2 sm:gap-3 sm:pr-2 lg:mt-0 lg:pr-4">
             <a
               href="https://www.instagram.com/fkolaine_sievietes/"
               target="_blank"
@@ -135,12 +134,12 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
             </JoinClubDrawer>
             <DrawerTrigger
               aria-label={mobileOpen ? "Aizvērt izvēlni" : "Atvērt izvēlni"}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light lg:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light lg:hidden"
             >
               {mobileOpen ? (
-                <X className="h-5 w-5" />
+                <X className="h-7 w-7" />
               ) : (
-                <Menu className="h-5 w-5" />
+                <Menu className="h-7 w-7" />
               )}
             </DrawerTrigger>
           </div>

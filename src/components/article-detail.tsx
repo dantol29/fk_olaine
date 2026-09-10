@@ -51,7 +51,7 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
 
   return (
     <>
-      <div className="relative h-[280px] overflow-hidden rounded-[2rem] sm:h-[420px]">
+      <div className="relative ml-[calc(50%-50vw)] h-[280px] w-screen overflow-hidden rounded-b-[2rem] sm:ml-0 sm:h-[420px] sm:w-full sm:rounded-[2rem]">
         <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
 
         <button
@@ -220,7 +220,7 @@ export function ArticleDetail({ article }: { article: Article }) {
     <>
       {/* Header band */}
       <section className="pt-4 sm:px-6">
-        <div className="mx-auto max-w-[1440px] rounded-b-[2rem] bg-gradient-to-br from-club-navy/25 via-club-navy/10 to-transparent px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
+        <div className="mx-auto max-w-[1440px] bg-gradient-to-br from-club-navy/25 via-club-navy/10 to-transparent px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
           <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <Link href="/" className="hover:text-club-navy">
               Sākums
@@ -293,7 +293,7 @@ export function ArticleDetail({ article }: { article: Article }) {
       </section>
 
       {/* Main content */}
-      <section className="px-6 pt-8 pb-24">
+      <section className="px-6 pt-0 pb-24 sm:pt-8">
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-2">
           <div className="min-w-0">
             <ArticleImagesCarousel images={images} />

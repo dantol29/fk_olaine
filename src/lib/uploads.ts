@@ -1,16 +1,22 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const UPLOADS_DIR = process.env.UPLOADS_DIR ?? "public/uploads";
+// Deliberately NOT under public/: Next.js enumerates public/ into a
+// build-time static-files manifest (see outputs.staticFiles), so a file
+// written here after the last build is invisible to Next's static-asset
+// serving and falls through to a (cached!) 404 page. Serving instead goes
+// through the route handler at src/app/uploads/[...path]/route.ts, which
+// reads this directory fresh on every request.
+export const UPLOADS_ROOT = path.join(process.cwd(), process.env.UPLOADS_DIR || "uploads");
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
+export const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
   "image/webp": ".webp",
 };
 
-/** Validates and writes an uploaded image under UPLOADS_DIR, returning the
+/** Validates and writes an uploaded image under UPLOADS_ROOT, returning the
  *  root-relative URL to store (e.g. "/uploads/coaches/<uuid>.jpg"). The
  *  browser-supplied filename is never used — this sidesteps path-traversal
  *  and collision concerns entirely. */
@@ -27,7 +33,7 @@ export async function saveUploadedPhoto(
   }
 
   const filename = `${crypto.randomUUID()}${extension}`;
-  const dir = path.join(UPLOADS_DIR, subfolder);
+  const dir = path.join(UPLOADS_ROOT, subfolder);
   await mkdir(dir, { recursive: true });
 
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -43,7 +49,7 @@ export async function deleteUploadedPhoto(photoUrl: string | null): Promise<void
   if (!photoUrl || !photoUrl.startsWith("/uploads/")) return;
 
   const relativePath = photoUrl.slice("/uploads/".length);
-  const filePath = path.join(UPLOADS_DIR, relativePath);
+  const filePath = path.join(UPLOADS_ROOT, relativePath);
 
   try {
     await unlink(filePath);

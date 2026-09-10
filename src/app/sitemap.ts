@@ -11,7 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/komandas`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${siteUrl}/treneri`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${siteUrl}/jaunumi`, changeFrequency: "daily", priority: 0.8 },
-    { url: `${siteUrl}/klubs/stadions`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
   const rows = await db.select({ slug: articles.slug, createdAt: articles.createdAt }).from(articles);
