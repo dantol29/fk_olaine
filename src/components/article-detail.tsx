@@ -36,36 +36,48 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
 
       {images.length > 1 && (
         <>
-          <button
-            type="button"
-            onClick={() => go("prev")}
-            aria-label="Iepriekšējais attēls"
-            className="absolute top-1/2 left-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white backdrop-blur transition hover:bg-black/50"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => go("next")}
-            aria-label="Nākamais attēls"
-            className="absolute top-1/2 right-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white backdrop-blur transition hover:bg-black/50"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </button>
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
 
-          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-            {images.map((_, i) => (
+          <div className="absolute bottom-8 left-8 z-20 flex items-center gap-3 sm:left-10">
+            <div className="flex items-center gap-2">
               <button
-                key={i}
                 type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Rādīt ${i + 1}. attēlu`}
-                className={cn(
-                  "h-1.5 rounded-full transition-all",
-                  i === index ? "w-6 bg-white" : "w-1.5 bg-white/40",
-                )}
-              />
-            ))}
+                onClick={() => go("prev")}
+                aria-label="Iepriekšējais attēls"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => go("next")}
+                aria-label="Nākamais attēls"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+              >
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <span className="text-xl text-white">
+              {String(index + 1).padStart(2, "0")}
+              <span className="ml-1.5 text-sm font-medium text-white/50">
+                /{String(images.length).padStart(2, "0")}
+              </span>
+            </span>
+            <div className="flex gap-1.5">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  aria-label={`Rādīt ${i + 1}. attēlu`}
+                  className={cn(
+                    "h-[3px] w-7 rounded-full transition-colors",
+                    i === index ? "bg-club-red" : "bg-white/25",
+                  )}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
