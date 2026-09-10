@@ -73,17 +73,17 @@ export function ArticleDetail({
     <>
       {/* Header band */}
       <section className="pt-4 sm:px-6">
-        <div className="mx-auto max-w-[1440px] bg-club-gray-light px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
-          <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-400">
-            <Link href="/" className="hover:text-club-navy">
+        <div className="mx-auto max-w-[1440px] bg-club-navy px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
+          <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-white/60">
+            <Link href="/" className="hover:text-white">
               Sākums
             </Link>
             <span>›</span>
-            <Link href="/jaunumi" className="hover:text-club-navy">
+            <Link href="/jaunumi" className="hover:text-white">
               Jaunumi
             </Link>
             <span>›</span>
-            <span className="max-w-[240px] truncate text-club-navy">
+            <span className="max-w-[240px] truncate text-white">
               {article.title}
             </span>
           </nav>
@@ -93,20 +93,20 @@ export function ArticleDetail({
               {article.category}
             </span>
             {article.team && (
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-club-navy">
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white">
                 {article.team}
               </span>
             )}
-            <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-white/70">
               <Calendar className="h-3.5 w-3.5" />
               {article.date}
             </span>
           </div>
 
-          <h1 className="mt-3 max-w-3xl text-3xl text-club-navy sm:text-4xl">
+          <h1 className="mt-3 max-w-3xl text-3xl text-white sm:text-4xl">
             {article.title}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
+          <p className="mt-3 max-w-2xl text-sm text-white/70 sm:text-base">
             {article.excerpt}
           </p>
         </div>
