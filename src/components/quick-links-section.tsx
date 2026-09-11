@@ -85,6 +85,17 @@ export function QuickLinksSection({ bento = false }: { bento?: boolean }) {
   if (bento) {
     return (
       <>
+        <div className="relative flex min-h-24 flex-col items-center justify-center sm:hidden">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none"
+          >
+            Saites
+          </span>
+          <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy">
+            Saites
+          </h2>
+        </div>
         {LINKS.map((link, index) => (
           <Link
             key={link.title}

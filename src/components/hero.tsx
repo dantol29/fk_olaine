@@ -160,7 +160,7 @@ export async function Hero() {
           <MatchesShowcase games={upcomingGames} />
 
           {/* League table card */}
-          <div className="relative flex h-[760px] flex-col overflow-hidden sm:h-[640px]">
+          <div className="relative flex h-auto flex-col lg:h-[640px] lg:overflow-hidden">
             <LeagueSelector leagues={leagues} />
           </div>
         </div>

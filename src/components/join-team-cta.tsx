@@ -26,13 +26,6 @@ export function JoinTeamCta() {
               </span>
             </div>
           </div>
-
-          <div className="relative z-10 hidden text-right text-xs leading-tight tracking-[0.2em] text-white uppercase sm:block">
-            <p>Attīstība</p>
-            <p>Komanda</p>
-            <p>Raksturs</p>
-            <p>Nākotne</p>
-          </div>
         </JoinClubDrawer>
       </div>
     </section>

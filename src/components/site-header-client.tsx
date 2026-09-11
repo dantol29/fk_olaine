@@ -146,18 +146,23 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
         </div>
 
         <DrawerContent className="border-none bg-transparent shadow-none">
-          <div className="flex h-full w-full flex-col gap-1 bg-white p-6 shadow-xl">
+          <div className="flex h-full w-full flex-col gap-2 bg-white p-6 shadow-xl">
             {MOBILE_NAV_ITEMS.map((item) => (
               <Link
                 key={item.title}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-between py-2 text-club-navy"
+                className="relative block min-h-24 py-3 text-club-navy sm:min-h-32"
               >
-                <span className="text-2xl font-extrabold tracking-wide uppercase">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:rotate-0 sm:text-8xl"
+                >
                   {item.title}
                 </span>
-                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <span className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
+                  {item.title}
+                </span>
               </Link>
             ))}
 

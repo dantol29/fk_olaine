@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BirthdaysSection } from "@/components/birthdays-section";
 import { CalendarSection } from "@/components/calendar-section";
 import { Hero } from "@/components/hero";
 import { HomeNewsCarousel } from "@/components/home-news-carousel";
@@ -25,17 +26,23 @@ export default function Home() {
       <main className="bg-background">
         <Hero />
       </main>
-      <div className="px-6 pt-4 pb-10">
+      <div className="px-6 pt-10 pb-10 sm:pt-14">
         <div className="relative mx-auto max-w-[1440px]">
           <PartnersBar />
         </div>
       </div>
       <section className="px-6 pb-8 pt-4 sm:pt-8">
         <div className="relative mx-auto max-w-[1440px]">
-          <div className="mb-5 flex items-end justify-between gap-4 sm:mb-6">
-            <div>
-              <h2 className="text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">
-                Jaunumi un informācija
+          <div className="mb-5 flex items-center justify-center gap-4 sm:mb-6 sm:justify-between">
+            <div className="relative flex min-h-24 min-w-0 flex-1 flex-col items-center justify-center sm:min-h-32 sm:items-start">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:rotate-0 sm:text-8xl"
+              >
+                Jaunumi
+              </span>
+              <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
+                Jaunumi
               </h2>
             </div>
             <Link
@@ -56,6 +63,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <BirthdaysSection />
       <CalendarSection />
       <JoinTeamCta />
       <SiteFooter />
