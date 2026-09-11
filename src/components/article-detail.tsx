@@ -255,7 +255,7 @@ export function ArticleDetail({ article }: { article: Article }) {
           </h1>
 
           {article.authorName && (
-            <div className="mt-6 flex items-center justify-between gap-3.5">
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3.5">
               <div className="flex items-center gap-4">
                 {article.authorAvatar ? (
                   <Image

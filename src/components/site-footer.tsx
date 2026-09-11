@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Mail, MapPin, Phone } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { PARTNERS } from "@/components/partners-bar";
+import { getPartners } from "@/lib/partners-server";
 import { getSiteSettings } from "@/lib/site-settings";
 import {
   FacebookIcon,
@@ -13,16 +13,6 @@ import {
 function mapsUrl(query: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
-
-// The colored logos PartnersBar uses for its white card don't have enough
-// contrast against the footer's dark background — swap in the original
-// white-on-transparent versions here instead.
-const FOOTER_PARTNERS = PARTNERS.map((partner) => {
-  if (partner.alt === "Joma") {
-    return { ...partner, src: "/partners/joma_logo.png", needsWhite: true };
-  }
-  return partner;
-});
 
 function SocialLink({
   href,
@@ -72,7 +62,7 @@ function FieldGroup({
 }
 
 export async function SiteFooter() {
-  const settings = await getSiteSettings();
+  const [settings, partners] = await Promise.all([getSiteSettings(), getPartners()]);
   const legalAddressFull = `${settings.legalAddress}, Latvija`;
 
   return (
@@ -189,13 +179,13 @@ export async function SiteFooter() {
         <div className="lg:border-l lg:border-[#3d5570]/20 lg:pl-10">
           <ColumnLabel>Mūsu partneri</ColumnLabel>
           <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-6">
-            {FOOTER_PARTNERS.map((partner) => (
+            {partners.map((partner) => (
               <Image
-                key={partner.alt}
-                src={partner.src}
-                alt={partner.alt}
-                width={partner.width}
-                height={partner.height}
+                key={partner.id}
+                src={partner.logoUrl}
+                alt={partner.name}
+                width={partner.logoWidth}
+                height={partner.logoHeight}
                 className={cn(
                   "w-auto object-contain",
                   partner.size === "lg" ? "h-14" : "h-10",

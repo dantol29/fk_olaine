@@ -193,7 +193,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
   return (
     <div className="relative ml-[calc(50%-50vw)] h-[580px] w-screen min-w-0 overflow-hidden rounded-b-[1.5rem] sm:ml-0 sm:h-[640px] sm:w-full sm:rounded-[1.5rem] sm:border sm:border-slate-200 sm:shadow-sm">
       <Image
-        src="/stadium-flag-dusk.jpg"
+        src="/stadions.jpg"
         alt="Olaines stadions"
         fill
         priority
@@ -203,8 +203,8 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
       <div className="absolute inset-x-0 top-0 z-10 h-56 bg-gradient-to-b from-black/65 via-black/30 to-transparent" />
 
       <div className="absolute inset-x-0 top-8 z-20 flex flex-col items-center sm:top-12">
-        <span className="mb-3 text-[20px] text-white/70 uppercase ">
-          Līdz nākamajai spēlei
+        <span className="mb-3 text-white text-3xl sm:text-4xl ">
+          Nākamā spēle
         </span>
         <AnimatedNumberCountdown
           endDate={gameDate(games[0])}

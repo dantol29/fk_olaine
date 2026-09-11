@@ -192,6 +192,19 @@ export const articlesRelations = relations(articles, ({ one }) => ({
   authorCoach: one(coaches, { fields: [articles.authorCoachId], references: [coaches.id] }),
 }));
 
+export const partners = sqliteTable("partners", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  logoUrl: text("logo_url").notNull(),
+  logoWidth: integer("logo_width").notNull(),
+  logoHeight: integer("logo_height").notNull(),
+  /** Display height bucket in the partners bar/marquee. */
+  size: text("size", { enum: ["lg", "sm"] }).notNull().default("lg"),
+  /** CSS-inverts logoUrl to white on the site footer's dark background. */
+  needsWhite: integer("needs_white", { mode: "boolean" }).notNull().default(false),
+  createdAt: integer("created_at").notNull(),
+});
+
 /** Singleton — always exactly one row (id 1). Lets the club admin update
  *  its own legal/bank/contact details shown in the site footer without
  *  needing a code change. */

@@ -17,6 +17,7 @@ import { OPEN_CALENDAR_EVENT_NAME } from "@/lib/calendar-bridge";
 import { cn } from "@/lib/utils";
 import type { CalendarEvent } from "@/lib/calendar";
 import { colorFor, initialsFor } from "@/lib/games";
+import { CalendarDatePicker } from "@/components/calendar-date-picker";
 import {
   Select,
   SelectContent,
@@ -150,7 +151,7 @@ const MIN_CARD_HEIGHT = 64;
 const CARD_INSET = 4;
 
 function toDateKey(year: number, month: number, day: number) {
-  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  return `${String(year).padStart(4, "0")}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
 /** Monday of the week containing `date`, computed purely with UTC date
@@ -413,6 +414,50 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
     () => new Set(ALL_EVENT_TYPES),
   );
   const [activeTeam, setActiveTeam] = useState("all");
+  const [weekCache, setWeekCache] = useState<Record<string, CalendarEvent[]>>({});
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const weekKey = toDayInfo(weekStart).dateKey;
+  const isLoading = !weekCache[weekKey] && loadError !== weekKey;
+
+  useEffect(() => {
+    if (weekCache[weekKey] || loadError === weekKey) return;
+    const controller = new AbortController();
+    fetch(`/api/calendar?date=${weekKey}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Calendar request failed");
+        const data = await response.json() as {
+          events: (Omit<CalendarEvent, "start" | "end"> & { start: string; end: string })[];
+        };
+        const loaded = data.events.map((event) => ({
+          ...event,
+          start: new Date(event.start),
+          end: new Date(event.end),
+        }));
+        if (!controller.signal.aborted) {
+          setWeekCache((cache) => ({ ...cache, [weekKey]: loaded }));
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setLoadError(weekKey);
+      });
+    return () => controller.abort();
+  }, [weekKey, weekCache, loadError]);
+
+  const availableEvents = useMemo(() => {
+    const byUid = new Map(events.map((event) => [event.uid, event]));
+    for (const loaded of Object.values(weekCache)) {
+      for (const event of loaded) byUid.set(event.uid, event);
+    }
+    return [...byUid.values()];
+  }, [events, weekCache]);
+
+  const goToDate = (date: Date) => {
+    setWeekStart(getMonday(date));
+    setHalf(getHalfForDate(date));
+    setMobileDate(toUtcMidnight(date));
+    setSelectedEvent(null);
+    setOpenOverflow(null);
+  };
 
   /** A header nav link like "/?type=training#kalendars" pre-selects that
    *  event type filter when the calendar first comes into view, and a
@@ -451,11 +496,11 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
 
   const teamOptions = useMemo(() => {
     const names = new Set<string>();
-    for (const event of events) {
+    for (const event of availableEvents) {
       if (event.team) names.add(event.team);
     }
     return Array.from(names).sort((a, b) => a.localeCompare(b, "lv"));
-  }, [events]);
+  }, [availableEvents]);
 
   const toggleType = (type: EventType) => {
     setActiveTypes((prev) => {
@@ -501,12 +546,12 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
 
   const filteredEvents = useMemo(
     () =>
-      events.filter(
+      availableEvents.filter(
         (event) =>
           activeTypes.has(event.eventType) &&
           (activeTeam === "all" || event.team === activeTeam),
       ),
-    [events, activeTypes, activeTeam],
+    [availableEvents, activeTypes, activeTeam],
   );
 
   const eventsByDay = useMemo(() => {
@@ -573,35 +618,14 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   );
 
   const navigateDays = (direction: "prev" | "next") => {
-    if (direction === "next") {
-      if (half === 0) {
-        setHalf(1);
-      } else {
-        setHalf(0);
-        setWeekStart((prev) => {
-          const next = new Date(prev);
-          next.setUTCDate(prev.getUTCDate() + 7);
-          return next;
-        });
-      }
-    } else {
-      if (half === 1) {
-        setHalf(0);
-      } else {
-        setHalf(1);
-        setWeekStart((prev) => {
-          const next = new Date(prev);
-          next.setUTCDate(prev.getUTCDate() - 7);
-          return next;
-        });
-      }
-    }
+    const next = new Date(weekStart);
+    const offset = direction === "next" ? (half === 0 ? 3 : 7) : (half === 0 ? -4 : 0);
+    next.setUTCDate(next.getUTCDate() + offset);
+    goToDate(next);
   };
 
   const goToToday = () => {
-    const today = new Date();
-    setWeekStart(getMonday(today));
-    setHalf(getHalfForDate(today));
+    goToDate(new Date(`${todayKeyInRiga()}T00:00:00Z`));
   };
 
   const mobileDay = useMemo(() => toDayInfo(mobileDate), [mobileDate]);
@@ -615,14 +639,12 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   );
 
   const navigateMobileDay = (direction: "prev" | "next") => {
-    setMobileDate((prev) => {
-      const next = new Date(prev);
-      next.setUTCDate(prev.getUTCDate() + (direction === "next" ? 1 : -1));
-      return next;
-    });
+    const next = new Date(mobileDate);
+    next.setUTCDate(next.getUTCDate() + (direction === "next" ? 1 : -1));
+    goToDate(next);
   };
 
-  const goToTodayMobile = () => setMobileDate(toUtcMidnight(new Date()));
+  const goToTodayMobile = goToToday;
 
   return (
     <div className="flex flex-col gap-4">
@@ -635,7 +657,8 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:flex-wrap">
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:contents">
           {ALL_EVENT_TYPES.map((type) => {
             const style = EVENT_TYPE_STYLES[type];
             const Icon = style.icon;
@@ -647,7 +670,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
                 onClick={() => toggleType(type)}
                 aria-pressed={isActive}
                 className={cn(
-                  "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white transition",
+                  "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white transition",
                   isActive
                     ? style.accent
                     : "bg-slate-100 text-slate-500 hover:bg-slate-200",
@@ -659,6 +682,10 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
             );
           })}
           <div className="hidden sm:block">{teamFilterSelect}</div>
+          </div>
+          <div className="ml-auto shrink-0 sm:ml-0">
+            <CalendarDatePicker value={mobileDate} onSelect={goToDate} />
+          </div>
         </div>
 
         <div className="hidden items-center gap-2 sm:flex">
@@ -687,6 +714,14 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
           </button>
         </div>
       </div>
+
+      {isLoading && <p role="status" className="text-sm text-slate-500">Ielādē notikumus…</p>}
+      {loadError === weekKey && (
+        <p role="alert" className="text-sm text-club-red">
+          Neizdevās ielādēt notikumus.{" "}
+          <button type="button" onClick={() => setLoadError(null)} className="font-semibold underline">Mēģināt vēlreiz</button>
+        </p>
+      )}
 
       {/* Single-day view — the multi-column grid below doesn't leave enough
        *  room per day to stay readable on a phone, so mobile gets its own
@@ -736,7 +771,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
         <div className="flex min-h-[220px] flex-col gap-2 rounded-2xl border border-slate-100 p-2">
           {mobileDayEvents.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-400">
-              Šajā dienā nav ieplānotu notikumu.
+              {isLoading ? "Ielādē notikumus…" : loadError === weekKey ? "Notikumi pašlaik nav pieejami." : "Šajā dienā nav ieplānotu notikumu."}
             </p>
           ) : (
             mobileDayEvents.map((event) => {

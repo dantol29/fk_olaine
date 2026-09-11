@@ -8,6 +8,7 @@ import {
   Award,
   CalendarDays,
   Dumbbell,
+  Handshake,
   ImageIcon,
   LogOut,
   Menu,
@@ -33,6 +34,7 @@ const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin/games", label: "Spēles", icon: Volleyball },
   { href: "/admin/league-sources", label: "Līgu avoti", icon: Trophy },
   { href: "/admin/club-logos", label: "Klubu logo", icon: ImageIcon },
+  { href: "/admin/partners", label: "Partneri", icon: Handshake },
   { href: "/admin/jaunumi", label: "Jaunumi", icon: Newspaper },
   { href: "/admin/site-settings", label: "Iestatījumi", icon: Settings },
 ];

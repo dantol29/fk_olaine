@@ -269,11 +269,14 @@ function weekBrowsingWindow() {
  *  week-browsing calendar widget. */
 export async function getScheduleForWeekBrowsing(): Promise<CalendarEvent[]> {
   const { after, before } = weekBrowsingWindow();
+  return getScheduleForRange(after, before);
+}
 
+export async function getScheduleForRange(after: Date, before: Date): Promise<CalendarEvent[]> {
   const [trainingEvents, otherEvents, gameEvents] = await Promise.all([
-    getAdminTrainingEvents(after, before).catch(() => []),
-    getAdminEvents(after, before).catch(() => []),
-    getAdminGameEvents(after, before).catch(() => []),
+    getAdminTrainingEvents(after, before),
+    getAdminEvents(after, before),
+    getAdminGameEvents(after, before),
   ]);
 
   return [...trainingEvents, ...otherEvents, ...gameEvents].sort(

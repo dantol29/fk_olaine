@@ -107,7 +107,7 @@ export default function AnimatedNumberCountdown({
               format={{ minimumIntegerDigits: 2 }}
               willChange
             />
-            <span className={labelClassName}>{unit.label}</span>
+            {/* <span className={labelClassName}>{unit.label}</span> */}
           </div>
         </React.Fragment>
       ))}
