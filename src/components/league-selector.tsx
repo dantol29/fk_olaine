@@ -25,7 +25,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           <div className="relative flex min-h-24 w-full min-w-0 flex-col items-center justify-center sm:min-h-0 sm:w-auto sm:items-start">
             <span
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:hidden"
+              className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:hidden"
             >
               {activeLabel}
             </span>

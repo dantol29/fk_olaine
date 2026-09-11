@@ -33,8 +33,8 @@ const NAV_ITEMS: NavItem[] = [
       { title: "Treneri", href: "/treneri" },
     ],
   },
-  { title: "Treniņi", href: "/?type=training#kalendars" },
-  { title: "Spēles", href: "/?type=game#kalendars" },
+  { title: "Treniņi", href: "/treninji" },
+  { title: "Spēles", href: "/speles" },
   { title: "Jaunumi", href: "/jaunumi" },
   { title: "Kontakti", href: "#footer" },
 ];
@@ -146,7 +146,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
         </div>
 
         <DrawerContent className="border-none bg-transparent shadow-none">
-          <div className="flex h-full w-full flex-col gap-2 bg-white p-6 shadow-xl">
+          <div className="flex h-full min-h-0 w-full flex-col gap-2 overflow-y-auto bg-white p-6 shadow-xl">
             {MOBILE_NAV_ITEMS.map((item) => (
               <Link
                 key={item.title}
@@ -156,7 +156,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
               >
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:rotate-0 sm:text-8xl"
+                  className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
                 >
                   {item.title}
                 </span>

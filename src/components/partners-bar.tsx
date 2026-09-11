@@ -32,7 +32,7 @@ export async function PartnersBar() {
         <div className="relative py-2">
           <span
             aria-hidden
-            className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 whitespace-nowrap text-[4.75rem] leading-none font-extrabold tracking-tight text-club-navy/[0.06] uppercase select-none"
+            className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 whitespace-nowrap text-[4.75rem] leading-none font-extrabold tracking-tight text-club-navy/[0.06] uppercase select-none"
           >
             Partneri
           </span>

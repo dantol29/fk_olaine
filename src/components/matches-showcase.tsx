@@ -191,7 +191,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
   }));
 
   return (
-    <div className="relative ml-[calc(50%-50vw)] h-[580px] w-screen min-w-0 overflow-hidden rounded-b-[1.5rem] sm:ml-0 sm:h-[640px] sm:w-full sm:rounded-[1.5rem] sm:border sm:border-slate-200 sm:shadow-sm">
+    <div className="relative ml-[calc(50%-50vw)] h-[530px] w-screen min-w-0 overflow-hidden rounded-b-[1.5rem] sm:ml-0 sm:h-[640px] sm:w-full sm:rounded-[1.5rem] sm:border sm:border-slate-200 sm:shadow-sm">
       <Image
         src="/stadions.jpg"
         alt="Olaines stadions"
@@ -221,7 +221,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
         />
       </div>
 
-      <div className="absolute inset-x-0 bottom-14 sm:bottom-14">
+      <div className="absolute inset-x-0 bottom-10 sm:bottom-14">
         <div className="relative">
           <CoverflowCarousel
             ref={carouselRef}
@@ -259,7 +259,7 @@ export function MatchesShowcase({ games }: MatchesShowcaseProps) {
       </div>
 
       {games.length > 1 && (
-        <div className="absolute bottom-8 left-8 z-20 flex items-center gap-3 sm:left-10">
+        <div className="absolute bottom-5 left-8 z-20 flex items-center gap-3 sm:bottom-8 sm:left-10">
           <div className="flex items-center gap-2">
             <button
               type="button"

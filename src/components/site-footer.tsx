@@ -197,22 +197,26 @@ export async function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-[#3d5570]/20 px-6 py-5">
-        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 text-xs text-white/40">
+      <div className="border-t border-[#3d5570]/20 px-6 py-8">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 text-sm text-white/40">
           <p>
             © {new Date().getFullYear()} FK Olaine. Visas tiesības aizsargātas.
           </p>
-          <p>
-            Izstrādājis{" "}
-            <a
-              href="https://42days.eu/lv"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white"
-            >
-              42days.eu
-            </a>
-          </p>
+          <a
+            href="https://42days.eu/lv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 transition hover:text-white"
+          >
+            Izstrādājis
+            <Image
+              src="/42logo-white.webp"
+              alt="42days.eu"
+              width={180}
+              height={120}
+              className="h-9 w-auto"
+            />
+          </a>
         </div>
       </div>
     </footer>

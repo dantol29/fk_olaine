@@ -1,8 +1,8 @@
 import "server-only";
-import { gte } from "drizzle-orm";
+import { eq, gte } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { games as gamesTable } from "@/db/schema";
+import { games as gamesTable, teams as teamsTable } from "@/db/schema";
 import { toDateKey } from "@/lib/calendar";
 import { resolveClubLogos } from "@/lib/club-logos";
 import { colorFor, initialsFor, MONTHS, type Team, type UpcomingGame } from "@/lib/games";
@@ -64,6 +64,56 @@ export async function getUpcomingGamesFromDb(
         home: teamDisplay(row.homeTeam, logos.get(row.homeTeam) ?? null),
         away: teamDisplay(row.awayTeam, logos.get(row.awayTeam) ?? null),
         venue: row.location,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
+export type GameListItem = UpcomingGame & {
+  /** Which of the club's own teams plays this fixture (e.g. "U14", "Sieviešu 1"). */
+  teamName: string;
+  isPast: boolean;
+};
+
+/** Every game on file — upcoming and past — for the public /speles listing.
+ *  Server-only: never import this from a "use client" component. */
+export async function getAllGamesFromDb(): Promise<GameListItem[]> {
+  try {
+    const todayKey = toDateKey(new Date());
+    const rows = await db
+      .select({
+        id: gamesTable.id,
+        homeTeam: gamesTable.homeTeam,
+        awayTeam: gamesTable.awayTeam,
+        date: gamesTable.date,
+        startTime: gamesTable.startTime,
+        location: gamesTable.location,
+        league: gamesTable.league,
+        teamName: teamsTable.name,
+      })
+      .from(gamesTable)
+      .innerJoin(teamsTable, eq(gamesTable.teamId, teamsTable.id))
+      .orderBy(gamesTable.date, gamesTable.startTime);
+
+    const logos = await resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam]));
+
+    return rows.map((row) => {
+      const [year, month, day] = row.date.split("-").map(Number);
+      return {
+        id: row.id,
+        day: String(day).padStart(2, "0"),
+        month: MONTHS[month - 1] ?? "",
+        year: String(year),
+        weekday: weekdayAbbrFor(row.date),
+        time: row.startTime,
+        league: row.league ?? "Draudzības spēle",
+        home: teamDisplay(row.homeTeam, logos.get(row.homeTeam) ?? null),
+        away: teamDisplay(row.awayTeam, logos.get(row.awayTeam) ?? null),
+        venue: row.location,
+        teamName: row.teamName,
+        isPast: row.date < todayKey,
       };
     });
   } catch {
