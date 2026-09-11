@@ -1,13 +1,41 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { imageSize } from "image-size";
+import { disableTypes, imageSize } from "image-size";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { partners } from "@/db/schema";
-import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
+import { requireAdminSession } from "@/lib/auth";
+import { EXTENSION_BY_MIME_TYPE, deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
+
+// Only jpg/png/webp uploads are ever accepted (see EXTENSION_BY_MIME_TYPE
+// below) — disable every other format's decoder so a file whose *bytes*
+// are crafted as one of them (the declared MIME type is client-supplied
+// and trivially spoofable) can never reach a vulnerable parser. image-size
+// has an unpatched DoS (infinite loop) in its ICNS/JXL/HEIF decoders —
+// GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq — with no fixed version
+// available, so parser-level disabling is the mitigation.
+disableTypes([
+  "bmp",
+  "cur",
+  "dds",
+  "gif",
+  "heif",
+  "icns",
+  "ico",
+  "j2c",
+  "jp2",
+  "jxl",
+  "jxl-stream",
+  "ktx",
+  "pnm",
+  "psd",
+  "svg",
+  "tga",
+  "tiff",
+]);
 
 // Every page that renders the marquee or the footer, both of which show
 // the partners list — see src/components/partners-bar.tsx / site-footer.tsx.
@@ -30,6 +58,10 @@ function parsePartnerInput(formData: FormData) {
 }
 
 async function probeImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  if (!EXTENSION_BY_MIME_TYPE[file.type]) {
+    throw new Error("Attēlam jābūt JPEG, PNG vai WebP formātā.");
+  }
+
   const buffer = new Uint8Array(await file.arrayBuffer());
   const { width, height } = imageSize(buffer);
   if (!width || !height) {
@@ -42,6 +74,8 @@ export async function createPartner(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parsePartnerInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -79,6 +113,8 @@ export async function updatePartner(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parsePartnerInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -111,6 +147,8 @@ export async function updatePartner(
 }
 
 export async function deletePartner(id: number) {
+  await requireAdminSession();
+
   const [existing] = await db.select().from(partners).where(eq(partners.id, id));
   if (existing) {
     await deleteUploadedPhoto(existing.logoUrl);

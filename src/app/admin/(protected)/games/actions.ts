@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { games } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 function parseGameInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
@@ -40,6 +41,8 @@ function parseGameInput(formData: FormData) {
 }
 
 export async function createGame(_prevState: { error?: string } | undefined, formData: FormData) {
+  await requireAdminSession();
+
   const parsed = parseGameInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -54,6 +57,8 @@ export async function updateGame(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseGameInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -64,6 +69,8 @@ export async function updateGame(
 }
 
 export async function deleteGame(id: number) {
+  await requireAdminSession();
+
   await db.delete(games).where(eq(games.id, id));
   revalidatePath("/admin/games");
   revalidatePath("/");

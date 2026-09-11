@@ -90,7 +90,17 @@ export function TeamsDirectory({ teams }: { teams: Team[] }) {
     <>
       <section className="px-6 pt-14 sm:pt-14">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4">
-          <h1 className="text-4xl text-club-navy sm:text-5xl">Komandas</h1>
+          <div className="relative flex min-h-24 min-w-0 flex-1 flex-col justify-center sm:min-h-32">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 -rotate-1 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:rotate-0 sm:text-8xl"
+            >
+              Komandas
+            </span>
+            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl">
+              Komandas
+            </h1>
+          </div>
 
           {searchOpen ? (
             <label className="relative flex w-full max-w-[220px] shrink-0 items-center sm:max-w-xs">

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { articles } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 const CATEGORIES = ["Klubs", "Komandas", "Spēles", "Treniņi", "Pasākumi"] as const;
@@ -92,6 +93,8 @@ export async function createArticle(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseArticleInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -128,6 +131,7 @@ export async function createArticle(
 
   revalidatePath("/admin/jaunumi");
   revalidatePath("/jaunumi");
+  revalidatePath("/");
   redirect("/admin/jaunumi");
 }
 
@@ -136,6 +140,8 @@ export async function updateArticle(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseArticleInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -186,12 +192,15 @@ export async function updateArticle(
 
   revalidatePath("/admin/jaunumi");
   revalidatePath("/jaunumi");
+  revalidatePath("/");
   revalidatePath(`/jaunumi/${existing.slug}`);
   if (existing.slug !== parsed.slug) revalidatePath(`/jaunumi/${parsed.slug}`);
   redirect("/admin/jaunumi");
 }
 
 export async function deleteArticle(id: number) {
+  await requireAdminSession();
+
   const [existing] = await db.select().from(articles).where(eq(articles.id, id));
   if (existing) {
     await deleteUploadedPhoto(existing.image);
@@ -205,4 +214,5 @@ export async function deleteArticle(id: number) {
   await db.delete(articles).where(eq(articles.id, id));
   revalidatePath("/admin/jaunumi");
   revalidatePath("/jaunumi");
+  revalidatePath("/");
 }

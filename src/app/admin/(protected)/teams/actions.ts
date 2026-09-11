@@ -6,11 +6,14 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { teams } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 export async function createTeam(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nosaukums ir obligāts." };
 
@@ -25,6 +28,8 @@ export async function updateTeam(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nosaukums ir obligāts." };
 
@@ -35,6 +40,8 @@ export async function updateTeam(
 }
 
 export async function deleteTeam(id: number) {
+  await requireAdminSession();
+
   await db.delete(teams).where(eq(teams.id, id));
   revalidatePath("/admin/teams");
   revalidatePath("/komandas");

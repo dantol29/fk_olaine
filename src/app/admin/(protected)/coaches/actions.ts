@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { coachTeams, coaches } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 function parseCoachInput(formData: FormData) {
@@ -42,6 +43,8 @@ export async function createCoach(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseCoachInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -72,6 +75,8 @@ export async function updateCoach(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseCoachInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -112,6 +117,8 @@ export async function updateCoach(
 }
 
 export async function deleteCoach(id: number) {
+  await requireAdminSession();
+
   const [existing] = await db
     .select({ photoUrl: coaches.photoUrl })
     .from(coaches)

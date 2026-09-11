@@ -21,6 +21,13 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
   const [index, setIndex] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
 
+  function go(direction: "prev" | "next") {
+    setIndex((current) => {
+      const next = direction === "next" ? current + 1 : current - 1;
+      return (next + images.length) % images.length;
+    });
+  }
+
   useEffect(() => {
     if (!fullscreen) return;
 
@@ -41,13 +48,6 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
   }, [fullscreen]);
 
   if (images.length === 0) return null;
-
-  const go = (direction: "prev" | "next") => {
-    setIndex((current) => {
-      const next = direction === "next" ? current + 1 : current - 1;
-      return (next + images.length) % images.length;
-    });
-  };
 
   return (
     <>
@@ -250,7 +250,7 @@ export function ArticleDetail({ article }: { article: Article }) {
             </span>
           </div>
 
-          <h1 className="mt-3 max-w-3xl text-3xl text-club-navy sm:text-4xl">
+          <h1 className="mt-3 max-w-3xl break-words text-3xl text-club-navy [overflow-wrap:anywhere] sm:text-4xl">
             {article.title}
           </h1>
 
@@ -300,16 +300,18 @@ export function ArticleDetail({ article }: { article: Article }) {
           </div>
 
           <div className="min-w-0">
-            <div className="flex flex-col gap-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+            <div className="min-w-0 max-w-full break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] sm:text-base">
               {article.body.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+                <p key={index} className="mb-4 max-w-full whitespace-pre-wrap last:mb-0">
+                  {paragraph}
+                </p>
               ))}
             </div>
 
             {article.quote && (
               <div className="mt-6">
                 <Quote className="h-6 w-6 text-club-red" />
-                <p className="mt-3 text-lg leading-relaxed text-club-navy italic">
+                <p className="mt-3 max-w-full break-words text-lg leading-relaxed text-club-navy italic [overflow-wrap:anywhere]">
                   &ldquo;{article.quote.text}&rdquo;
                 </p>
                 <div className="mt-4 flex items-center gap-3">

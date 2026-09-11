@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { games } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 type SelectedFixture = {
   homeTeam: string;
@@ -23,6 +24,8 @@ function addMinutes(time: string, minutes: number): string {
 }
 
 export async function confirmImport(teamId: number, league: string, formData: FormData) {
+  await requireAdminSession();
+
   const selections = formData
     .getAll("selected")
     .map((value) => JSON.parse(String(value)) as SelectedFixture);
@@ -45,5 +48,6 @@ export async function confirmImport(teamId: number, league: string, formData: Fo
   }
 
   revalidatePath("/admin/games");
+  revalidatePath("/");
   redirect("/admin/games");
 }

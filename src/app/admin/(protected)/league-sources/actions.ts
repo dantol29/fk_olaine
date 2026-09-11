@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { leagueSources } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 function parseLeagueSourceInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
@@ -41,11 +42,14 @@ export async function createLeagueSource(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseLeagueSourceInput(formData);
   if ("error" in parsed) return parsed;
 
   await db.insert(leagueSources).values({ ...parsed, createdAt: Date.now() });
   revalidatePath("/admin/league-sources");
+  revalidatePath("/");
   redirect("/admin/league-sources");
 }
 
@@ -54,15 +58,21 @@ export async function updateLeagueSource(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseLeagueSourceInput(formData);
   if ("error" in parsed) return parsed;
 
   await db.update(leagueSources).set(parsed).where(eq(leagueSources.id, id));
   revalidatePath("/admin/league-sources");
+  revalidatePath("/");
   redirect("/admin/league-sources");
 }
 
 export async function deleteLeagueSource(id: number) {
+  await requireAdminSession();
+
   await db.delete(leagueSources).where(eq(leagueSources.id, id));
   revalidatePath("/admin/league-sources");
+  revalidatePath("/");
 }

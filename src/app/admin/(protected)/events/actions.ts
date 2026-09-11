@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { events } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 function parseEventInput(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -38,6 +39,8 @@ export async function createEvent(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseEventInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -51,6 +54,8 @@ export async function updateEvent(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseEventInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -60,6 +65,8 @@ export async function updateEvent(
 }
 
 export async function deleteEvent(id: number) {
+  await requireAdminSession();
+
   await db.delete(events).where(eq(events.id, id));
   revalidatePath("/admin/events");
 }

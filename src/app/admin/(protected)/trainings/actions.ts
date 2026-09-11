@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { trainings } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 function parseTrainingInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
@@ -35,6 +36,8 @@ export async function createTraining(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseTrainingInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -48,6 +51,8 @@ export async function updateTraining(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parseTrainingInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -57,6 +62,8 @@ export async function updateTraining(
 }
 
 export async function deleteTraining(id: number) {
+  await requireAdminSession();
+
   await db.delete(trainings).where(eq(trainings.id, id));
   revalidatePath("/admin/trainings");
 }

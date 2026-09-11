@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { db } from "@/db/client";
 import { siteSettings } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 
 const SETTINGS_ID = 1;
 
@@ -45,6 +46,8 @@ export async function updateSiteSettings(
   _prevState: { error?: string; success?: boolean } | undefined,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
+  await requireAdminSession();
+
   const parsed = parseSettingsInput(formData);
   if ("error" in parsed) return parsed;
 

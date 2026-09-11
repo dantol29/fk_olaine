@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 export const SESSION_COOKIE_NAME = "fko_admin_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
@@ -64,5 +67,20 @@ export async function verifySessionToken(
     );
   } catch {
     return false;
+  }
+}
+
+/** Guards a protected Server Component render or Server Action — redirects
+ *  to the login page unless the request carries a valid admin session
+ *  cookie. Proxy (src/proxy.ts) also redirects unauthenticated page loads,
+ *  but Server Actions are invoked as direct POSTs to the page route and
+ *  don't reliably re-run a proxy matcher across refactors (see Next.js's
+ *  own "Server Functions" note in the proxy docs) — so every admin
+ *  Server Action calls this itself as its first line, not just the pages. */
+export async function requireAdminSession(): Promise<void> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  if (!(await verifySessionToken(token))) {
+    redirect("/admin/login");
   }
 }

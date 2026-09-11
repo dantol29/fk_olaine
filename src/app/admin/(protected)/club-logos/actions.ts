@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { clubLogoNames, clubLogos } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 function parseNames(formData: FormData): string[] {
@@ -31,6 +32,8 @@ export async function createClubLogo(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const names = parseNames(formData);
   if (names.length === 0) return { error: "Jānorāda vismaz viens nosaukums." };
 
@@ -61,6 +64,8 @@ export async function updateClubLogo(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const names = parseNames(formData);
   if (names.length === 0) return { error: "Jānorāda vismaz viens nosaukums." };
 
@@ -88,6 +93,8 @@ export async function updateClubLogo(
 }
 
 export async function deleteClubLogo(id: number) {
+  await requireAdminSession();
+
   const [existing] = await db
     .select({ logoUrl: clubLogos.logoUrl })
     .from(clubLogos)

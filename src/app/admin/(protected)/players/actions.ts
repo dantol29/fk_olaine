@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
 import { playerTeams, players } from "@/db/schema";
+import { requireAdminSession } from "@/lib/auth";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 function parsePlayerInput(formData: FormData) {
@@ -31,6 +32,8 @@ export async function createPlayer(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parsePlayerInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -53,6 +56,7 @@ export async function createPlayer(
 
   revalidatePath("/admin/players");
   revalidatePath("/komandas");
+  revalidatePath("/");
   redirect("/admin/players");
 }
 
@@ -61,6 +65,8 @@ export async function updatePlayer(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  await requireAdminSession();
+
   const parsed = parsePlayerInput(formData);
   if ("error" in parsed) return parsed;
 
@@ -97,10 +103,13 @@ export async function updatePlayer(
 
   revalidatePath("/admin/players");
   revalidatePath("/komandas");
+  revalidatePath("/");
   redirect("/admin/players");
 }
 
 export async function deletePlayer(id: number) {
+  await requireAdminSession();
+
   const [existing] = await db
     .select({ photoUrl: players.photoUrl })
     .from(players)
@@ -110,4 +119,5 @@ export async function deletePlayer(id: number) {
   await db.delete(players).where(eq(players.id, id));
   revalidatePath("/admin/players");
   revalidatePath("/komandas");
+  revalidatePath("/");
 }
