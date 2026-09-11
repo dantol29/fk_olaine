@@ -15,7 +15,13 @@ export type NewsCarouselItem = {
   image: string;
 };
 
-export function NewsCarousel({ articles }: { articles: NewsCarouselItem[] }) {
+export function NewsCarousel({
+  articles,
+  className,
+}: {
+  articles: NewsCarouselItem[];
+  className?: string;
+}) {
   const [index, setIndex] = useState(0);
 
   if (articles.length === 0) return null;
@@ -30,7 +36,12 @@ export function NewsCarousel({ articles }: { articles: NewsCarouselItem[] }) {
   };
 
   return (
-    <div className="relative ml-[calc(50%-50vw)] flex h-full min-h-[360px] w-screen flex-col overflow-hidden rounded-b-[1.5rem] shadow-sm sm:ml-0 sm:w-full sm:rounded-[1.5rem]">
+    <div
+      className={cn(
+        "relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-[1.5rem] shadow-sm",
+        className,
+      )}
+    >
       <Link
         href={`/jaunumi/${article.slug}`}
         className="group relative flex flex-1 flex-col justify-end p-6 pb-20 sm:p-8 sm:pb-24"

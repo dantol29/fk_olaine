@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { getArticles } from "@/lib/jaunumi-server";
 import { NewsCarousel } from "@/components/news-carousel";
 
-export async function HomeNewsCarousel() {
+export async function HomeNewsCarousel({ embedded = false }: { embedded?: boolean }) {
   const articles = await getArticles();
   const items = articles.slice(0, 3).map((article) => ({
     slug: article.slug,
@@ -13,6 +13,10 @@ export async function HomeNewsCarousel() {
     date: article.date,
     image: article.image,
   }));
+
+  if (embedded) {
+    return <NewsCarousel articles={items} className="min-h-0" />;
+  }
 
   return (
     <div className="flex h-full flex-col gap-3">

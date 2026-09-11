@@ -29,7 +29,7 @@ export async function PartnersBar() {
       {/* Mobile: big section title, like Jaunumi's, above a full-bleed
        *  looping marquee — the boxed desktop card doesn't fit this content. */}
       <div className="sm:hidden">
-        <h2 className="text-3xl text-club-navy">Mūsu partneri</h2>
+        <h2 className="text-center text-3xl text-club-navy">Mūsu partneri</h2>
         <div className="partners-marquee-mask ml-[calc(50%-50vw)] mt-8 w-screen overflow-hidden">
           <div className="partners-marquee-track flex w-max items-center">
             {Array.from({ length: MARQUEE_COPIES }, (_, copy) => (
