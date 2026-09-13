@@ -1,77 +1,81 @@
 import * as cheerio from "cheerio";
+import type { Cheerio } from "cheerio";
+import type { AnyNode } from "domhandler";
+
+import { absoluteLffUrl, fetchLffHtml, normalizeLffText } from "@/lib/lff-fetch";
 
 export type StandingRow = {
-  pos: number;
-  team: string;
-  logo: string | null;
-  played: number;
-  wins: number;
-  draws: number;
-  losses: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDiff: number;
-  points: number;
-  isOlaine: boolean;
+  pos: number; team: string; logo: string | null; played: number; wins: number;
+  draws: number; losses: number; goalsFor: number; goalsAgainst: number;
+  goalDiff: number; points: number; isOlaine: boolean;
 };
 
-function toInt(value: string) {
-  return parseInt(value.replace("+", "").trim(), 10);
+function integer(value: string): number | null {
+  const match = normalizeLffText(value).replace(/\u2212/g, "-").match(/[+-]?\d+/);
+  if (!match) return null;
+  const result = Number(match[0]);
+  return Number.isSafeInteger(result) ? result : null;
 }
 
-/** LFF pages carry the "which tab is this" info directly in their own URL
- *  (`?tab=content_1_4`) — the tab element's id is "tab" plus that value
- *  with its first letter capitalized (`tabContent_1_4`), so there's
- *  nothing extra for an admin to configure. */
-function tabIdFromUrl(url: string): string {
+function requestedTabSelector(url: string): string | null {
   const tab = new URL(url).searchParams.get("tab");
-  if (!tab) {
-    throw new Error(`LFF standings URL is missing a "tab" query parameter: ${url}`);
+  return tab ? `#tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}` : null;
+}
+
+function parseTable($: cheerio.CheerioAPI, table: Cheerio<AnyNode>, pageUrl: string): StandingRow[] {
+  let candidates: AnyNode[] = table.find(".rankings .tr.row, tbody tr, [class*=ranking] .row").toArray();
+  if (candidates.length === 0) {
+    candidates = table.find('a[href*="/klubi/"]').map((_, link) =>
+      $(link).closest(".tr, tr, li").get(0),
+    ).get();
   }
-  return `tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}`;
+
+  const result: StandingRow[] = [];
+  const seen = new Set<string>();
+  for (const candidate of candidates) {
+    const row = $(candidate);
+    const teamLink = row.find('a[href*="/klubi/"]').first();
+    const teamCell = teamLink.closest("div, td");
+    const team = normalizeLffText(teamLink.text() || teamCell.find("[class*=name], .title").first().text());
+    const teamKey = team.toLocaleLowerCase("lv");
+    if (!team || seen.has(teamKey)) continue;
+
+    const cells = row.children("div, td").toArray();
+    const teamIndex = cells.findIndex((cell) => cell === teamCell.get(0));
+    const pos = integer($(cells[0]).text());
+    const values = cells.slice(teamIndex >= 0 ? teamIndex + 1 : 2)
+      .map((cell) => integer($(cell).text()))
+      .filter((value): value is number => value !== null);
+    if (pos === null || values.length < 8) continue;
+
+    seen.add(teamKey);
+    const image = teamCell.find("img").first();
+    result.push({
+      pos, team,
+      logo: absoluteLffUrl(image.attr("src") ?? image.attr("data-src"), pageUrl),
+      played: values[0], wins: values[1], draws: values[2], losses: values[3],
+      goalsFor: values[4], goalsAgainst: values[5], goalDiff: values[6], points: values[7],
+      isOlaine: /olaine/i.test(team),
+    });
+  }
+  return result;
+}
+
+export function parseStandingsHtml(html: string, pageUrl: string): StandingRow[] {
+  const $ = cheerio.load(html);
+  const requestedTab = requestedTabSelector(pageUrl);
+  const scope = requestedTab && $(requestedTab).length ? $(requestedTab) : $.root();
+  let tables = scope.find(".competitionTable, table").toArray();
+  if (tables.length === 0 && scope.find(".rankings").length) tables = scope.find(".rankings").toArray();
+
+  const parsed = tables.map((table) => parseTable($, $(table), pageUrl)).filter((rows) => rows.length);
+  const standings = parsed.find((rows) => rows.some((row) => row.isOlaine)) ?? parsed[0];
+  if (!standings) {
+    throw new Error(`LFF standings layout was not recognized (tables=${tables.length}, club links=${scope.find('a[href*="/klubi/"]').length}, requested tab=${requestedTab ?? "none"})`);
+  }
+  return standings;
 }
 
 export async function getStandings(url: string): Promise<StandingRow[]> {
-  const tabId = tabIdFromUrl(url);
-
-  const res = await fetch(url, {
-    next: { revalidate: 3600 },
-    headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; FKOlaineSite/1.0)",
-    },
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch LFF standings: ${res.status}`);
-  }
-
-  const $ = cheerio.load(await res.text());
-  const rows: StandingRow[] = [];
-
-  // Some competitions (e.g. 1. līga) split the table into multiple groups
-  // (1.-5. vieta, 6.-10. vieta, stage standings, ...) on the same tab —
-  // only the first one is the group our teams actually sit in.
-  const table = $(`#${tabId} .competitionTable`).first();
-
-  table.find(".rankings .tr.row").each((_, el) => {
-    const cells = $(el).children("div");
-    const team = $(cells[1]).find("a").first().text().trim();
-
-    rows.push({
-      pos: toInt($(cells[0]).text()),
-      team,
-      logo: $(cells[1]).find("img").attr("src") ?? null,
-      played: toInt($(cells[2]).text()),
-      wins: toInt($(cells[3]).text()),
-      draws: toInt($(cells[4]).text()),
-      losses: toInt($(cells[5]).text()),
-      goalsFor: toInt($(cells[6]).text()),
-      goalsAgainst: toInt($(cells[7]).text()),
-      goalDiff: toInt($(cells[8]).text()),
-      points: toInt($(cells[9]).text()),
-      isOlaine: /olaine/i.test(team),
-    });
-  });
-
-  return rows;
+  return parseStandingsHtml(await fetchLffHtml(url, "standings"), url);
 }

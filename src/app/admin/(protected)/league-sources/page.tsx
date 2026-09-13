@@ -5,23 +5,46 @@ import Link from "next/link";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
-import { leagueSources, teams } from "@/db/schema";
+import { cronJobStatuses, leagueSources, teams } from "@/db/schema";
 
 import { deleteLeagueSource } from "./actions";
 
 export default async function AdminLeagueSourcesPage() {
-  const rows = await db
-    .select({
-      id: leagueSources.id,
-      label: leagueSources.label,
-      url: leagueSources.url,
-      standingsUrl: leagueSources.standingsUrl,
-      displayOrder: leagueSources.displayOrder,
-      teamName: teams.name,
-    })
-    .from(leagueSources)
-    .innerJoin(teams, eq(leagueSources.teamId, teams.id))
-    .orderBy(leagueSources.displayOrder, leagueSources.label);
+  const [rows, [cronStatus]] = await Promise.all([
+    db
+      .select({
+        id: leagueSources.id,
+        label: leagueSources.label,
+        url: leagueSources.url,
+        standingsUrl: leagueSources.standingsUrl,
+        displayOrder: leagueSources.displayOrder,
+        teamName: teams.name,
+      })
+      .from(leagueSources)
+      .innerJoin(teams, eq(leagueSources.teamId, teams.id))
+      .orderBy(leagueSources.displayOrder, leagueSources.label),
+    db.select().from(cronJobStatuses).where(eq(cronJobStatuses.job, "sync-fixtures")),
+  ]);
+
+  const statusLabels = {
+    running: "Notiek sinhronizācija",
+    success: "Veiksmīgi",
+    partial: "Daļēji veiksmīgi",
+    error: "Neizdevās",
+  } as const;
+  const statusColors = {
+    running: "bg-blue-50 text-blue-700",
+    success: "bg-emerald-50 text-emerald-700",
+    partial: "bg-amber-50 text-amber-700",
+    error: "bg-red-50 text-red-700",
+  } as const;
+  const formatDate = (timestamp: number | null) => timestamp
+    ? new Intl.DateTimeFormat("lv-LV", {
+        dateStyle: "medium",
+        timeStyle: "medium",
+        timeZone: "Europe/Riga",
+      }).format(new Date(timestamp))
+    : "—";
 
   return (
     <div>
@@ -33,6 +56,32 @@ export default async function AdminLeagueSourcesPage() {
         >
           + Pievienot
         </Link>
+      </div>
+      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-club-navy">Pēdējā automātiskā LFF sinhronizācija</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {cronStatus ? formatDate(cronStatus.finishedAt ?? cronStatus.startedAt) : "Cron vēl nav palaists"}
+            </p>
+          </div>
+          {cronStatus && (
+            <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusColors[cronStatus.status]}`}>
+              {statusLabels[cronStatus.status]}
+            </span>
+          )}
+        </div>
+        {cronStatus && (
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
+            <span>Importētas spēles: {cronStatus.importedCount}</span>
+            <span>Pēdējā pilnībā veiksmīgā reize: {formatDate(cronStatus.lastSuccessAt)}</span>
+          </div>
+        )}
+        {cronStatus?.message && (
+          <p className="mt-3 whitespace-pre-wrap rounded-lg bg-red-50 p-3 text-xs text-red-700">
+            {cronStatus.message}
+          </p>
+        )}
       </div>
       <AdminSearch placeholder="Meklēt līgu avotus…" />
 

@@ -152,6 +152,18 @@ export const leagueSources = sqliteTable("league_sources", {
   createdAt: integer("created_at").notNull(),
 });
 
+/** Durable health record for scheduled jobs. One row is kept per job so the
+ * admin can distinguish a successful sync from a cron job that stopped running. */
+export const cronJobStatuses = sqliteTable("cron_job_statuses", {
+  job: text("job").primaryKey(),
+  status: text("status", { enum: ["running", "success", "partial", "error"] }).notNull(),
+  startedAt: integer("started_at").notNull(),
+  finishedAt: integer("finished_at"),
+  lastSuccessAt: integer("last_success_at"),
+  importedCount: integer("imported_count").notNull().default(0),
+  message: text("message"),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   playerTeams: many(playerTeams),
   coachTeams: many(coachTeams),

@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { UserRound } from "lucide-react";
+import { Calendar, Goal, UserRound, Users } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import type { GameListItem } from "@/lib/games-server";
 import type { TrainingListItem } from "@/lib/trainings-server";
 import { CollapsibleGrid } from "@/components/collapsible-grid";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { GameFixtureCard } from "@/components/game-fixture-card";
 import { TrainingFixtureCard } from "@/components/training-fixture-card";
 
@@ -15,6 +16,9 @@ type Player = {
   id: number;
   name: string;
   photoUrl: string | null;
+  birthdate: string;
+  goals: number;
+  teamNames: string[];
 };
 
 type Coach = {
@@ -24,6 +28,7 @@ type Coach = {
   photoUrl: string | null;
   license: string;
   authority: "UEFA" | "LFF";
+  teamNames: string[];
 };
 
 const AUTHORITY_LOGO: Record<"UEFA" | "LFF", string> = {
@@ -49,6 +54,87 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
+/** A player avatar in the grid — clicking it opens the detail drawer
+ *  (birthdate, teams, goals) instead of navigating anywhere. */
+function PlayerCell({
+  player,
+  avatarClassName,
+  nameClassName,
+  onSelect,
+}: {
+  player: Player;
+  avatarClassName: string;
+  nameClassName: string;
+  onSelect: (player: Player) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(player)}
+      className="flex flex-col items-center gap-3 text-center"
+    >
+      <div
+        className={cn(
+          "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
+          avatarClassName,
+        )}
+      >
+        {player.photoUrl ? (
+          <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+          </div>
+        )}
+      </div>
+      <span className={cn("font-medium text-club-navy", nameClassName)}>{player.name}</span>
+    </button>
+  );
+}
+
+/** A coach avatar in the grid — clicking it opens the detail drawer
+ *  (position, license, teams) instead of navigating anywhere. Only name and
+ *  position show in the grid itself; license lives in the drawer. */
+function CoachCell({
+  coach,
+  avatarClassName,
+  nameClassName,
+  onSelect,
+}: {
+  coach: Coach;
+  avatarClassName: string;
+  nameClassName: string;
+  onSelect: (coach: Coach) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(coach)}
+      className="flex flex-col items-center gap-3 text-center"
+    >
+      <div
+        className={cn(
+          "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
+          avatarClassName,
+        )}
+      >
+        {coach.photoUrl ? (
+          <Image src={coach.photoUrl} alt={coach.name} fill className="object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+          </div>
+        )}
+      </div>
+      <div>
+        <span className={cn("block font-medium text-club-navy", nameClassName)}>
+          {coach.name}
+        </span>
+        <span className="block text-xs text-slate-400">{coach.position}</span>
+      </div>
+    </button>
+  );
+}
 
 function onlyUpcoming<T extends { isPast: boolean; rawDate: string }>(
   items: T[],
@@ -78,6 +164,8 @@ export function HomeTeamsPanel({
   showTabs?: boolean;
 }) {
   const [activeTeamId, setActiveTeamId] = useState(teams[0]?.id ?? null);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>(defaultTab);
 
   const activeTeam = teams.find((team) => team.id === activeTeamId) ?? teams[0];
@@ -189,30 +277,13 @@ export function HomeTeamsPanel({
               bare ? (
                 <div className="grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
                   {activeTeam.players.map((player) => (
-                    <div key={player.id} className="flex flex-col items-center gap-3 text-center">
-                      <div
-                        className={cn(
-                          "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
-                          avatarClassName,
-                        )}
-                      >
-                        {player.photoUrl ? (
-                          <Image
-                            src={player.photoUrl}
-                            alt={player.name}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
-                          </div>
-                        )}
-                      </div>
-                      <span className={cn("font-medium text-club-navy", nameClassName)}>
-                        {player.name}
-                      </span>
-                    </div>
+                    <PlayerCell
+                      key={player.id}
+                      player={player}
+                      avatarClassName={avatarClassName}
+                      nameClassName={nameClassName}
+                      onSelect={setSelectedPlayer}
+                    />
                   ))}
                 </div>
               ) : (
@@ -224,30 +295,13 @@ export function HomeTeamsPanel({
                   moreHref="/komandas"
                 >
                   {activeTeam.players.map((player) => (
-                    <div key={player.id} className="flex flex-col items-center gap-3 text-center">
-                      <div
-                        className={cn(
-                          "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
-                          avatarClassName,
-                        )}
-                      >
-                        {player.photoUrl ? (
-                          <Image
-                            src={player.photoUrl}
-                            alt={player.name}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
-                          </div>
-                        )}
-                      </div>
-                      <span className={cn("font-medium text-club-navy", nameClassName)}>
-                        {player.name}
-                      </span>
-                    </div>
+                    <PlayerCell
+                      key={player.id}
+                      player={player}
+                      avatarClassName={avatarClassName}
+                      nameClassName={nameClassName}
+                      onSelect={setSelectedPlayer}
+                    />
                   ))}
                 </CollapsibleGrid>
               )
@@ -261,43 +315,13 @@ export function HomeTeamsPanel({
             (activeTeam.coaches.length > 0 ? (
               <div className="grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
                 {activeTeam.coaches.map((coach) => (
-                  <div key={coach.id} className="flex flex-col items-center gap-3 text-center">
-                    <div
-                      className={cn(
-                        "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
-                        avatarClassName,
-                      )}
-                    >
-                      {coach.photoUrl ? (
-                        <Image
-                          src={coach.photoUrl}
-                          alt={coach.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <span className={cn("block font-medium text-club-navy", nameClassName)}>
-                        {coach.name}
-                      </span>
-                      <span className="block text-xs text-slate-400">{coach.position}</span>
-                      <span className="mt-1 hidden items-center justify-center gap-1.5 text-xs text-club-navy sm:flex">
-                        <Image
-                          src={AUTHORITY_LOGO[coach.authority]}
-                          alt={coach.authority}
-                          width={16}
-                          height={16}
-                          className="h-4 w-4 shrink-0 rounded-full object-contain"
-                        />
-                        <span className="truncate">{coach.license}</span>
-                      </span>
-                    </div>
-                  </div>
+                  <CoachCell
+                    key={coach.id}
+                    coach={coach}
+                    avatarClassName={avatarClassName}
+                    nameClassName={nameClassName}
+                    onSelect={setSelectedCoach}
+                  />
                 ))}
               </div>
             ) : (
@@ -337,6 +361,132 @@ export function HomeTeamsPanel({
             ))}
         </div>
       </div>
+
+      <Drawer
+        open={Boolean(selectedPlayer)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedPlayer(null);
+        }}
+      >
+        <DrawerContent className="border-none bg-transparent shadow-none">
+          {selectedPlayer && (
+            <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-6 shadow-xl">
+              <div className="flex items-center gap-4">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-club-gray-light">
+                  {selectedPlayer.photoUrl ? (
+                    <Image
+                      src={selectedPlayer.photoUrl}
+                      alt={selectedPlayer.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <UserRound className="h-8 w-8 text-club-muted" strokeWidth={1.5} />
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-xl text-club-navy">{selectedPlayer.name}</h3>
+              </div>
+
+              <div className="mt-6 flex flex-col divide-y divide-slate-100">
+                <div className="flex items-center gap-3 py-3 first:pt-0">
+                  <Calendar className="h-4 w-4 shrink-0 text-club-red" />
+                  <div>
+                    <p className="text-xs text-slate-400">Dzimšanas datums</p>
+                    <p className="text-sm text-club-navy">
+                      {selectedPlayer.birthdate}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-3">
+                  <Users className="h-4 w-4 shrink-0 text-club-red" />
+                  <div>
+                    <p className="text-xs text-slate-400">Komandas</p>
+                    <p className="text-sm text-club-navy">
+                      {selectedPlayer.teamNames.length > 0
+                        ? selectedPlayer.teamNames.join(", ")
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-3 last:pb-0">
+                  <Goal className="h-4 w-4 shrink-0 text-club-red" />
+                  <div>
+                    <p className="text-xs text-slate-400">Gūtie vārti</p>
+                    <p className="text-sm text-club-navy">
+                      {selectedPlayer.goals}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DrawerContent>
+      </Drawer>
+
+      <Drawer
+        open={Boolean(selectedCoach)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedCoach(null);
+        }}
+      >
+        <DrawerContent className="border-none bg-transparent shadow-none">
+          {selectedCoach && (
+            <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-6 shadow-xl">
+              <div className="flex items-center gap-4">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-club-gray-light">
+                  {selectedCoach.photoUrl ? (
+                    <Image
+                      src={selectedCoach.photoUrl}
+                      alt={selectedCoach.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <UserRound className="h-8 w-8 text-club-muted" strokeWidth={1.5} />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-xl text-club-navy">{selectedCoach.name}</h3>
+                  <p className="text-sm text-slate-400">{selectedCoach.position}</p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col divide-y divide-slate-100">
+                <div className="flex items-center gap-3 py-3 first:pt-0">
+                  <Image
+                    src={AUTHORITY_LOGO[selectedCoach.authority]}
+                    alt={selectedCoach.authority}
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 shrink-0 rounded-full object-contain"
+                  />
+                  <div>
+                    <p className="text-xs text-slate-400">Licence</p>
+                    <p className="text-sm text-club-navy">
+                      {selectedCoach.license}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-3 last:pb-0">
+                  <Users className="h-4 w-4 shrink-0 text-club-red" />
+                  <div>
+                    <p className="text-xs text-slate-400">Komandas</p>
+                    <p className="text-sm text-club-navy">
+                      {selectedCoach.teamNames.length > 0
+                        ? selectedCoach.teamNames.join(", ")
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }

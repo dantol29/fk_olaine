@@ -54,22 +54,24 @@ export function NewsCarousel({
             fill
             priority={i === 0}
             className={cn(
-              "object-cover transition-opacity duration-700 ease-in-out",
+              "object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
               i === index ? "opacity-100" : "opacity-0",
             )}
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
 
-        <h3 className="relative z-10 max-w-md text-3xl text-white sm:text-4xl">
-          {article.title}
-        </h3>
-        <p className="relative z-10 mt-3 line-clamp-2 max-w-md text-base text-white/70">
-          {article.excerpt}
-        </p>
+        <div key={article.slug} className="news-text-fade-in">
+          <h3 className="relative z-10 max-w-md text-3xl text-white sm:text-4xl">
+            {article.title}
+          </h3>
+          <p className="relative z-10 mt-3 line-clamp-2 max-w-md text-base text-white/70">
+            {article.excerpt}
+          </p>
+        </div>
 
-        <span className="absolute right-6 bottom-6 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-white/50 text-white sm:right-8 sm:bottom-8 sm:flex">
-          <ArrowRight className="h-4 w-4" />
+        <span className="absolute right-6 bottom-6 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white sm:right-8 sm:bottom-8 sm:flex">
+          <ArrowRight className="h-5 w-5" />
         </span>
       </Link>
 
@@ -80,7 +82,7 @@ export function NewsCarousel({
               type="button"
               onClick={() => go("prev")}
               aria-label="Iepriekšējais raksts"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition-transform duration-150 ease-out active:scale-90"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -88,7 +90,7 @@ export function NewsCarousel({
               type="button"
               onClick={() => go("next")}
               aria-label="Nākamais raksts"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition-transform duration-150 ease-out active:scale-90"
             >
               <ArrowRight className="h-5 w-5" />
             </button>
@@ -108,7 +110,7 @@ export function NewsCarousel({
                 onClick={() => setIndex(i)}
                 aria-label={`Rādīt ${i + 1}. rakstu`}
                 className={cn(
-                  "h-1 w-9 rounded-full transition-colors",
+                  "h-1 w-9 rounded-full transition-[background-color,transform] duration-150 ease-out active:scale-90",
                   i === index ? "bg-club-red" : "bg-white/25",
                 )}
               />

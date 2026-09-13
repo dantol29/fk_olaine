@@ -57,8 +57,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
   }
 
   return (
-    <Drawer open={mobileOpen} onOpenChange={setMobileOpen} swipeDirection="right">
-      <header className="relative z-40">
+    <header className="relative z-40">
         <div className="relative mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-6 sm:h-24">
           <div className="w-[110px] shrink-0" />
 
@@ -146,59 +145,60 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
                 <ArrowRight className="size-5" />
               </span>
             </JoinClubDrawer>
-            <DrawerTrigger
-              aria-label={mobileOpen ? "Aizvērt izvēlni" : "Atvērt izvēlni"}
-              className="flex h-11 w-11 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light lg:hidden"
-            >
-              {mobileOpen ? (
-                <X className="h-7 w-7" />
-              ) : (
-                <Menu className="h-7 w-7" />
-              )}
-            </DrawerTrigger>
+            <Drawer open={mobileOpen} onOpenChange={setMobileOpen} swipeDirection="right">
+              <DrawerTrigger
+                aria-label={mobileOpen ? "Aizvērt izvēlni" : "Atvērt izvēlni"}
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light lg:hidden"
+              >
+                {mobileOpen ? (
+                  <X className="h-7 w-7" />
+                ) : (
+                  <Menu className="h-7 w-7" />
+                )}
+              </DrawerTrigger>
+
+              <DrawerContent className="border-none bg-transparent shadow-none">
+                <div className="flex h-full min-h-0 w-full flex-col gap-2 overflow-y-auto bg-white p-6 shadow-xl">
+                  {MOBILE_NAV_ITEMS.map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="relative block min-h-16 py-2 text-club-navy sm:min-h-32 sm:py-3"
+                    >
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-4xl leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
+                      >
+                        {item.title}
+                      </span>
+                      <span className="relative text-center text-xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
+                        {item.title}
+                      </span>
+                    </Link>
+                  ))}
+
+                  <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-4">
+                    <a
+                      href={`tel:${phone.replace(/\s+/g, "")}`}
+                      className="flex items-center gap-2.5 text-sm font-semibold text-club-navy"
+                    >
+                      <Phone className="h-4 w-4 shrink-0 text-club-red" />
+                      {phone}
+                    </a>
+                    <a
+                      href={`mailto:${email}`}
+                      className="flex items-center gap-2.5 text-sm font-semibold text-club-navy"
+                    >
+                      <Mail className="h-4 w-4 shrink-0 text-club-red" />
+                      {email}
+                    </a>
+                  </div>
+                </div>
+              </DrawerContent>
+            </Drawer>
           </div>
         </div>
-
-        <DrawerContent className="border-none bg-transparent shadow-none">
-          <div className="flex h-full min-h-0 w-full flex-col gap-2 overflow-y-auto bg-white p-6 shadow-xl">
-            {MOBILE_NAV_ITEMS.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className="relative block min-h-16 py-2 text-club-navy sm:min-h-32 sm:py-3"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-4xl leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
-                >
-                  {item.title}
-                </span>
-                <span className="relative text-center text-xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
-                  {item.title}
-                </span>
-              </Link>
-            ))}
-
-            <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-4">
-              <a
-                href={`tel:${phone.replace(/\s+/g, "")}`}
-                className="flex items-center gap-2.5 text-sm font-semibold text-club-navy"
-              >
-                <Phone className="h-4 w-4 shrink-0 text-club-red" />
-                {phone}
-              </a>
-              <a
-                href={`mailto:${email}`}
-                className="flex items-center gap-2.5 text-sm font-semibold text-club-navy"
-              >
-                <Mail className="h-4 w-4 shrink-0 text-club-red" />
-                {email}
-              </a>
-            </div>
-          </div>
-        </DrawerContent>
       </header>
-    </Drawer>
   );
 }

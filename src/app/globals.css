@@ -140,6 +140,21 @@
   html {
     @apply font-sans overflow-x-hidden;
   }
+  /* Site-wide press feedback for every button — a component can still
+   * override with its own active:scale-* utility (utilities win over this
+   * base-layer rule), so this only fills in buttons that don't have one. */
+  button:not(:disabled) {
+    transition: transform 150ms ease-out;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active {
+    transform: none;
+  }
 }
 
 @keyframes league-row-enter {
@@ -159,6 +174,53 @@
 
 @media (prefers-reduced-motion: reduce) {
   .league-row-enter {
+    animation: none;
+  }
+}
+
+/** Fades the news carousel's title/excerpt in on slide change, synced with
+ *  the photo's own crossfade (same duration/curve) so the two halves of
+ *  the card change together instead of the text popping instantly. */
+@keyframes news-text-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.news-text-fade-in {
+  animation: news-text-fade-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-text-fade-in {
+    animation: none;
+  }
+}
+
+/** Reveals each poll result row (label + bar) once the visitor votes —
+ *  staggered per row via an inline animation-delay so the list cascades in
+ *  instead of popping all at once. Same curve/duration as the news
+ *  carousel's text fade for a consistent feel across the site. */
+@keyframes poll-result-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.poll-result-enter {
+  animation: poll-result-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poll-result-enter {
     animation: none;
   }
 }

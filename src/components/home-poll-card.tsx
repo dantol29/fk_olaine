@@ -81,7 +81,7 @@ function PollOptionsList({
 }) {
   return (
     <>
-      {options.map((option) => {
+      {options.map((option, index) => {
         const percent = totalVotes > 0 ? Math.round((option.votes / totalVotes) * 100) : 0;
         const isLeader = option.id === leaderId;
 
@@ -92,7 +92,7 @@ function PollOptionsList({
               type="button"
               disabled={isPending}
               onClick={() => onVote(option.id)}
-              className="rounded-full bg-slate-100 px-4 py-2 text-left text-sm font-semibold text-club-navy transition hover:bg-slate-200 disabled:opacity-50"
+              className="rounded-full bg-slate-100 px-4 py-2 text-left text-sm font-semibold text-club-navy transition-[background-color,transform] duration-150 ease-out hover:bg-slate-200 active:scale-95 disabled:opacity-50"
             >
               {option.label}
             </button>
@@ -100,13 +100,17 @@ function PollOptionsList({
         }
 
         return (
-          <div key={option.id}>
+          <div
+            key={option.id}
+            className="poll-result-enter"
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
             <p className="truncate text-sm font-semibold text-club-navy">{option.label}</p>
             <div className="mt-1.5 flex items-center gap-2">
               <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
                 <div
                   className={cn(
-                    "h-full rounded-full transition-[width] duration-500",
+                    "h-full rounded-full transition-[width] duration-700 ease-out",
                     isLeader ? "bg-club-red" : "bg-slate-300",
                   )}
                   style={{ width: `${percent}%` }}

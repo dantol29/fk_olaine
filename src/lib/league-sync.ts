@@ -35,6 +35,12 @@ export async function syncLeagueSource(source: {
   const candidates = fixtures.filter(
     (fixture) => fixture.time !== null && (isOlaine(fixture.home) || isOlaine(fixture.away)),
   );
+  if (candidates.length === 0) {
+    return {
+      imported: 0,
+      error: `LFF returned ${fixtures.length} fixtures, but none with a valid time matched FK Olaine`,
+    };
+  }
 
   const scrapedLogos = new Map<string, string>();
   for (const fixture of candidates) {

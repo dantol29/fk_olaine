@@ -19,6 +19,27 @@ export async function getTeamsRoster() {
     getAllTrainingsFromDb(),
   ]);
 
+  // A player (or coach) can belong to more than one team — build the full
+  // list of team names per person across the whole roster (not just the
+  // team this instance of the card happens to render under), so the
+  // detail drawer can show all of them.
+  const teamNamesByPlayerId = new Map<number, string[]>();
+  const teamNamesByCoachId = new Map<number, string[]>();
+  for (const team of rows) {
+    for (const pt of team.playerTeams) {
+      if (!pt.player) continue;
+      const list = teamNamesByPlayerId.get(pt.player.id) ?? [];
+      list.push(team.name);
+      teamNamesByPlayerId.set(pt.player.id, list);
+    }
+    for (const ct of team.coachTeams) {
+      if (!ct.coach) continue;
+      const list = teamNamesByCoachId.get(ct.coach.id) ?? [];
+      list.push(team.name);
+      teamNamesByCoachId.set(ct.coach.id, list);
+    }
+  }
+
   return rows.map((team) => ({
     id: team.id,
     name: team.name,
@@ -31,6 +52,9 @@ export async function getTeamsRoster() {
         id: player.id,
         name: player.name,
         photoUrl: player.photoUrl,
+        birthdate: player.birthdate,
+        goals: player.goals,
+        teamNames: teamNamesByPlayerId.get(player.id) ?? [],
       })),
     coaches: team.coachTeams
       .map((ct) => ct.coach)
@@ -44,6 +68,7 @@ export async function getTeamsRoster() {
         license: coach.license,
         authority: coach.authority,
         photoUrl: coach.photoUrl,
+        teamNames: teamNamesByCoachId.get(coach.id) ?? [],
       })),
     games: games.filter((game) => game.teamName === team.name),
     trainings: trainings.filter((training) => training.teamName === team.name),
