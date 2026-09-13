@@ -9,9 +9,16 @@ import type { StandingRow } from "@/lib/standings";
 
 type LeagueSelectorProps = {
   leagues: { label: string; standings: StandingRow[]; url: string }[];
+  /** Drops the "Spēles" and "Vārti" columns for narrower layouts (e.g. the
+   *  /speles page, where this sits in a slimmer sidebar column). */
+  compact?: boolean;
+  /** Squares off the left corners on desktop (lg+), where this card sits
+   *  flush against another card to its left with no gap (e.g. the
+   *  homepage hero's news carousel). */
+  flushLeft?: boolean;
 };
 
-export function LeagueSelector({ leagues }: LeagueSelectorProps) {
+export function LeagueSelector({ leagues, compact = false, flushLeft = false }: LeagueSelectorProps) {
   const [activeLeague, setActiveLeague] = useState(0);
 
   const standings = leagues[activeLeague]?.standings ?? [];
@@ -20,7 +27,13 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
 
   return (
     <div className="flex h-auto flex-col lg:h-full">
-      <div className="relative flex flex-1 flex-col pt-6 pb-4 sm:overflow-hidden sm:rounded-[1.5rem] sm:bg-white sm:px-8 sm:pt-8 sm:pb-6">
+      <div
+        className={cn(
+          "relative flex flex-1 flex-col pt-6 pb-4 sm:overflow-hidden sm:rounded-[1.5rem] sm:bg-white sm:px-8 sm:pt-8 sm:pb-6",
+          compact && "lg:rounded-t-none",
+          flushLeft && "lg:rounded-l-none",
+        )}
+      >
         <div className="mb-4 flex items-center justify-center gap-3 sm:mb-6 sm:justify-between">
           <div className="relative flex min-h-24 w-full min-w-0 flex-col items-center justify-center sm:min-h-0 sm:w-auto sm:items-start">
             <span
@@ -46,7 +59,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
           </a>
         </div>
 
-        <div className="overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <div className="league-scroll overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
           <table
             key={`table-${activeLeague}`}
             className="w-full border-collapse text-sm"
@@ -73,10 +86,14 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                     ))}
                   </div>
                 </th>
-                <th className="hidden pb-3 text-center sm:table-cell sm:pr-0">
-                  Spēles
-                </th>
-                <th className="hidden pb-3 text-center sm:table-cell">Vārti</th>
+                {!compact && (
+                  <th className="hidden pb-3 text-center sm:table-cell sm:pr-0">
+                    Spēles
+                  </th>
+                )}
+                {!compact && (
+                  <th className="hidden pb-3 text-center sm:table-cell">Vārti</th>
+                )}
                 <th className="hidden min-[400px]:table-cell pb-3 pr-1 text-center">
                   <span className="sm:hidden">P</span>
                   <span className="hidden sm:inline">Punkti</span>
@@ -87,7 +104,7 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
               {standings.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={compact ? 3 : 5}
                     className="py-6 text-center text-sm text-slate-400"
                   >
                     Tabula pašlaik nav pieejama.
@@ -142,12 +159,16 @@ export function LeagueSelector({ leagues }: LeagueSelectorProps) {
                           </span>
                         </div>
                       </td>
-                      <td className="hidden py-4 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell sm:py-5 sm:pr-3">
-                        {row.played}
-                      </td>
-                      <td className="hidden py-4 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell sm:py-5">
-                        {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
-                      </td>
+                      {!compact && (
+                        <td className="hidden py-4 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell sm:py-5 sm:pr-3">
+                          {row.played}
+                        </td>
+                      )}
+                      {!compact && (
+                        <td className="hidden py-4 text-center font-mono text-sm tabular-nums text-slate-600 sm:table-cell sm:py-5">
+                          {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
+                        </td>
+                      )}
                       <td
                         className={cn(
                           "hidden min-[400px]:table-cell py-4 pr-2 text-center font-mono text-base font-bold tabular-nums sm:py-5",

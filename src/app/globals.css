@@ -188,3 +188,35 @@
     animation: none;
   }
 }
+
+/** Thin, subtle scrollbar for the league standings table's internal
+ *  scroll area — the default OS scrollbar looks chunky/out of place
+ *  against the rest of the site's design. */
+.league-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--club-navy) transparent;
+}
+.league-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.league-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.league-scroll::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--club-navy) 20%, transparent);
+  border-radius: 9999px;
+}
+.league-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--club-navy) 35%, transparent);
+}
+
+/** Fully hides the scrollbar on an overflow-scroll container while
+ *  keeping it scrollable — for horizontal chip rows (e.g. the mobile
+ *  team-pill nav) where any visible scrollbar looks out of place. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

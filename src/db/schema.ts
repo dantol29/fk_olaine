@@ -7,11 +7,41 @@ export const teams = sqliteTable("teams", {
   createdAt: integer("created_at").notNull(),
 });
 
+/** Homepage poll cards — up to 3 shown in a row, oldest first. Options and
+ *  their vote tallies are freeform (not tied to teams/players), so any
+ *  question can be seeded, not just "favourite team". */
+export const polls = sqliteTable("polls", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  question: text("question").notNull(),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const pollOptions = sqliteTable("poll_options", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  pollId: integer("poll_id")
+    .notNull()
+    .references(() => polls.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  votes: integer("votes").notNull().default(0),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const pollsRelations = relations(polls, ({ many }) => ({
+  options: many(pollOptions),
+}));
+
+export const pollOptionsRelations = relations(pollOptions, ({ one }) => ({
+  poll: one(polls, { fields: [pollOptions.pollId], references: [polls.id] }),
+}));
+
 export const players = sqliteTable("players", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   birthdate: text("birthdate").notNull(),
   photoUrl: text("photo_url"),
+  /** Season goal tally — manually kept by admins. Drives the homepage
+   *  "top scorers" section; 0 for anyone not tracked (goalkeepers etc). */
+  goals: integer("goals").notNull().default(0),
   createdAt: integer("created_at").notNull(),
 });
 
@@ -63,6 +93,19 @@ export const trainings = sqliteTable("trainings", {
   notes: text("notes"),
   createdAt: integer("created_at").notNull(),
 });
+
+export const trainingCoaches = sqliteTable(
+  "training_coaches",
+  {
+    trainingId: integer("training_id")
+      .notNull()
+      .references(() => trainings.id, { onDelete: "cascade" }),
+    coachId: integer("coach_id")
+      .notNull()
+      .references(() => coaches.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.trainingId, table.coachId] })],
+);
 
 export const events = sqliteTable("events", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -135,6 +178,16 @@ export const coachesRelations = relations(coaches, ({ many }) => ({
 export const coachTeamsRelations = relations(coachTeams, ({ one }) => ({
   coach: one(coaches, { fields: [coachTeams.coachId], references: [coaches.id] }),
   team: one(teams, { fields: [coachTeams.teamId], references: [teams.id] }),
+}));
+
+export const trainingsRelations = relations(trainings, ({ one, many }) => ({
+  team: one(teams, { fields: [trainings.teamId], references: [teams.id] }),
+  trainingCoaches: many(trainingCoaches),
+}));
+
+export const trainingCoachesRelations = relations(trainingCoaches, ({ one }) => ({
+  training: one(trainings, { fields: [trainingCoaches.trainingId], references: [trainings.id] }),
+  coach: one(coaches, { fields: [trainingCoaches.coachId], references: [coaches.id] }),
 }));
 
 export const leagueSourcesRelations = relations(leagueSources, ({ one }) => ({

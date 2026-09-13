@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { Article, ArticleCategory } from "@/lib/jaunumi";
@@ -17,6 +17,13 @@ const CATEGORIES: ArticleCategory[] = [
 ];
 
 const PAGE_SIZE = 6;
+
+// Varying the image aspect ratio card-to-card (rather than one fixed
+// height) is what actually produces the masonry/waterfall look in a CSS
+// `columns` layout — a uniform ratio would just make evenly-tall cards
+// wrap into columns, no visual rhythm. Kept short/wide so photos stay
+// small relative to the card.
+const ARTICLE_ASPECTS = ["aspect-video", "aspect-[2/1]", "aspect-[16/10]"];
 
 function getPageNumbers(current: number, total: number): (number | "…")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -38,29 +45,20 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
   const [activeCategory, setActiveCategory] = useState<
     ArticleCategory | "Visi"
   >("Visi");
-  const [query, setQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return articles.filter((article) => {
-      const matchesCategory =
-        activeCategory === "Visi" || article.category === activeCategory;
-      const matchesQuery =
-        q.length === 0 ||
-        article.title.toLowerCase().includes(q) ||
-        article.excerpt.toLowerCase().includes(q);
-      return matchesCategory && matchesQuery;
-    });
-  }, [articles, activeCategory, query]);
+    return articles.filter(
+      (article) => activeCategory === "Visi" || article.category === activeCategory,
+    );
+  }, [articles, activeCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
   // Reset to page 1 whenever the filters change (adjusting state during
   // render, per https://react.dev/learn/you-might-not-need-an-effect,
   // instead of a setState-in-effect that would trigger a second render).
-  const filterKey = `${activeCategory}|${query}`;
+  const filterKey = activeCategory;
   const [lastFilterKey, setLastFilterKey] = useState(filterKey);
   if (filterKey !== lastFilterKey) {
     setLastFilterKey(filterKey);
@@ -78,8 +76,8 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
     <>
       {/* Title */}
       <section className="px-6 pt-14 sm:pt-14">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4">
-          <div className="relative flex min-h-24 min-w-0 flex-1 flex-col justify-center sm:min-h-32">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="relative flex min-h-24 flex-col justify-center sm:min-h-32">
             <span
               aria-hidden
               className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
@@ -90,40 +88,6 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
               Jaunumi
             </h1>
           </div>
-
-          {searchOpen ? (
-            <label className="relative flex w-full max-w-[220px] shrink-0 items-center sm:max-w-xs">
-              <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
-              <input
-                autoFocus
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Meklēt rakstus..."
-                className="w-full rounded-full border border-slate-200 bg-white py-2 pr-9 pl-10 text-sm text-club-navy outline-none focus:border-club-red"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery("");
-                  setSearchOpen(false);
-                }}
-                aria-label="Aizvērt meklēšanu"
-                className="absolute right-3.5 flex h-4 w-4 items-center justify-center text-slate-400 transition hover:text-club-navy"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </label>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Meklēt rakstus"
-              className="shrink-0 text-club-navy transition hover:text-club-red"
-            >
-              <Search className="h-7 w-7" />
-            </button>
-          )}
         </div>
       </section>
 
@@ -150,33 +114,35 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
           </div>
 
           {pageArticles.length > 0 ? (
-            <div className="flex flex-col gap-4 sm:gap-5">
-              {pageArticles.map((article) => (
+            <div className="columns-1 gap-4 sm:columns-2 sm:gap-5 lg:columns-3">
+              {pageArticles.map((article, index) => (
                 <Link
                   key={article.slug}
                   href={`/jaunumi/${article.slug}`}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm sm:flex-row sm:rounded-[2rem]"
+                  className="group mb-4 flex break-inside-avoid flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm sm:mb-5"
                 >
-                  <div className="relative h-56 w-full shrink-0 overflow-hidden sm:h-auto sm:w-[420px]">
+                  <div
+                    className={cn(
+                      "relative w-full shrink-0 overflow-hidden",
+                      ARTICLE_ASPECTS[index % ARTICLE_ASPECTS.length],
+                    )}
+                  >
                     <Image
                       src={article.image}
                       alt=""
                       fill
                       className="object-cover transition duration-500 group-hover:scale-105"
                     />
-                    <span className="absolute top-4 left-4 z-10 rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
-                      {article.category}
-                    </span>
                   </div>
 
-                  <div className="flex flex-1 flex-col justify-center gap-2 p-6 sm:gap-3 sm:p-8">
+                  <div className="relative z-10 -mt-4 flex flex-1 flex-col gap-2 rounded-t-2xl bg-white p-6">
                     <span className="text-xs font-medium text-slate-400">
                       {article.date}
                     </span>
-                    <h3 className="text-xl text-club-navy sm:text-2xl">
+                    <h3 className="text-xl text-club-navy">
                       {article.title}
                     </h3>
-                    <p className="line-clamp-2 text-sm text-slate-500 sm:text-base">
+                    <p className="line-clamp-3 text-sm text-slate-500">
                       {article.excerpt}
                     </p>
                     <span className="mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold text-club-navy transition group-hover:text-club-red">

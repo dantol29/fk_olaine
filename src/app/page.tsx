@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { BirthdaysSection } from "@/components/birthdays-section";
 import { CalendarSection } from "@/components/calendar-section";
 import { Hero } from "@/components/hero";
-import { HomeNewsCarousel } from "@/components/home-news-carousel";
+import { HomeCoachesSection } from "@/components/home-coaches-section";
+import { HomePollsSection } from "@/components/home-polls-section";
+import { HomeTeamsSection } from "@/components/home-teams-section";
+import { HomeUpcomingGames } from "@/components/home-upcoming-games";
+import { HomeUpcomingTrainings } from "@/components/home-upcoming-trainings";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { PartnersBar } from "@/components/partners-bar";
-import { QuickLinksSection } from "@/components/quick-links-section";
 import { SiteFooter } from "@/components/site-footer";
+import { CoachesList } from "@/components/coaches-list";
 import { SiteHeader } from "@/components/site-header";
-import { ArrowRight } from "lucide-react";
+import { TopScorersList } from "@/components/top-scorers-list";
+import { UpcomingBirthdays } from "@/components/upcoming-birthdays";
 
 export const metadata: Metadata = {
   title: "FK Olaine — Olaines futbola klubs",
@@ -25,47 +29,54 @@ export default function Home() {
       <SiteHeader />
       <main className="bg-background">
         <Hero />
-      </main>
-      <div className="px-6 pt-10 pb-10 sm:pt-14">
-        <div className="relative mx-auto max-w-[1440px]">
-          <PartnersBar />
+        <HomeUpcomingGames />
+        <div className="px-6 pt-8 sm:pt-10">
+          <div className="relative mx-auto max-w-[1440px]">
+            <HomePollsSection />
+          </div>
         </div>
-      </div>
-      <section className="px-6 pb-8 pt-4 sm:pt-8">
-        <div className="relative mx-auto max-w-[1440px]">
-          <div className="mb-5 flex items-center justify-center gap-4 sm:mb-6 sm:justify-between">
-            <div className="relative flex min-h-24 min-w-0 flex-1 flex-col items-center justify-center sm:min-h-32 sm:items-start">
+        <div className="px-6 pt-16 pb-10 sm:pt-20">
+          <div className="relative mx-auto max-w-[1440px]">
+            <PartnersBar />
+          </div>
+        </div>
+        <section className="px-6 pb-8 pt-4 sm:pt-8">
+          <div className="relative mx-auto max-w-[1440px]">
+            <HomeTeamsSection />
+
+            <div className="relative mt-12 flex min-h-24 flex-col justify-center sm:mt-16 sm:min-h-32">
               <span
                 aria-hidden
                 className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
               >
-                Jaunumi
+                Kluba dzīve
               </span>
-              <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
-                Jaunumi
+              <h2 className="relative text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">
+                Kluba dzīve
               </h2>
             </div>
-            <Link
-              href="/jaunumi"
-              className="hidden shrink-0 items-center gap-2 rounded-full border border-slate-200 py-1.5 pr-1.5 pl-4 text-sm font-semibold text-club-navy transition-colors hover:border-slate-300 sm:flex"
-            >
-              Visi jaunumi
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 sm:h-8 sm:w-8">
-                <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </span>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:auto-rows-[270px] lg:grid-cols-12 lg:gap-5">
-            <div className="min-h-[420px] sm:col-span-2 lg:col-span-7 lg:row-span-2 lg:min-h-0">
-              <HomeNewsCarousel embedded />
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 lg:grid-cols-3 lg:gap-0">
+              <CoachesList className="lg:rounded-r-none" />
+              <TopScorersList className="lg:rounded-l-none lg:rounded-r-none" />
+              <UpcomingBirthdays className="lg:rounded-l-none" />
             </div>
-            <QuickLinksSection bento />
           </div>
+        </section>
+        <HomeUpcomingTrainings />
+        {/* Hidden per request — kept mounted (not removed) so it's a
+         *  one-line toggle to bring back. */}
+        <div className="hidden">
+          <section className="px-6 pb-8 sm:pb-10">
+            <div className="relative mx-auto max-w-[1440px]">
+              <HomeCoachesSection />
+            </div>
+          </section>
+          <BirthdaysSection />
         </div>
-      </section>
-      <BirthdaysSection />
-      <CalendarSection />
-      <JoinTeamCta />
+        <CalendarSection />
+        <JoinTeamCta />
+      </main>
       <SiteFooter />
     </>
   );

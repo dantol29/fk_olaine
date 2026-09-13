@@ -1,0 +1,80 @@
+import Image from "next/image";
+import { UserRound } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { db } from "@/db/client";
+
+type TopScorer = {
+  id: number;
+  name: string;
+  photoUrl: string | null;
+  goals: number;
+  teamName: string | null;
+};
+
+async function getTopScorers(limit: number): Promise<TopScorer[]> {
+  const rows = await db.query.players.findMany({
+    with: { playerTeams: { with: { team: true } } },
+  });
+
+  return rows
+    .filter((player) => player.goals > 0)
+    .sort((a, b) => b.goals - a.goals)
+    .slice(0, limit)
+    .map((player) => ({
+      id: player.id,
+      name: player.name,
+      photoUrl: player.photoUrl,
+      goals: player.goals,
+      teamName: player.playerTeams[0]?.team.name ?? null,
+    }));
+}
+
+/** Compact "Rezultatīvākie spēlētāji" list — styled to match
+ *  upcoming-birthdays.tsx exactly (same card shell, divide-y rows, a
+ *  ring-highlighted leader row) since the two sit side by side on the
+ *  homepage, directly under the Komandas panel. */
+export async function TopScorersList({ className }: { className?: string } = {}) {
+  const scorers = await getTopScorers(3);
+  if (scorers.length === 0) return null;
+
+  return (
+    <div
+      className={cn(
+        "h-full rounded-2xl bg-white pt-6 pr-4 pb-4 pl-6 sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        className,
+      )}
+    >
+      <h3 className="text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">
+        Bombardieri
+      </h3>
+
+      <div className="mt-4 flex flex-col divide-y divide-slate-100">
+        {scorers.map((scorer) => (
+          <div key={scorer.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
+              {scorer.photoUrl ? (
+                <Image src={scorer.photoUrl} alt={scorer.name} fill className="object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+                </div>
+              )}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-lg font-semibold text-club-navy">{scorer.name}</p>
+              {scorer.teamName && (
+                <p className="truncate text-sm text-slate-400">{scorer.teamName}</p>
+              )}
+            </div>
+
+            <span className="shrink-0 text-lg font-semibold text-club-navy">
+              {scorer.goals}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

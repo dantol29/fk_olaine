@@ -44,60 +44,63 @@ export function NewsCarousel({
     >
       <Link
         href={`/jaunumi/${article.slug}`}
-        className="group relative flex flex-1 flex-col justify-end p-6 pb-20 sm:p-8 sm:pb-24"
+        className="relative flex flex-1 flex-col justify-end p-6 pb-20 sm:p-8 sm:pb-24"
       >
-        <Image
-          key={article.slug}
-          src={article.image}
-          alt=""
-          fill
-          className="object-cover transition duration-500 group-hover:scale-105"
-        />
+        {articles.map((item, i) => (
+          <Image
+            key={item.slug}
+            src={item.image}
+            alt=""
+            fill
+            priority={i === 0}
+            className={cn(
+              "object-cover transition-opacity duration-700 ease-in-out",
+              i === index ? "opacity-100" : "opacity-0",
+            )}
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
 
-        <span className="relative z-10 text-xs font-medium text-white/70">
-          {article.date}
-        </span>
-        <h3 className="relative z-10 mt-2 max-w-md text-xl text-white sm:text-2xl">
+        <h3 className="relative z-10 max-w-md text-3xl text-white sm:text-4xl">
           {article.title}
         </h3>
-        <p className="relative z-10 mt-2 line-clamp-2 max-w-md text-sm text-white/70">
+        <p className="relative z-10 mt-3 line-clamp-2 max-w-md text-base text-white/70">
           {article.excerpt}
         </p>
 
-        <span className="absolute right-6 bottom-6 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-white/50 text-white transition group-hover:border-club-red group-hover:bg-club-red sm:right-8 sm:bottom-8 sm:flex">
+        <span className="absolute right-6 bottom-6 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-white/50 text-white sm:right-8 sm:bottom-8 sm:flex">
           <ArrowRight className="h-4 w-4" />
         </span>
       </Link>
 
       {articles.length > 1 && (
         <div className="absolute bottom-8 left-8 z-20 flex items-center gap-3 sm:left-10">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => go("prev")}
               aria-label="Iepriekšējais raksts"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
+              <ArrowLeft className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={() => go("next")}
               aria-label="Nākamais raksts"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white"
             >
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-5 w-5" />
             </button>
           </div>
 
-          <span className="text-xl text-white">
+          <span className="text-2xl text-white sm:text-3xl">
             {String(index + 1).padStart(2, "0")}
-            <span className="ml-1.5 text-sm font-medium text-white/50">
+            <span className="ml-1.5 text-base font-medium text-white/50">
               /{String(articles.length).padStart(2, "0")}
             </span>
           </span>
-          <div className="flex gap-1.5">
+          <div className="flex gap-2">
             {articles.map((item, i) => (
               <button
                 key={item.slug}
@@ -105,7 +108,7 @@ export function NewsCarousel({
                 onClick={() => setIndex(i)}
                 aria-label={`Rādīt ${i + 1}. rakstu`}
                 className={cn(
-                  "h-[3px] w-7 rounded-full transition-colors",
+                  "h-1 w-9 rounded-full transition-colors",
                   i === index ? "bg-club-red" : "bg-white/25",
                 )}
               />

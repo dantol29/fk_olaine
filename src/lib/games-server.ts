@@ -74,6 +74,8 @@ export async function getUpcomingGamesFromDb(
 export type GameListItem = UpcomingGame & {
   /** Which of the club's own teams plays this fixture (e.g. "U14", "Sieviešu 1"). */
   teamName: string;
+  /** "YYYY-MM-DD" — used for calendar-grid placement. */
+  rawDate: string;
   isPast: boolean;
 };
 
@@ -113,6 +115,7 @@ export async function getAllGamesFromDb(): Promise<GameListItem[]> {
         away: teamDisplay(row.awayTeam, logos.get(row.awayTeam) ?? null),
         venue: row.location,
         teamName: row.teamName,
+        rawDate: row.date,
         isPast: row.date < todayKey,
       };
     });

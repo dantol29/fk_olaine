@@ -2,9 +2,16 @@ import "server-only";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { teams as teamsTable, trainings as trainingsTable } from "@/db/schema";
+import {
+  coaches as coachesTable,
+  teams as teamsTable,
+  trainingCoaches as trainingCoachesTable,
+  trainings as trainingsTable,
+} from "@/db/schema";
 import { toDateKey } from "@/lib/calendar";
 import { MONTHS } from "@/lib/games";
+
+export type TrainingCoach = { name: string; photoUrl: string | null };
 
 export type TrainingListItem = {
   id: number;
@@ -16,6 +23,7 @@ export type TrainingListItem = {
   endTime: string;
   location: string;
   teamName: string;
+  coaches: TrainingCoach[];
   isPast: boolean;
 };
 
@@ -37,6 +45,22 @@ export async function getAllTrainingsFromDb(): Promise<TrainingListItem[]> {
       .innerJoin(teamsTable, eq(trainingsTable.teamId, teamsTable.id))
       .orderBy(trainingsTable.date, trainingsTable.startTime);
 
+    const coachRows = await db
+      .select({
+        trainingId: trainingCoachesTable.trainingId,
+        name: coachesTable.name,
+        photoUrl: coachesTable.photoUrl,
+      })
+      .from(trainingCoachesTable)
+      .innerJoin(coachesTable, eq(trainingCoachesTable.coachId, coachesTable.id));
+
+    const coachesByTraining = new Map<number, TrainingCoach[]>();
+    for (const row of coachRows) {
+      const list = coachesByTraining.get(row.trainingId) ?? [];
+      list.push({ name: row.name, photoUrl: row.photoUrl });
+      coachesByTraining.set(row.trainingId, list);
+    }
+
     return rows.map((row) => {
       const [year, month, day] = row.date.split("-").map(Number);
       return {
@@ -49,6 +73,7 @@ export async function getAllTrainingsFromDb(): Promise<TrainingListItem[]> {
         endTime: row.endTime,
         location: row.location,
         teamName: row.teamName,
+        coaches: coachesByTraining.get(row.id) ?? [],
         isPast: row.date < todayKey,
       };
     });

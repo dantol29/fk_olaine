@@ -2,6 +2,7 @@ import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 import { teams } from "@/db/schema";
 
@@ -21,6 +22,7 @@ export default async function AdminTeamsPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt komandas…" />
 
       <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
         <thead>
@@ -31,7 +33,7 @@ export default async function AdminTeamsPage() {
         </thead>
         <tbody>
           {rows.map((team) => (
-            <tr key={team.id} className="border-b border-slate-100 last:border-0">
+            <tr data-admin-search-item={team.name} key={team.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 font-semibold text-club-navy">{team.name}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">

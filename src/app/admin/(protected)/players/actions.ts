@@ -13,12 +13,14 @@ function parsePlayerInput(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const birthdate = String(formData.get("birthdate") ?? "").trim();
   const teamIds = formData.getAll("teamIds").map(Number).filter((n) => Number.isFinite(n));
+  const goalsRaw = Number(formData.get("goals"));
+  const goals = Number.isFinite(goalsRaw) && goalsRaw >= 0 ? Math.trunc(goalsRaw) : 0;
 
   if (!name) return { error: "Vārds, uzvārds ir obligāts." } as const;
   if (!birthdate) return { error: "Dzimšanas datums ir obligāts." } as const;
   if (teamIds.length === 0) return { error: "Jāizvēlas vismaz viena komanda." } as const;
 
-  return { name, birthdate, teamIds } as const;
+  return { name, birthdate, teamIds, goals } as const;
 }
 
 async function syncPlayerTeams(playerId: number, teamIds: number[]) {

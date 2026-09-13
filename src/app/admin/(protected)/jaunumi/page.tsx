@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 
 import { deleteArticle } from "./actions";
@@ -24,6 +25,7 @@ export default async function AdminArticlesPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt jaunumus…" />
 
       {rows.length === 0 ? (
         <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
@@ -34,6 +36,7 @@ export default async function AdminArticlesPage() {
           {rows.map((article) => (
             <div
               key={article.id}
+              data-admin-search-item={`${article.title} ${article.date} ${article.category} ${article.team?.name ?? ""}`}
               className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
             >
               <div className="relative aspect-video bg-club-gray-light">

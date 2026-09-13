@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 
 import { deleteClubLogo } from "./actions";
@@ -24,6 +25,7 @@ export default async function AdminClubLogosPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt klubu logo…" />
 
       {rows.length === 0 ? (
         <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
@@ -46,7 +48,7 @@ export default async function AdminClubLogosPage() {
                   .sort((a, b) => a.localeCompare(b, "lv"))
                   .join(", ") || "—";
               return (
-                <tr key={club.id} className="border-b border-slate-100 last:border-0">
+                <tr data-admin-search-item={namesLabel} key={club.id} className="border-b border-slate-100 last:border-0">
                   <td className="p-4">
                     <Image
                       src={club.logoUrl}

@@ -10,6 +10,7 @@ type Player = {
   name: string;
   birthdate: string;
   photoUrl: string | null;
+  goals: number;
   playerTeams: { teamId: number }[];
 };
 type TeamOption = { id: number; name: string };
@@ -49,6 +50,18 @@ export function PlayerForm(
           placeholder="12.04.1998."
           required
           defaultValue={player?.birthdate ?? ""}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Gūtie vārti (šosezon)
+        <input
+          type="number"
+          name="goals"
+          min={0}
+          step={1}
+          defaultValue={player?.goals ?? 0}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>

@@ -3,6 +3,7 @@ import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 import { leagueSources, teams } from "@/db/schema";
 
@@ -33,6 +34,7 @@ export default async function AdminLeagueSourcesPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt līgu avotus…" />
 
       <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
         <thead>
@@ -46,7 +48,7 @@ export default async function AdminLeagueSourcesPage() {
         </thead>
         <tbody>
           {rows.map((source) => (
-            <tr key={source.id} className="border-b border-slate-100 last:border-0">
+            <tr data-admin-search-item={`${source.label} ${source.teamName} ${source.url} ${source.standingsUrl ?? ""}`} key={source.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 text-slate-500">{source.displayOrder}</td>
               <td className="p-4 font-semibold text-club-navy">{source.label}</td>
               <td className="p-4 text-slate-500">{source.teamName}</td>

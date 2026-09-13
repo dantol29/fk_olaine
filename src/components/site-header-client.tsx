@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRight, Mail, Menu, Phone, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { GlobalSearchDrawer } from "@/components/global-search-drawer";
 import { JoinClubDrawer } from "@/components/join-club-drawer";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import {
@@ -47,6 +49,12 @@ const MOBILE_NAV_ITEMS: { title: string; href: string }[] = NAV_ITEMS.flatMap(
 
 export function SiteHeaderClient({ phone, email }: { phone: string; email: string }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  function isActive(item: NavItem) {
+    if (item.items) return item.items.some((sub) => sub.href === pathname);
+    return item.href === pathname;
+  }
 
   return (
     <Drawer open={mobileOpen} onOpenChange={setMobileOpen} swipeDirection="right">
@@ -70,7 +78,12 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
               {NAV_ITEMS.map((item) =>
                 item.items ? (
                   <NavigationMenuItem key={item.title}>
-                    <NavigationMenuTrigger className="text-base font-semibold text-club-navy hover:text-club-red data-popup-open:text-club-red">
+                    <NavigationMenuTrigger
+                      className={cn(
+                        "text-base font-semibold hover:text-club-red data-popup-open:text-club-red",
+                        isActive(item) ? "text-club-red" : "text-club-navy",
+                      )}
+                    >
                       {item.title}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent className="w-56 p-2">
@@ -94,7 +107,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
                       href={item.href}
                       className={cn(
                         "relative px-3 py-2 text-base font-semibold hover:bg-transparent",
-                        item.title === "Sākums"
+                        isActive(item)
                           ? "text-club-red after:absolute after:bottom-[-2px] after:left-1/2 after:h-[2px] after:w-8 after:-translate-x-1/2 after:bg-club-red after:content-['']"
                           : "text-club-navy hover:text-club-red",
                       )}
@@ -108,6 +121,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
           </NavigationMenu>
 
           <div className="mt-4 flex items-center justify-end gap-2 sm:gap-3 sm:pr-2 lg:mt-0 lg:pr-4">
+            <GlobalSearchDrawer />
             <a
               href="https://www.instagram.com/fkolaine_sievietes/"
               target="_blank"
@@ -152,15 +166,15 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
                 key={item.title}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="relative block min-h-24 py-3 text-club-navy sm:min-h-32"
+                className="relative block min-h-16 py-2 text-club-navy sm:min-h-32 sm:py-3"
               >
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
+                  className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-4xl leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
                 >
                   {item.title}
                 </span>
-                <span className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
+                <span className="relative text-center text-xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
                   {item.title}
                 </span>
               </Link>

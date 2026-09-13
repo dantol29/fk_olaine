@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { getPartners } from "@/lib/partners-server";
 
 import { deletePartner } from "./actions";
@@ -21,6 +22,7 @@ export default async function AdminPartnersPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt partnerus…" />
 
       <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
         <thead>
@@ -33,7 +35,7 @@ export default async function AdminPartnersPage() {
         </thead>
         <tbody>
           {rows.map((partner) => (
-            <tr key={partner.id} className="border-b border-slate-100 last:border-0">
+            <tr data-admin-search-item={`${partner.name} ${partner.size === "lg" ? "Liels" : "Mazs"}`} key={partner.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4">
                 <Image
                   src={partner.logoUrl}

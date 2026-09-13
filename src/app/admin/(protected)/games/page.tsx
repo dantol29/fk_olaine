@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 import { games, teams } from "@/db/schema";
 import { resolveClubLogos } from "@/lib/club-logos";
@@ -68,6 +69,7 @@ export default async function AdminGamesPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt spēles…" />
 
       <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
         <thead>
@@ -84,7 +86,7 @@ export default async function AdminGamesPage() {
         </thead>
         <tbody>
           {rows.map((game) => (
-            <tr key={game.id} className="border-b border-slate-100 last:border-0">
+            <tr data-admin-search-item={`${game.date} ${game.startTime} ${game.teamName} ${game.homeTeam} ${game.awayTeam} ${game.league ?? ""} ${game.location}`} key={game.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 text-club-navy">{game.date}</td>
               <td className="p-4 text-slate-500">
                 {game.startTime}–{game.endTime}

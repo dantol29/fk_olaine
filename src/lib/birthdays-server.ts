@@ -54,20 +54,15 @@ function nextBirthday(birthdate: string, today: Date) {
   };
 }
 
-/** A left-to-right timeline for the homepage's "Dzimšanas dienas" section:
- *  the soonest birthday (today's, if any) sits in the `center`, the most
- *  recently *passed* ones trail off to the left in `past`, and the next
- *  ones after center lead off to the right in `future`. Built from one
- *  sorted-by-days-until list: the tail of that list (largest daysUntil,
- *  i.e. "almost a full year away") is exactly the most recently passed
- *  birthdays, so no separate past/future query is needed. */
-export async function getBirthdaysTimeline(sideCount = 4): Promise<BirthdaysTimeline> {
+/** Every player with a parseable birthdate, soonest-first. Shared by the
+ *  homepage timeline and the simple upcoming-birthdays list. */
+async function getSortedUpcomingBirthdays(): Promise<UpcomingBirthday[]> {
   const rows = await db.query.players.findMany({
     with: { playerTeams: { with: { team: true } } },
   });
 
   const today = new Date();
-  const all = rows
+  return rows
     .map((player): UpcomingBirthday | null => {
       const parsed = nextBirthday(player.birthdate, today);
       if (!parsed) return null;
@@ -85,6 +80,17 @@ export async function getBirthdaysTimeline(sideCount = 4): Promise<BirthdaysTime
     })
     .filter((player) => player !== null)
     .sort((a, b) => a.daysUntil - b.daysUntil);
+}
+
+/** A left-to-right timeline for the homepage's "Dzimšanas dienas" section:
+ *  the soonest birthday (today's, if any) sits in the `center`, the most
+ *  recently *passed* ones trail off to the left in `past`, and the next
+ *  ones after center lead off to the right in `future`. Built from one
+ *  sorted-by-days-until list: the tail of that list (largest daysUntil,
+ *  i.e. "almost a full year away") is exactly the most recently passed
+ *  birthdays, so no separate past/future query is needed. */
+export async function getBirthdaysTimeline(sideCount = 4): Promise<BirthdaysTimeline> {
+  const all = await getSortedUpcomingBirthdays();
 
   if (all.length === 0) return { past: [], center: null, future: [] };
 
@@ -95,4 +101,10 @@ export async function getBirthdaysTimeline(sideCount = 4): Promise<BirthdaysTime
   const past = remaining.slice(Math.max(0, remaining.length - sideCount));
 
   return { past, center, future };
+}
+
+/** A plain soonest-first list for compact sidebar widgets (e.g. /treninji). */
+export async function getUpcomingBirthdays(limit = 5): Promise<UpcomingBirthday[]> {
+  const all = await getSortedUpcomingBirthdays();
+  return all.slice(0, limit);
 }

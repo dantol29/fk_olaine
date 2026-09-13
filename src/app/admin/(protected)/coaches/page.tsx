@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 
 import { deleteCoach } from "./actions";
@@ -24,6 +25,7 @@ export default async function AdminCoachesPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt trenerus…" />
 
       {rows.length === 0 ? (
         <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
@@ -34,6 +36,7 @@ export default async function AdminCoachesPage() {
           {rows.map((coach) => (
             <div
               key={coach.id}
+              data-admin-search-item={`${coach.name} ${coach.position} ${coach.coachTeams.map((ct) => ct.team.name).join(" ")}`}
               className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
             >
               <div className="relative aspect-square bg-club-gray-light">

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
+import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 
 import { deletePlayer } from "./actions";
@@ -35,6 +36,7 @@ export default async function AdminPlayersPage() {
           + Pievienot
         </Link>
       </div>
+      <AdminSearch placeholder="Meklēt spēlētājus…" />
 
       {totalPlayers === 0 ? (
         <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
@@ -43,7 +45,7 @@ export default async function AdminPlayersPage() {
       ) : (
         teamsWithPlayers.map((team) =>
           team.players.length === 0 ? null : (
-            <div key={team.id} className="mb-8">
+            <div key={team.id} data-admin-search-group className="mb-8">
               <div className="mb-3 flex items-baseline gap-3">
                 <h2 className="text-lg font-bold text-club-navy">{team.name}</h2>
                 <span className="text-sm text-slate-400">{team.players.length} spēlētāji</span>
@@ -52,6 +54,7 @@ export default async function AdminPlayersPage() {
                 {team.players.map((player) => (
                   <div
                     key={player.id}
+                    data-admin-search-item={`${player.name} ${player.birthdate} ${team.name}`}
                     className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                   >
                     <div className="relative aspect-square bg-club-gray-light">

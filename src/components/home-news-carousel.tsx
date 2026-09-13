@@ -2,9 +2,16 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { getArticles } from "@/lib/jaunumi-server";
+import { cn } from "@/lib/utils";
 import { NewsCarousel } from "@/components/news-carousel";
 
-export async function HomeNewsCarousel({ embedded = false }: { embedded?: boolean }) {
+export async function HomeNewsCarousel({
+  embedded = false,
+  className,
+}: {
+  embedded?: boolean;
+  className?: string;
+}) {
   const articles = await getArticles();
   const items = articles.slice(0, 3).map((article) => ({
     slug: article.slug,
@@ -15,7 +22,7 @@ export async function HomeNewsCarousel({ embedded = false }: { embedded?: boolea
   }));
 
   if (embedded) {
-    return <NewsCarousel articles={items} className="min-h-0" />;
+    return <NewsCarousel articles={items} className={cn("min-h-0", className)} />;
   }
 
   return (

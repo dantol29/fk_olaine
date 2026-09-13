@@ -51,7 +51,7 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
 
   return (
     <>
-      <div className="relative ml-[calc(50%-50vw)] h-[280px] w-screen overflow-hidden rounded-b-[2rem] sm:ml-0 sm:h-[420px] sm:w-full sm:rounded-[2rem]">
+      <div className="relative ml-[calc(50%-50vw)] h-[280px] w-screen overflow-hidden rounded-b-[2rem] sm:ml-0 sm:h-[420px] sm:w-full sm:rounded-[2rem] lg:h-[560px]">
         <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
 
         <button
@@ -67,34 +67,34 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
           <>
             <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
 
-            <div className="absolute bottom-4 left-8 z-20 flex items-center gap-3 sm:left-10">
-              <div className="flex items-center gap-2">
+            <div className="absolute bottom-5 left-8 z-20 flex items-center gap-4 sm:left-10">
+              <div className="flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => go("prev")}
                   aria-label="Iepriekšējais attēls"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <ArrowLeft className="h-5 w-5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => go("next")}
                   aria-label="Nākamais attēls"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white transition hover:bg-white/10"
                 >
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-5 w-5" />
                 </button>
               </div>
 
-              <span className="text-xl text-white">
+              <span className="text-2xl text-white">
                 {String(index + 1).padStart(2, "0")}
-                <span className="ml-1.5 text-sm font-medium text-white/50">
+                <span className="ml-1.5 text-base font-medium text-white/50">
                   /{String(images.length).padStart(2, "0")}
                 </span>
               </span>
               {images.length <= 5 && (
-                <div className="flex gap-1.5">
+                <div className="flex gap-2">
                   {images.map((_, i) => (
                     <button
                       key={i}
@@ -102,7 +102,7 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
                       onClick={() => setIndex(i)}
                       aria-label={`Rādīt ${i + 1}. attēlu`}
                       className={cn(
-                        "h-[3px] w-7 rounded-full transition-colors",
+                        "h-[4px] w-9 rounded-full transition-colors",
                         i === index ? "bg-club-red" : "bg-white/25",
                       )}
                     />
@@ -218,89 +218,86 @@ export function ArticleDetail({ article }: { article: Article }) {
 
   return (
     <>
-      {/* Header band */}
-      <section className="pt-4 sm:px-6">
-        <div className="mx-auto max-w-[1440px] bg-gradient-to-br from-club-navy/25 via-club-navy/10 to-transparent px-6 py-8 sm:rounded-[2rem] sm:px-10 sm:py-10">
-          <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
-            <Link href="/" className="hover:text-club-navy">
-              Sākums
-            </Link>
-            <span>›</span>
-            <Link href="/jaunumi" className="hover:text-club-navy">
-              Jaunumi
-            </Link>
-            <span>›</span>
-            <span className="max-w-[240px] truncate text-club-navy">
-              {article.title}
-            </span>
-          </nav>
+      {/* Hero + content on the left, image column on the right — text flows
+       *  straight from the title into the body without a section break, so
+       *  the body starts right under the title card instead of waiting for
+       *  the (taller) image column to end. */}
+      <section className="px-6 pt-4 pb-24 sm:pt-8">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
+          <div className="min-w-0">
+            <div className="rounded-[2rem] bg-white p-6 sm:p-10">
+              <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                <Link href="/" className="hover:text-club-navy">
+                  Sākums
+                </Link>
+                <span>›</span>
+                <Link href="/jaunumi" className="hover:text-club-navy">
+                  Jaunumi
+                </Link>
+                <span>›</span>
+                <span className="max-w-[240px] truncate text-club-navy">
+                  {article.title}
+                </span>
+              </nav>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
-              {article.category}
-            </span>
-            {article.team && (
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-club-navy">
-                {article.team}
-              </span>
-            )}
-            <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
-              <Calendar className="h-3.5 w-3.5" />
-              {article.date}
-            </span>
-          </div>
-
-          <h1 className="mt-3 max-w-3xl break-words text-3xl text-club-navy [overflow-wrap:anywhere] sm:text-4xl">
-            {article.title}
-          </h1>
-
-          {article.authorName && (
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3.5">
-              <div className="flex items-center gap-4">
-                {article.authorAvatar ? (
-                  <Image
-                    src={article.authorAvatar}
-                    alt={article.authorName}
-                    width={72}
-                    height={72}
-                    className="h-18 w-18 shrink-0 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full bg-club-navy text-2xl font-bold text-white">
-                    {article.authorName
-                      .split(" ")
-                      .map((word) => word[0])
-                      .join("")}
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
+                  {article.category}
+                </span>
+                {article.team && (
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-club-navy">
+                    {article.team}
                   </span>
                 )}
-                <span className="flex flex-col leading-tight">
-                  <span className="text-lg font-semibold text-club-navy">
-                    {article.authorName}
-                  </span>
-                  {article.authorPosition && (
-                    <span className="text-base text-slate-500">
-                      {article.authorPosition}
-                    </span>
-                  )}
+                <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {article.date}
                 </span>
               </div>
-              <div className="relative">
-                <CopyLinkButton />
-              </div>
+
+              <h1 className="mt-3 max-w-full break-words text-3xl text-club-navy [overflow-wrap:anywhere] sm:text-4xl">
+                {article.title}
+              </h1>
+
+              {article.authorName && (
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3.5">
+                  <div className="flex items-center gap-4">
+                    {article.authorAvatar ? (
+                      <Image
+                        src={article.authorAvatar}
+                        alt={article.authorName}
+                        width={72}
+                        height={72}
+                        className="h-18 w-18 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full bg-club-navy text-2xl font-bold text-white">
+                        {article.authorName
+                          .split(" ")
+                          .map((word) => word[0])
+                          .join("")}
+                      </span>
+                    )}
+                    <span className="flex flex-col leading-tight">
+                      <span className="text-lg font-semibold text-club-navy">
+                        {article.authorName}
+                      </span>
+                      {article.authorPosition && (
+                        <span className="text-base text-slate-500">
+                          {article.authorPosition}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <CopyLinkButton />
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </section>
 
-      {/* Main content */}
-      <section className="px-6 pt-0 pb-24 sm:pt-8">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="min-w-0">
-            <ArticleImagesCarousel images={images} />
-          </div>
-
-          <div className="min-w-0">
-            <div className="min-w-0 max-w-full break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] sm:text-base">
+            <div className="mt-8 max-w-2xl min-w-0 pl-3 sm:pl-6">
+              <div className="min-w-0 max-w-full break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] sm:text-base">
               {article.body.map((paragraph, index) => (
                 <p key={index} className="mb-4 max-w-full whitespace-pre-wrap last:mb-0">
                   {paragraph}
@@ -379,6 +376,11 @@ export function ArticleDetail({ article }: { article: Article }) {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="min-w-0">
+          <ArticleImagesCarousel images={images} />
+        </div>
         </div>
       </section>
     </>
