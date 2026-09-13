@@ -15,7 +15,7 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
   return (
     <div
       className={cn(
-        "rounded-2xl bg-white pt-6 pr-4 pb-4 pl-6 sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        "pt-4 pr-4 pb-4 pl-4 sm:rounded-2xl sm:bg-white sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
         className,
       )}
     >
@@ -29,11 +29,11 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
           return (
             <div
               key={player.id}
-              className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+              className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 sm:gap-4"
             >
               <div
                 className={cn(
-                  "relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28",
+                  "relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-16 sm:w-16",
                   isToday && "ring-2 ring-club-red/40",
                 )}
               >
@@ -41,24 +41,24 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
                   <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
-                    <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+                    <UserRound className="h-6 w-6 text-club-muted" strokeWidth={1.5} />
                   </div>
                 )}
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate text-lg font-semibold text-club-navy">{player.name}</p>
+                <p className="truncate text-sm font-semibold text-club-navy">{player.name}</p>
                 {player.teamName && (
-                  <p className="truncate text-sm text-slate-400">{player.teamName}</p>
+                  <p className="truncate text-xs text-slate-400">{player.teamName}</p>
                 )}
               </div>
 
               {player.daysUntil === 0 ? (
-                <span className="shrink-0 rounded-full bg-club-red px-2.5 py-1 text-sm font-semibold text-white">
+                <span className="shrink-0 rounded-full bg-club-red px-2.5 py-1 text-xs font-semibold text-white">
                   Šodien!
                 </span>
               ) : (
-                <span className="shrink-0 text-lg font-semibold text-club-navy">
+                <span className="shrink-0 text-sm font-semibold text-club-navy">
                   {String(player.birthDay).padStart(2, "0")}.{String(player.birthMonth).padStart(2, "0")}.
                   {player.birthYear}
                 </span>

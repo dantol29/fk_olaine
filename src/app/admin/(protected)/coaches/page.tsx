@@ -36,7 +36,7 @@ export default async function AdminCoachesPage() {
           {rows.map((coach) => (
             <div
               key={coach.id}
-              data-admin-search-item={`${coach.name} ${coach.position} ${coach.coachTeams.map((ct) => ct.team.name).join(" ")}`}
+              data-admin-search-item={`${coach.name} ${coach.position} ${coach.coachTeams.map((ct) => ct.team?.name).join(" ")}`}
               className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
             >
               <div className="relative aspect-square bg-club-gray-light">
@@ -52,7 +52,7 @@ export default async function AdminCoachesPage() {
                 <p className="truncate text-sm font-semibold text-club-navy">{coach.name}</p>
                 <p className="text-xs text-slate-400">{coach.position}</p>
                 <p className="mt-1 truncate text-xs font-semibold text-club-red">
-                  {coach.coachTeams.map((ct) => ct.team.name).join(", ") || "—"}
+                  {coach.coachTeams.map((ct) => ct.team?.name).join(", ") || "—"}
                 </p>
                 <div className="mt-3 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
                   <Link

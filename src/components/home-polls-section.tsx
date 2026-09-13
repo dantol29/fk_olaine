@@ -25,7 +25,7 @@ async function getPolls(): Promise<Poll[]> {
 
 function EmptyPollSlot() {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 p-6 text-center">
+    <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 p-4 text-center sm:p-6">
       <MessageCircleQuestion className="h-6 w-6 text-slate-300" strokeWidth={1.5} />
       <p className="text-sm text-slate-400">Šeit drīzumā būs jauna aptauja.</p>
     </div>
@@ -50,7 +50,7 @@ export async function HomePollsSection() {
         </h2>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 lg:grid-cols-[3fr_2fr] lg:min-h-[24rem]">
+      <div className="mt-6 ml-[calc(50%-50vw)] grid w-screen grid-cols-1 gap-4 sm:mt-8 sm:ml-0 sm:w-full lg:grid-cols-[3fr_2fr] lg:min-h-[24rem]">
         {slots.map((poll, index) =>
           poll ? (
             <HomePollCard

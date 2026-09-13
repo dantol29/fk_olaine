@@ -28,7 +28,7 @@ export async function CoachesList({ className }: { className?: string } = {}) {
   return (
     <div
       className={cn(
-        "h-full rounded-2xl bg-white pt-6 pr-4 pb-4 pl-6 sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        "h-full pt-4 pr-4 pb-4 pl-4 sm:rounded-2xl sm:bg-white sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
         className,
       )}
     >

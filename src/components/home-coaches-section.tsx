@@ -21,7 +21,7 @@ async function getCoaches() {
     position: coach.position,
     license: coach.license,
     authority: coach.authority,
-    teams: coach.coachTeams.map((ct) => ct.team.name),
+    teams: coach.coachTeams.map((ct) => ct.team?.name).filter((name) => name !== undefined),
     photo: coach.photoUrl,
   }));
 }

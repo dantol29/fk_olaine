@@ -70,7 +70,7 @@ async function getSortedUpcomingBirthdays(): Promise<UpcomingBirthday[]> {
         id: player.id,
         name: player.name,
         photoUrl: player.photoUrl,
-        teamName: player.playerTeams[0]?.team.name ?? null,
+        teamName: player.playerTeams[0]?.team?.name ?? null,
         birthDay: parsed.day,
         birthMonth: parsed.month,
         birthYear: parsed.year,

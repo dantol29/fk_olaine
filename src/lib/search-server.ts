@@ -64,7 +64,7 @@ export async function searchSite(query: string): Promise<SearchResults> {
       id: player.id,
       name: player.name,
       photoUrl: player.photoUrl,
-      teamName: player.playerTeams[0]?.team.name ?? null,
+      teamName: player.playerTeams[0]?.team?.name ?? null,
     })),
     coaches: coachRows.map((coach) => ({
       id: coach.id,

@@ -25,7 +25,7 @@ async function getTopScorers(limit: number): Promise<TopScorer[]> {
       name: player.name,
       photoUrl: player.photoUrl,
       goals: player.goals,
-      teamName: player.playerTeams[0]?.team.name ?? null,
+      teamName: player.playerTeams[0]?.team?.name ?? null,
     }));
 }
 

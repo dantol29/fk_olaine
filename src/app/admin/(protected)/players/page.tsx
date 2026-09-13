@@ -19,6 +19,7 @@ export default async function AdminPlayersPage() {
     name: team.name,
     players: team.playerTeams
       .map((pt) => pt.player)
+      .filter((player) => player !== null)
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name, "lv")),
   }));

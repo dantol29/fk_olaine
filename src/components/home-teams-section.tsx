@@ -24,6 +24,7 @@ export async function getTeamsRoster() {
     name: team.name,
     players: team.playerTeams
       .map((pt) => pt.player)
+      .filter((player) => player !== null)
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name, "lv"))
       .map((player) => ({
@@ -33,6 +34,7 @@ export async function getTeamsRoster() {
       })),
     coaches: team.coachTeams
       .map((ct) => ct.coach)
+      .filter((coach) => coach !== null)
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name, "lv"))
       .map((coach) => ({

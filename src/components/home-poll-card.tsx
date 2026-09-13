@@ -139,7 +139,7 @@ function HeroPollCard({
         className,
       )}
     >
-      <div className="relative flex min-h-[16rem] flex-col justify-end p-6 sm:order-2 sm:w-3/5 sm:p-8">
+      <div className="relative flex min-h-[16rem] flex-col justify-end p-4 sm:order-2 sm:w-3/5 sm:p-8">
         <Image src={imageSrc} alt="" fill className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
 
@@ -149,7 +149,7 @@ function HeroPollCard({
         </div>
       </div>
 
-      <div className="flex flex-col justify-center gap-3 bg-white p-6 sm:order-1 sm:w-2/5 sm:p-8">
+      <div className="flex flex-col justify-center gap-3 p-4 sm:order-1 sm:w-2/5 sm:bg-white sm:p-8">
         <PollOptionsList
           options={poll.options}
           totalVotes={totalVotes}
@@ -169,7 +169,7 @@ function PlainPollCard({ poll, className }: { poll: Poll; className?: string }) 
   return (
     <div
       className={cn(
-        "flex h-full flex-col justify-end rounded-2xl bg-white p-6 sm:p-8",
+        "flex h-full flex-col justify-end rounded-2xl p-4 sm:bg-white sm:p-8",
         className,
       )}
     >

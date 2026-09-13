@@ -21,4 +21,12 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN || undefined,
 });
 
+// SQLite/libSQL doesn't enforce foreign keys by default — without this,
+// every `onDelete: "cascade"`/`"set null"` in schema.ts silently does
+// nothing, leaving orphaned rows behind in join tables (player_teams,
+// coach_teams, training_coaches, ...) whenever a player/coach/team/etc.
+// is deleted, which then crashes any page that assumes the joined row
+// still exists.
+client.execute("PRAGMA foreign_keys = ON");
+
 export const db = drizzle(client, { schema });

@@ -86,16 +86,14 @@ export function HomeTeamsPanel({
   const displayedGames = onlyUpcoming(activeTeam.games, 6);
   const displayedTrainings = onlyUpcoming(activeTeam.trainings, 6);
 
-  const avatarClassName = bare
-    ? "h-32 w-32 sm:h-40 sm:w-40"
-    : "h-24 w-24 sm:h-28 sm:w-28";
-  const nameClassName = bare ? "text-base" : "text-sm";
+  const avatarClassName = "h-24 w-24 sm:h-28 sm:w-28";
+  const nameClassName = "text-sm";
 
   return (
     <div
       className={cn(
-        "grid grid-cols-1 lg:grid-cols-[200px_1fr]",
-        !bare && "overflow-hidden rounded-2xl bg-white",
+        "ml-[calc(50%-50vw)] grid w-screen grid-cols-1 sm:ml-0 sm:w-full lg:grid-cols-[200px_1fr]",
+        !bare && "sm:overflow-hidden sm:rounded-2xl sm:bg-white",
         bare ? "lg:min-h-[48rem] lg:max-h-[48rem]" : "lg:min-h-[40rem] lg:max-h-[40rem]",
         className,
       )}
@@ -163,7 +161,7 @@ export function HomeTeamsPanel({
         })}
       </nav>
 
-      <div className="px-6 pt-4 pb-6 sm:px-8 sm:pt-5 sm:pb-8 lg:overflow-y-auto">
+      <div className="px-4 pt-4 pb-6 sm:px-8 sm:pt-5 sm:pb-8 lg:overflow-y-auto">
         {showTabs && (
           <div className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
@@ -288,7 +286,7 @@ export function HomeTeamsPanel({
                         {coach.name}
                       </span>
                       <span className="block text-xs text-slate-400">{coach.position}</span>
-                      <span className="mt-1 flex items-center justify-center gap-1.5 text-xs text-club-navy">
+                      <span className="mt-1 hidden items-center justify-center gap-1.5 text-xs text-club-navy sm:flex">
                         <Image
                           src={AUTHORITY_LOGO[coach.authority]}
                           alt={coach.authority}

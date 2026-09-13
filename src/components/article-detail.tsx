@@ -223,10 +223,10 @@ export function ArticleDetail({ article }: { article: Article }) {
        *  the body starts right under the title card instead of waiting for
        *  the (taller) image column to end. */}
       <section className="px-6 pt-4 pb-24 sm:pt-8">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
+        <div className="ml-[calc(50%-50vw)] grid w-screen max-w-[1440px] grid-cols-1 gap-8 sm:mx-auto sm:w-full lg:grid-cols-2 lg:items-start">
           <div className="min-w-0">
-            <div className="rounded-[2rem] bg-white p-6 sm:p-10">
-              <nav className="mb-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+            <div className="rounded-[2rem] bg-white px-4 pt-8 pb-4 sm:p-10">
+              <nav className="mb-4 hidden items-center gap-1.5 text-xs font-medium text-slate-500 sm:flex">
                 <Link href="/" className="hover:text-club-navy">
                   Sākums
                 </Link>

@@ -26,7 +26,7 @@ async function getTopScorers(limit: number): Promise<TopScorer[]> {
       name: player.name,
       photoUrl: player.photoUrl,
       goals: player.goals,
-      teamName: player.playerTeams[0]?.team.name ?? null,
+      teamName: player.playerTeams[0]?.team?.name ?? null,
     }));
 }
 
@@ -41,7 +41,7 @@ export async function TopScorersList({ className }: { className?: string } = {})
   return (
     <div
       className={cn(
-        "h-full rounded-2xl bg-white pt-6 pr-4 pb-4 pl-6 sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        "h-full pt-4 pr-4 pb-4 pl-4 sm:rounded-2xl sm:bg-white sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
         className,
       )}
     >

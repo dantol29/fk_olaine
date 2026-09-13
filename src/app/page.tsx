@@ -44,19 +44,19 @@ export default function Home() {
           <div className="relative mx-auto max-w-[1440px]">
             <HomeTeamsSection />
 
-            <div className="relative mt-12 flex min-h-24 flex-col justify-center sm:mt-16 sm:min-h-32">
+            <div className="relative mt-12 flex min-h-24 flex-col items-center justify-center sm:mt-16 sm:min-h-32 sm:items-start">
               <span
                 aria-hidden
                 className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
               >
                 Kluba dzīve
               </span>
-              <h2 className="relative text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">
+              <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
                 Kluba dzīve
               </h2>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 lg:grid-cols-3 lg:gap-0">
+            <div className="mt-6 ml-[calc(50%-50vw)] grid w-screen grid-cols-1 gap-4 sm:mt-8 sm:ml-0 sm:w-full lg:grid-cols-3 lg:gap-0">
               <CoachesList className="lg:rounded-r-none" />
               <TopScorersList className="lg:rounded-l-none lg:rounded-r-none" />
               <UpcomingBirthdays className="lg:rounded-l-none" />
