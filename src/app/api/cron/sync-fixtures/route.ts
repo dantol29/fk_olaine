@@ -5,14 +5,24 @@ import { db } from "@/db/client";
 import { cronJobStatuses, leagueSources } from "@/db/schema";
 import { syncLeagueSource } from "@/lib/league-sync";
 
+export const dynamic = "force-dynamic";
+
+const NO_STORE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+  Pragma: "no-cache",
+};
+
 /** Hit on a schedule (e.g. a daily cPanel Cron Job) to pull in any new
  *  fixtures for every league source, with no admin review step — see
  *  syncLeagueSource. Requires `?secret=` matching CRON_SECRET so this
  *  isn't a public, unauthenticated way to write to the database. */
-export async function GET(request: NextRequest) {
-  const secret = request.nextUrl.searchParams.get("secret");
+async function runSync(request: NextRequest) {
+  const authorization = request.headers.get("authorization");
+  const secret = authorization?.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length)
+    : request.nextUrl.searchParams.get("secret");
   if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_STORE_HEADERS });
   }
 
   const startedAt = Date.now();
@@ -49,7 +59,10 @@ export async function GET(request: NextRequest) {
       message,
     }).where(eq(cronJobStatuses.job, "sync-fixtures"));
 
-    return NextResponse.json({ results });
+    return NextResponse.json(
+      { status, recordedAt: new Date(finishedAt).toISOString(), importedCount, results },
+      { headers: NO_STORE_HEADERS },
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     await db.update(cronJobStatuses).set({
@@ -57,6 +70,14 @@ export async function GET(request: NextRequest) {
       finishedAt: Date.now(),
       message,
     }).where(eq(cronJobStatuses.job, "sync-fixtures"));
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { status: "error", recordedAt: new Date().toISOString(), error: message },
+      { status: 500, headers: NO_STORE_HEADERS },
+    );
   }
 }
+
+// GET remains available for existing cron configurations. POST is preferred
+// because hosting/CDN caches cannot replay a previous successful response.
+export const GET = runSync;
+export const POST = runSync;

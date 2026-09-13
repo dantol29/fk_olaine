@@ -9,6 +9,8 @@ import { cronJobStatuses, leagueSources, teams } from "@/db/schema";
 
 import { deleteLeagueSource } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminLeagueSourcesPage() {
   const [rows, [cronStatus]] = await Promise.all([
     db
