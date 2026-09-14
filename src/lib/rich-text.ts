@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { isTag } from "domhandler";
 
 const ALLOWED_TAGS = new Set([
   "p", "div", "br", "strong", "b", "em", "i", "u", "h2", "h3",
@@ -10,6 +11,7 @@ export function sanitizeRichText(input: string): string {
   $("script, style, iframe, object, embed, form, input, button").remove();
 
   $("*").each((_, element) => {
+    if (!isTag(element)) return;
     const tag = element.tagName.toLowerCase();
     if (!ALLOWED_TAGS.has(tag)) {
       $(element).replaceWith($(element).contents());

@@ -1,60 +1,83 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Bold, Heading2, Italic, Link2, List, ListOrdered, Quote, Redo2, Underline, Undo2 } from "lucide-react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import UnderlineExtension from "@tiptap/extension-underline";
+import StarterKit from "@tiptap/starter-kit";
+import { Placeholder } from "@tiptap/extensions";
+import {
+  Bold, Heading2, Heading3, Italic, Link2, List, ListOrdered,
+  Pilcrow, Quote, Redo2, RemoveFormatting, Underline, Undo2,
+} from "lucide-react";
+import { useState } from "react";
 
-type Command = { label: string; icon: React.ComponentType<{ className?: string }>; command: string; value?: string };
-
-const COMMANDS: Command[] = [
-  { label: "Treknraksts", icon: Bold, command: "bold" },
-  { label: "Slīpraksts", icon: Italic, command: "italic" },
-  { label: "Pasvītrots", icon: Underline, command: "underline" },
-  { label: "Virsraksts", icon: Heading2, command: "formatBlock", value: "h2" },
-  { label: "Citāts", icon: Quote, command: "formatBlock", value: "blockquote" },
-  { label: "Aizzīmju saraksts", icon: List, command: "insertUnorderedList" },
-  { label: "Numurēts saraksts", icon: ListOrdered, command: "insertOrderedList" },
-];
+const BUTTON = "flex h-9 w-9 items-center justify-center rounded-md text-club-navy transition hover:bg-white hover:text-club-red disabled:pointer-events-none disabled:opacity-35";
 
 export function RichTextEditor({ name, defaultValue }: { name: string; defaultValue: string }) {
-  const editorRef = useRef<HTMLDivElement>(null);
   const [value, setValue] = useState(defaultValue);
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+        link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
+      }),
+      UnderlineExtension,
+      Placeholder.configure({ placeholder: "Sāc rakstīt…" }),
+    ],
+    content: defaultValue || "<p></p>",
+    editorProps: {
+      attributes: {
+        class: "rich-text-editor min-h-72 px-4 py-3 text-base leading-7 text-slate-700 outline-none",
+        "aria-label": "Lapas teksts",
+      },
+    },
+    onUpdate: ({ editor: currentEditor }) => setValue(currentEditor.getHTML()),
+  });
 
-  function run(command: string, commandValue?: string) {
-    editorRef.current?.focus();
-    document.execCommand(command, false, commandValue);
-    setValue(editorRef.current?.innerHTML ?? "");
+  function setLink() {
+    if (!editor) return;
+    const current = editor.getAttributes("link").href as string | undefined;
+    const href = window.prompt("Ievadi pilnu saiti, piemēram, https://example.com", current ?? "https://");
+    if (href === null) return;
+    if (!href.trim()) editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    else editor.chain().focus().extendMarkRange("link").setLink({ href: href.trim() }).run();
   }
 
-  function addLink() {
-    const href = window.prompt("Ievadi pilnu saiti, piemēram, https://example.com");
-    if (href) run("createLink", href);
-  }
+  const tool = (
+    label: string,
+    Icon: React.ComponentType<{ className?: string }>,
+    action: () => void,
+    active = false,
+    disabled = !editor,
+  ) => (
+    <button key={label} type="button" title={label} aria-label={label} aria-pressed={active}
+      disabled={disabled} onClick={action}
+      className={`${BUTTON} ${active ? "bg-white text-club-red shadow-sm" : ""}`}>
+      <Icon className="h-4 w-4" />
+    </button>
+  );
 
   return (
     <div className="mt-1.5 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-club-red">
       <div className="flex flex-wrap items-center gap-1 border-b border-slate-200 bg-slate-50 p-2">
-        {COMMANDS.map(({ label, icon: Icon, command, value: commandValue }) => (
-          <button key={label} type="button" title={label} aria-label={label}
-            onMouseDown={(event) => event.preventDefault()} onClick={() => run(command, commandValue)}
-            className="flex h-9 w-9 items-center justify-center rounded-md text-club-navy transition hover:bg-white hover:text-club-red">
-            <Icon className="h-4 w-4" />
-          </button>
-        ))}
-        <button type="button" title="Pievienot saiti" aria-label="Pievienot saiti"
-          onMouseDown={(event) => event.preventDefault()} onClick={addLink}
-          className="flex h-9 w-9 items-center justify-center rounded-md text-club-navy transition hover:bg-white hover:text-club-red">
-          <Link2 className="h-4 w-4" />
-        </button>
+        {tool("Rindkopa", Pilcrow, () => editor?.chain().focus().setParagraph().run(), editor?.isActive("paragraph"))}
+        {tool("2. līmeņa virsraksts", Heading2, () => editor?.chain().focus().toggleHeading({ level: 2 }).run(), editor?.isActive("heading", { level: 2 }))}
+        {tool("3. līmeņa virsraksts", Heading3, () => editor?.chain().focus().toggleHeading({ level: 3 }).run(), editor?.isActive("heading", { level: 3 }))}
         <span className="mx-1 h-5 w-px bg-slate-200" />
-        <button type="button" title="Atsaukt" aria-label="Atsaukt" onClick={() => run("undo")}
-          className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition hover:bg-white hover:text-club-navy"><Undo2 className="h-4 w-4" /></button>
-        <button type="button" title="Atkārtot" aria-label="Atkārtot" onClick={() => run("redo")}
-          className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition hover:bg-white hover:text-club-navy"><Redo2 className="h-4 w-4" /></button>
+        {tool("Treknraksts", Bold, () => editor?.chain().focus().toggleBold().run(), editor?.isActive("bold"))}
+        {tool("Slīpraksts", Italic, () => editor?.chain().focus().toggleItalic().run(), editor?.isActive("italic"))}
+        {tool("Pasvītrots", Underline, () => editor?.chain().focus().toggleUnderline().run(), editor?.isActive("underline"))}
+        {tool("Saite", Link2, setLink, editor?.isActive("link"))}
+        <span className="mx-1 h-5 w-px bg-slate-200" />
+        {tool("Aizzīmju saraksts", List, () => editor?.chain().focus().toggleBulletList().run(), editor?.isActive("bulletList"))}
+        {tool("Numurēts saraksts", ListOrdered, () => editor?.chain().focus().toggleOrderedList().run(), editor?.isActive("orderedList"))}
+        {tool("Citāts", Quote, () => editor?.chain().focus().toggleBlockquote().run(), editor?.isActive("blockquote"))}
+        {tool("Notīrīt formatējumu", RemoveFormatting, () => editor?.chain().focus().unsetAllMarks().clearNodes().run())}
+        <span className="mx-1 h-5 w-px bg-slate-200" />
+        {tool("Atsaukt", Undo2, () => editor?.chain().focus().undo().run(), false, !editor?.can().undo())}
+        {tool("Atkārtot", Redo2, () => editor?.chain().focus().redo().run(), false, !editor?.can().redo())}
       </div>
-      <div ref={editorRef} contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true"
-        onInput={(event) => setValue(event.currentTarget.innerHTML)}
-        dangerouslySetInnerHTML={{ __html: defaultValue }}
-        className="rich-text-editor min-h-72 px-4 py-3 text-base leading-7 text-slate-700 outline-none empty:before:pointer-events-none empty:before:text-slate-400 empty:before:content-['Sāc_rakstīt…']" />
+      <EditorContent editor={editor} />
       <input type="hidden" name={name} value={value} />
     </div>
   );

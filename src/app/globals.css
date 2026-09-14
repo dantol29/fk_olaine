@@ -18,6 +18,7 @@
 .rich-page-content blockquote { margin: 1.5em 0; border-left: 3px solid var(--color-club-red); padding-left: 1.25em; color: var(--color-club-navy); font-style: italic; }
 .rich-text-editor a,
 .rich-page-content a { color: var(--color-club-red); text-decoration: underline; text-underline-offset: 3px; }
+.rich-text-editor p.is-editor-empty:first-child::before { float: left; height: 0; color: #94a3b8; content: attr(data-placeholder); pointer-events: none; }
 
 @custom-variant dark (&:is(.dark *));
 
