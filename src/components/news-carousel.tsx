@@ -53,6 +53,7 @@ export function NewsCarousel({
             alt=""
             fill
             priority={i === 0}
+            sizes="(min-width: 1024px) 55vw, 100vw"
             className={cn(
               "object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
               i === index ? "opacity-100" : "opacity-0",

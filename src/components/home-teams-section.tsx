@@ -20,17 +20,19 @@ export async function getTeamsRoster() {
   ]);
 
   // A player (or coach) can belong to more than one team — build the full
-  // list of team names per person across the whole roster (not just the
-  // team this instance of the card happens to render under), so the
-  // detail drawer can show all of them.
-  const teamNamesByPlayerId = new Map<number, string[]>();
+  // list of team associations per person across the whole roster (not just
+  // the team this instance of the card happens to render under), so the
+  // detail drawer can show all of them. Goals are tracked per player-team
+  // pair (see playerTeams.goals), since a player can score a different
+  // tally in each league they play in.
+  const goalsByPlayerId = new Map<number, { name: string; goals: number }[]>();
   const teamNamesByCoachId = new Map<number, string[]>();
   for (const team of rows) {
     for (const pt of team.playerTeams) {
       if (!pt.player) continue;
-      const list = teamNamesByPlayerId.get(pt.player.id) ?? [];
-      list.push(team.name);
-      teamNamesByPlayerId.set(pt.player.id, list);
+      const list = goalsByPlayerId.get(pt.player.id) ?? [];
+      list.push({ name: team.name, goals: pt.goals });
+      goalsByPlayerId.set(pt.player.id, list);
     }
     for (const ct of team.coachTeams) {
       if (!ct.coach) continue;
@@ -53,8 +55,8 @@ export async function getTeamsRoster() {
         name: player.name,
         photoUrl: player.photoUrl,
         birthdate: player.birthdate,
-        goals: player.goals,
-        teamNames: teamNamesByPlayerId.get(player.id) ?? [],
+        number: player.number,
+        teams: goalsByPlayerId.get(player.id) ?? [],
       })),
     coaches: team.coachTeams
       .map((ct) => ct.coach)

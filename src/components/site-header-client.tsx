@@ -26,8 +26,9 @@ type NavItem = {
   items?: { title: string; href: string }[];
 };
 
-const NAV_ITEMS: NavItem[] = [
+const BASE_NAV_ITEMS: NavItem[] = [
   { title: "Sākums", href: "/" },
+  { title: "Jaunumi", href: "/jaunumi" },
   {
     title: "Klubs",
     items: [
@@ -37,19 +38,26 @@ const NAV_ITEMS: NavItem[] = [
   },
   { title: "Treniņi", href: "/treninji" },
   { title: "Spēles", href: "/speles" },
-  { title: "Jaunumi", href: "/jaunumi" },
   { title: "Kontakti", href: "#footer" },
 ];
 
-// Mobile menu has no room for a dropdown group — flatten "Klubs" so its
-// subsections (Komandas, Treneri, Stadions) show as top-level big titles.
-const MOBILE_NAV_ITEMS: { title: string; href: string }[] = NAV_ITEMS.flatMap(
-  (item) => (item.items ? item.items : item.href ? [{ title: item.title, href: item.href }] : []),
-);
-
-export function SiteHeaderClient({ phone, email }: { phone: string; email: string }) {
+export function SiteHeaderClient({
+  phone,
+  email,
+  clubPages,
+}: {
+  phone: string;
+  email: string;
+  clubPages: { title: string; href: string }[];
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const navItems = BASE_NAV_ITEMS.map((item) =>
+    item.title === "Klubs" ? { ...item, items: [...(item.items ?? []), ...clubPages] } : item,
+  );
+  const mobileNavItems = navItems.flatMap(
+    (item) => (item.items ? item.items : item.href ? [{ title: item.title, href: item.href }] : []),
+  );
 
   function isActive(item: NavItem) {
     if (item.items) return item.items.some((sub) => sub.href === pathname);
@@ -74,7 +82,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
 
           <NavigationMenu className="hidden max-w-none flex-1 justify-center px-20 lg:flex">
             <NavigationMenuList className="w-full justify-between">
-              {NAV_ITEMS.map((item) =>
+              {navItems.map((item) =>
                 item.items ? (
                   <NavigationMenuItem key={item.title}>
                     <NavigationMenuTrigger
@@ -89,7 +97,7 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
                       <div className="flex flex-col text-sm">
                         {item.items.map((sub) => (
                           <NavigationMenuLink
-                            key={sub.title}
+                            key={sub.href}
                             href={sub.href}
                             className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted"
                           >
@@ -159,9 +167,9 @@ export function SiteHeaderClient({ phone, email }: { phone: string; email: strin
 
               <DrawerContent className="border-none bg-transparent shadow-none">
                 <div className="flex h-full min-h-0 w-full flex-col gap-2 overflow-y-auto bg-white p-6 shadow-xl">
-                  {MOBILE_NAV_ITEMS.map((item) => (
+                  {mobileNavItems.map((item) => (
                     <Link
-                      key={item.title}
+                      key={item.href}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className="relative block min-h-16 py-2 text-club-navy sm:min-h-32 sm:py-3"

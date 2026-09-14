@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { isNotNull } from "drizzle-orm";
 
 import { db } from "@/db/client";
@@ -44,7 +45,7 @@ export type LeagueStandings = { label: string; standings: StandingRow[]; url: st
  *  with the same real data. A per-source fetch failure just shows that one
  *  league empty (LeagueSelector already renders "Tabula pašlaik nav
  *  pieejama." for an empty list), not the whole page falling back. */
-export async function getLeagueStandingsForDisplay(): Promise<LeagueStandings[]> {
+export const getLeagueStandingsForDisplay = cache(async function getLeagueStandingsForDisplay(): Promise<LeagueStandings[]> {
   const fallback = [{ label: "Sieviešu līga", standings: FALLBACK_STANDINGS, url: "https://lff.lv/" }];
 
   try {
@@ -90,4 +91,4 @@ export async function getLeagueStandingsForDisplay(): Promise<LeagueStandings[]>
   } catch {
     return fallback;
   }
-}
+});

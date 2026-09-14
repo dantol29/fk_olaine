@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Caveat, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
+import { getSiteSettings } from "@/lib/site-settings";
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "latin-ext"],
@@ -44,13 +46,44 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const settings = await getSiteSettings();
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SportsTeam",
+    name: "FK Olaine",
+    legalName: settings.legalName,
+    url: SITE_URL,
+    logo: `${SITE_URL}/fk-olaine-crest-v2.png`,
+    sport: "Soccer",
+    foundingDate: "2008",
+    email: settings.email,
+    telephone: settings.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: settings.stadiumAddress,
+      addressLocality: "Olaine",
+      addressCountry: "LV",
+    },
+    sameAs: [
+      "https://www.facebook.com/afaolaine.sievietes/",
+      "https://www.instagram.com/fkolaine_sievietes/",
+    ],
+  };
+
   return (
     <html
       lang="lv"
       className={`${inter.variable} ${geistMono.variable} ${caveat.variable} h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

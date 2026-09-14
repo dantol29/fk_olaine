@@ -39,9 +39,8 @@ export const players = sqliteTable("players", {
   name: text("name").notNull(),
   birthdate: text("birthdate").notNull(),
   photoUrl: text("photo_url"),
-  /** Season goal tally — manually kept by admins. Drives the homepage
-   *  "top scorers" section; 0 for anyone not tracked (goalkeepers etc). */
-  goals: integer("goals").notNull().default(0),
+  /** Jersey number — optional, not every roster tracks these. */
+  number: integer("number"),
   createdAt: integer("created_at").notNull(),
 });
 
@@ -54,6 +53,10 @@ export const playerTeams = sqliteTable(
     teamId: integer("team_id")
       .notNull()
       .references(() => teams.id, { onDelete: "cascade" }),
+    /** Goals scored for THIS team specifically — a player who plays for more
+     *  than one team/league (e.g. a youth team and a senior team) keeps a
+     *  separate tally per team instead of one ambiguous combined total. */
+    goals: integer("goals").notNull().default(0),
   },
   (table) => [primaryKey({ columns: [table.playerId, table.teamId] })],
 );
@@ -147,6 +150,11 @@ export const leagueSources = sqliteTable("league_sources", {
    *  same LFF competition). Optional — a source with none set never shows
    *  up in the homepage league table. */
   standingsUrl: text("standings_url"),
+  /** The same competition's goal-scorers page (the "Vārtu guvēji" tab).
+   *  Optional — when set, syncTopScorersForSource matches FK Olaine rows
+   *  from this list to this source's team's players by name and updates
+   *  their `goals` count. Never creates players or touches photos. */
+  topScorersUrl: text("top_scorers_url"),
   /** Lower shows first in the homepage league tabs. */
   displayOrder: integer("display_order").notNull().default(0),
   createdAt: integer("created_at").notNull(),
@@ -161,6 +169,11 @@ export const cronJobStatuses = sqliteTable("cron_job_statuses", {
   finishedAt: integer("finished_at"),
   lastSuccessAt: integer("last_success_at"),
   importedCount: integer("imported_count").notNull().default(0),
+  /** Existing games where LFF now shows a different time/venue than what's
+   *  saved locally — detected by the sync, but never auto-applied. Cleared
+   *  back toward 0 as an admin reviews and applies each one from the
+   *  league source's "Ielādēt spēles" screen. */
+  needsReviewCount: integer("needs_review_count").notNull().default(0),
   message: text("message"),
 });
 
@@ -267,6 +280,8 @@ export const partners = sqliteTable("partners", {
   size: text("size", { enum: ["lg", "sm"] }).notNull().default("lg"),
   /** CSS-inverts logoUrl to white on the site footer's dark background. */
   needsWhite: integer("needs_white", { mode: "boolean" }).notNull().default(false),
+  /** Optional — when set, the logo links out to this URL wherever it's shown. */
+  websiteUrl: text("website_url"),
   createdAt: integer("created_at").notNull(),
 });
 
@@ -284,5 +299,19 @@ export const siteSettings = sqliteTable("site_settings", {
   stadiumAddress: text("stadium_address").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
+
+export const clubPages = sqliteTable("club_pages", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description").notNull(),
+  body: text("body").notNull(),
+  /** Uploaded image URLs, one per line, displayed in the right column. */
+  images: text("images"),
+  displayOrder: integer("display_order").notNull().default(0),
+  isPublished: integer("is_published", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at").notNull(),
   updatedAt: integer("updated_at").notNull(),
 });

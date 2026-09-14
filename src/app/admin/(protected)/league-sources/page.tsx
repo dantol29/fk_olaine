@@ -19,6 +19,7 @@ export default async function AdminLeagueSourcesPage() {
         label: leagueSources.label,
         url: leagueSources.url,
         standingsUrl: leagueSources.standingsUrl,
+        topScorersUrl: leagueSources.topScorersUrl,
         displayOrder: leagueSources.displayOrder,
         teamName: teams.name,
       })
@@ -67,17 +68,31 @@ export default async function AdminLeagueSourcesPage() {
               {cronStatus ? formatDate(cronStatus.finishedAt ?? cronStatus.startedAt) : "Cron vēl nav palaists"}
             </p>
           </div>
-          {cronStatus && (
-            <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusColors[cronStatus.status]}`}>
-              {statusLabels[cronStatus.status]}
-            </span>
-          )}
+          <div className="flex shrink-0 items-center gap-2">
+            {cronStatus && cronStatus.needsReviewCount > 0 && (
+              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                {cronStatus.needsReviewCount} spēles jāpārskata
+              </span>
+            )}
+            {cronStatus && (
+              <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusColors[cronStatus.status]}`}>
+                {statusLabels[cronStatus.status]}
+              </span>
+            )}
+          </div>
         </div>
         {cronStatus && (
           <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
             <span>Importētas spēles: {cronStatus.importedCount}</span>
             <span>Pēdējā pilnībā veiksmīgā reize: {formatDate(cronStatus.lastSuccessAt)}</span>
           </div>
+        )}
+        {cronStatus && cronStatus.needsReviewCount > 0 && (
+          <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-700">
+            LFF tagad rāda citu laiku vai stadionu {cronStatus.needsReviewCount} jau importētai
+            spēlei — pārskati un piemēro izmaiņas attiecīgā līgas avota &quot;Ielādēt
+            spēles&quot; ekrānā (zemāk).
+          </p>
         )}
         {cronStatus?.message && (
           <p className="mt-3 whitespace-pre-wrap rounded-lg bg-red-50 p-3 text-xs text-red-700">
@@ -99,7 +114,7 @@ export default async function AdminLeagueSourcesPage() {
         </thead>
         <tbody>
           {rows.map((source) => (
-            <tr data-admin-search-item={`${source.label} ${source.teamName} ${source.url} ${source.standingsUrl ?? ""}`} key={source.id} className="border-b border-slate-100 last:border-0">
+            <tr data-admin-search-item={`${source.label} ${source.teamName} ${source.url} ${source.standingsUrl ?? ""} ${source.topScorersUrl ?? ""}`} key={source.id} className="border-b border-slate-100 last:border-0">
               <td className="p-4 text-slate-500">{source.displayOrder}</td>
               <td className="p-4 font-semibold text-club-navy">{source.label}</td>
               <td className="p-4 text-slate-500">{source.teamName}</td>
@@ -118,6 +133,14 @@ export default async function AdminLeagueSourcesPage() {
                       className="text-sm font-semibold text-club-navy hover:underline"
                     >
                       Testēt tabulu
+                    </Link>
+                  )}
+                  {source.topScorersUrl && (
+                    <Link
+                      href={`/admin/league-sources/${source.id}/sync-top-scorers`}
+                      className="text-sm font-semibold text-club-navy hover:underline"
+                    >
+                      Sinhronizēt vārtu guvējus
                     </Link>
                   )}
                   <Link

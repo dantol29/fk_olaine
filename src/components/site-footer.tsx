@@ -7,7 +7,6 @@ import { getSiteSettings } from "@/lib/site-settings";
 import {
   FacebookIcon,
   InstagramIcon,
-  YoutubeIcon,
 } from "@/components/social-icons";
 
 function mapsUrl(query: string) {
@@ -179,20 +178,34 @@ export async function SiteFooter() {
         <div className="lg:border-l lg:border-[#3d5570]/20 lg:pl-10">
           <ColumnLabel>Mūsu partneri</ColumnLabel>
           <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-6">
-            {partners.map((partner) => (
-              <Image
-                key={partner.id}
-                src={partner.logoUrl}
-                alt={partner.name}
-                width={partner.logoWidth}
-                height={partner.logoHeight}
-                className={cn(
-                  "w-auto object-contain",
-                  partner.size === "lg" ? "h-14" : "h-10",
-                  partner.needsWhite && "brightness-0 invert",
-                )}
-              />
-            ))}
+            {partners.map((partner) => {
+              const image = (
+                <Image
+                  src={partner.logoUrl}
+                  alt={partner.name}
+                  width={partner.logoWidth}
+                  height={partner.logoHeight}
+                  className={cn(
+                    "w-auto object-contain",
+                    partner.size === "lg" ? "h-14" : "h-10",
+                    partner.needsWhite && "brightness-0 invert",
+                  )}
+                />
+              );
+
+              return partner.websiteUrl ? (
+                <a
+                  key={partner.id}
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {image}
+                </a>
+              ) : (
+                <span key={partner.id}>{image}</span>
+              );
+            })}
           </div>
         </div>
       </div>

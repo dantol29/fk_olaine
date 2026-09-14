@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Trophy } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -22,7 +22,6 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
   const [activeLeague, setActiveLeague] = useState(0);
 
   const standings = leagues[activeLeague]?.standings ?? [];
-  const currentYear = new Date().getFullYear();
   const activeLabel = leagues[activeLeague]?.label ?? "";
 
   return (

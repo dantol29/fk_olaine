@@ -14,7 +14,6 @@
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@libsql/client": "^0.18.0",
-    "@number-flow/react": "^0.6.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -25,10 +24,10 @@
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",
-    "framer-motion": "^13.2.0",
     "image-size": "^2.0.2",
     "lucide-react": "^1.40.0",
     "next": "16.3.4",
+    "nodemailer": "^10.0.10",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
@@ -39,6 +38,7 @@
     "typescript": "^5"
   },
   "devDependencies": {
+    "@types/nodemailer": "^8.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "tsx": "^4.23.13"

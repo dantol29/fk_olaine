@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
@@ -29,7 +30,7 @@ export type TrainingListItem = {
 
 /** Every training session on file, for the public /treninji listing.
  *  Server-only: never import this from a "use client" component. */
-export async function getAllTrainingsFromDb(): Promise<TrainingListItem[]> {
+export const getAllTrainingsFromDb = cache(async function getAllTrainingsFromDb(): Promise<TrainingListItem[]> {
   try {
     const todayKey = toDateKey(new Date());
     const rows = await db
@@ -80,4 +81,4 @@ export async function getAllTrainingsFromDb(): Promise<TrainingListItem[]> {
   } catch {
     return [];
   }
-}
+});

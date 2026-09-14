@@ -13,6 +13,12 @@ import { cn } from "@/lib/utils";
 
 import { deleteGame } from "./actions";
 
+function formatDateDisplay(isoDate: string) {
+  const [year, month, day] = isoDate.split("-");
+  if (!year || !month || !day) return isoDate;
+  return `${day}.${month}.${year}`;
+}
+
 function ClubBadge({ name, logo }: { name: string; logo: string | null }) {
   return (
     <span className="flex items-center gap-2">
@@ -85,9 +91,11 @@ export default async function AdminGamesPage() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((game) => (
-            <tr data-admin-search-item={`${game.date} ${game.startTime} ${game.teamName} ${game.homeTeam} ${game.awayTeam} ${game.league ?? ""} ${game.location}`} key={game.id} className="border-b border-slate-100 last:border-0">
-              <td className="p-4 text-club-navy">{game.date}</td>
+          {rows.map((game) => {
+            const dateDisplay = formatDateDisplay(game.date);
+            return (
+            <tr data-admin-search-item={`${game.date} ${dateDisplay} ${game.startTime} ${game.teamName} ${game.homeTeam} ${game.awayTeam} ${game.league ?? ""} ${game.location}`} key={game.id} className="border-b border-slate-100 last:border-0">
+              <td className="p-4 text-club-navy">{dateDisplay}</td>
               <td className="p-4 text-slate-500">
                 {game.startTime}–{game.endTime}
               </td>
@@ -117,7 +125,8 @@ export default async function AdminGamesPage() {
                 </div>
               </td>
             </tr>
-          ))}
+            );
+          })}
           {rows.length === 0 && (
             <tr>
               <td colSpan={8} className="p-4 text-center text-slate-400">

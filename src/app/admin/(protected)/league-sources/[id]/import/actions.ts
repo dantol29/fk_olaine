@@ -1,5 +1,6 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -11,6 +12,12 @@ type SelectedFixture = {
   homeTeam: string;
   awayTeam: string;
   date: string;
+  startTime: string;
+  location: string;
+};
+
+type LffGameUpdate = {
+  id: number;
   startTime: string;
   location: string;
 };
@@ -50,4 +57,30 @@ export async function confirmImport(teamId: number, league: string, formData: Fo
   revalidatePath("/admin/games");
   revalidatePath("/");
   redirect("/admin/games");
+}
+
+/** Overwrites the local start time/location for already-imported games with
+ *  whatever LFF currently shows for them — for the rows the import screen
+ *  flagged as "dati atšķiras". Only ever touches games the admin explicitly
+ *  submitted (built from the diff shown on that screen), never inserts or
+ *  deletes anything. */
+export async function applyLffChanges(sourceId: number, formData: FormData) {
+  await requireAdminSession();
+
+  const updates = JSON.parse(String(formData.get("updates") ?? "[]")) as LffGameUpdate[];
+
+  for (const update of updates) {
+    await db
+      .update(games)
+      .set({
+        startTime: update.startTime,
+        endTime: addMinutes(update.startTime, 90),
+        location: update.location,
+      })
+      .where(eq(games.id, update.id));
+  }
+
+  revalidatePath("/admin/games");
+  revalidatePath("/");
+  redirect(`/admin/league-sources/${sourceId}/import`);
 }

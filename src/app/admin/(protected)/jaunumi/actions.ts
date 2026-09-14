@@ -41,7 +41,7 @@ function parseArticleInput(formData: FormData) {
   const quoteText = String(formData.get("quoteText") ?? "").trim();
   const quoteAuthor = String(formData.get("quoteAuthor") ?? "").trim();
   const quoteRole = String(formData.get("quoteRole") ?? "").trim();
-  const slug = slugify(String(formData.get("slug") ?? "") || title);
+  const baseSlug = slugify(title);
 
   if (!title) return { error: "Virsraksts ir obligāts." } as const;
   if (!excerpt) return { error: "Ievads ir obligāts." } as const;
@@ -50,7 +50,7 @@ function parseArticleInput(formData: FormData) {
     return { error: "Jāizvēlas kategorija." } as const;
   }
   if (!body) return { error: "Raksta teksts ir obligāts." } as const;
-  if (!slug) return { error: "Nederīgs virsraksts saites veidošanai." } as const;
+  if (!baseSlug) return { error: "Nederīgs virsraksts saites veidošanai." } as const;
 
   const bodyLines = body
     .split("\n")
@@ -58,7 +58,7 @@ function parseArticleInput(formData: FormData) {
     .filter(Boolean);
 
   return {
-    slug,
+    baseSlug,
     title,
     excerpt,
     date,
@@ -72,15 +72,19 @@ function parseArticleInput(formData: FormData) {
   } as const;
 }
 
-async function checkSlugAvailable(slug: string, excludeId?: number) {
-  const [existing] = await db
-    .select({ id: articles.id })
-    .from(articles)
-    .where(eq(articles.slug, slug));
-  if (existing && existing.id !== excludeId) {
-    return `Saite "${slug}" jau tiek izmantota citam rakstam.`;
+/** Appends "-2", "-3", etc. until the slug doesn't collide with another
+ *  article — so two articles with the same (or similarly-worded) title
+ *  never fight over one URL, with no admin input needed. */
+async function ensureUniqueSlug(baseSlug: string, excludeId?: number): Promise<string> {
+  let candidate = baseSlug;
+  for (let suffix = 2; ; suffix++) {
+    const [existing] = await db
+      .select({ id: articles.id })
+      .from(articles)
+      .where(eq(articles.slug, candidate));
+    if (!existing || existing.id === excludeId) return candidate;
+    candidate = `${baseSlug}-${suffix}`;
   }
-  return null;
 }
 
 function parseHighlightFiles(formData: FormData): File[] {
@@ -98,8 +102,8 @@ export async function createArticle(
   const parsed = parseArticleInput(formData);
   if ("error" in parsed) return parsed;
 
-  const slugError = await checkSlugAvailable(parsed.slug);
-  if (slugError) return { error: slugError };
+  const { baseSlug, ...articleFields } = parsed;
+  const slug = await ensureUniqueSlug(baseSlug);
 
   const image = formData.get("image");
   if (!(image instanceof File) || image.size === 0) {
@@ -123,7 +127,8 @@ export async function createArticle(
   }
 
   await db.insert(articles).values({
-    ...parsed,
+    ...articleFields,
+    slug,
     image: imageUrl,
     highlights: highlightUrls.length > 0 ? highlightUrls.join("\n") : null,
     createdAt: Date.now(),
@@ -145,11 +150,12 @@ export async function updateArticle(
   const parsed = parseArticleInput(formData);
   if ("error" in parsed) return parsed;
 
-  const slugError = await checkSlugAvailable(parsed.slug, id);
-  if (slugError) return { error: slugError };
-
   const [existing] = await db.select().from(articles).where(eq(articles.id, id));
   if (!existing) return { error: "Raksts nav atrasts." };
+
+  // The slug is locked at creation and never re-derived from an edited
+  // title — otherwise renaming an article would break its published URL.
+  const { baseSlug, ...articleFields } = parsed;
 
   const image = formData.get("image");
   let imageUrl = existing.image;
@@ -187,14 +193,13 @@ export async function updateArticle(
 
   await db
     .update(articles)
-    .set({ ...parsed, image: imageUrl, highlights })
+    .set({ ...articleFields, image: imageUrl, highlights })
     .where(eq(articles.id, id));
 
   revalidatePath("/admin/jaunumi");
   revalidatePath("/jaunumi");
   revalidatePath("/");
   revalidatePath(`/jaunumi/${existing.slug}`);
-  if (existing.slug !== parsed.slug) revalidatePath(`/jaunumi/${parsed.slug}`);
   redirect("/admin/jaunumi");
 }
 

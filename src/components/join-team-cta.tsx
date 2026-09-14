@@ -13,6 +13,7 @@ export function JoinTeamCta() {
           src="/player-shooting.png"
           alt=""
           fill
+          sizes="100vw"
           className="object-cover object-[center_25%]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/10" />

@@ -6,7 +6,7 @@ import { getPartners, type Partner } from "@/lib/partners-server";
 const MARQUEE_COPIES = 12;
 
 function PartnerLogo({ partner }: { partner: Partner }) {
-  return (
+  const image = (
     <Image
       src={partner.logoUrl}
       alt={partner.name}
@@ -17,6 +17,14 @@ function PartnerLogo({ partner }: { partner: Partner }) {
         partner.size === "lg" ? "h-16 sm:h-16" : "h-12 sm:h-11",
       )}
     />
+  );
+
+  if (!partner.websiteUrl) return image;
+
+  return (
+    <a href={partner.websiteUrl} target="_blank" rel="noopener noreferrer">
+      {image}
+    </a>
   );
 }
 

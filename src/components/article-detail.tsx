@@ -52,7 +52,7 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
   return (
     <>
       <div className="relative ml-[calc(50%-50vw)] h-[280px] w-screen overflow-hidden rounded-b-[2rem] sm:ml-0 sm:h-[420px] sm:w-full sm:rounded-[2rem] lg:h-[560px]">
-        <Image key={images[index]} src={images[index]} alt="" fill className="object-cover" />
+        <Image key={images[index]} src={images[index]} alt="" fill sizes="100vw" className="object-cover" />
 
         <button
           type="button"
@@ -134,6 +134,7 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
               src={images[index]}
               alt=""
               fill
+              sizes="100vw"
               className="object-contain"
             />
           </div>

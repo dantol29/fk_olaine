@@ -17,8 +17,11 @@ type Player = {
   name: string;
   photoUrl: string | null;
   birthdate: string;
-  goals: number;
-  teamNames: string[];
+  number: number | null;
+  /** One entry per team the player is on, each with that team's own goal
+   *  tally — a player playing across leagues can have a different count
+   *  in each. */
+  teams: { name: string; goals: number }[];
 };
 
 type Coach = {
@@ -73,19 +76,27 @@ function PlayerCell({
       onClick={() => onSelect(player)}
       className="flex flex-col items-center gap-3 text-center"
     >
-      <div
-        className={cn(
-          "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
-          avatarClassName,
-        )}
-      >
-        {player.photoUrl ? (
-          <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
-          </div>
-        )}
+      <div className="relative shrink-0">
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-full bg-club-gray-light",
+            avatarClassName,
+          )}
+        >
+          {player.photoUrl ? (
+            <Image
+              src={player.photoUrl}
+              alt={player.name}
+              fill
+              sizes="(min-width: 640px) 112px, 96px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+            </div>
+          )}
+        </div>
       </div>
       <span className={cn("font-medium text-club-navy", nameClassName)}>{player.name}</span>
     </button>
@@ -119,7 +130,13 @@ function CoachCell({
         )}
       >
         {coach.photoUrl ? (
-          <Image src={coach.photoUrl} alt={coach.name} fill className="object-cover" />
+          <Image
+            src={coach.photoUrl}
+            alt={coach.name}
+            fill
+            sizes="(min-width: 640px) 112px, 96px"
+            className="object-cover"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
@@ -372,18 +389,26 @@ export function HomeTeamsPanel({
           {selectedPlayer && (
             <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-6 shadow-xl">
               <div className="flex items-center gap-4">
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-club-gray-light">
-                  {selectedPlayer.photoUrl ? (
-                    <Image
-                      src={selectedPlayer.photoUrl}
-                      alt={selectedPlayer.name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <UserRound className="h-8 w-8 text-club-muted" strokeWidth={1.5} />
-                    </div>
+                <div className="relative h-20 w-20 shrink-0">
+                  <div className="relative h-full w-full overflow-hidden rounded-full bg-club-gray-light">
+                    {selectedPlayer.photoUrl ? (
+                      <Image
+                        src={selectedPlayer.photoUrl}
+                        alt={selectedPlayer.name}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <UserRound className="h-8 w-8 text-club-muted" strokeWidth={1.5} />
+                      </div>
+                    )}
+                  </div>
+                  {selectedPlayer.number !== null && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-white px-3 text-base text-black">
+                      {selectedPlayer.number}
+                    </span>
                   )}
                 </div>
                 <h3 className="text-xl text-club-navy">{selectedPlayer.name}</h3>
@@ -404,8 +429,8 @@ export function HomeTeamsPanel({
                   <div>
                     <p className="text-xs text-slate-400">Komandas</p>
                     <p className="text-sm text-club-navy">
-                      {selectedPlayer.teamNames.length > 0
-                        ? selectedPlayer.teamNames.join(", ")
+                      {selectedPlayer.teams.length > 0
+                        ? selectedPlayer.teams.map((t) => t.name).join(", ")
                         : "—"}
                     </p>
                   </div>
@@ -414,9 +439,17 @@ export function HomeTeamsPanel({
                   <Goal className="h-4 w-4 shrink-0 text-club-red" />
                   <div>
                     <p className="text-xs text-slate-400">Gūtie vārti</p>
-                    <p className="text-sm text-club-navy">
-                      {selectedPlayer.goals}
-                    </p>
+                    {selectedPlayer.teams.length > 0 ? (
+                      <div className="mt-0.5 flex flex-col">
+                        {selectedPlayer.teams.map((t) => (
+                          <p key={t.name} className="text-sm text-club-navy">
+                            {t.name} - {t.goals}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-club-navy">—</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -441,6 +474,7 @@ export function HomeTeamsPanel({
                       src={selectedCoach.photoUrl}
                       alt={selectedCoach.name}
                       fill
+                      sizes="80px"
                       className="object-cover"
                     />
                   ) : (

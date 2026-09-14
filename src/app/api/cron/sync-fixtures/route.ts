@@ -3,7 +3,9 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { cronJobStatuses, leagueSources } from "@/db/schema";
-import { syncLeagueSource } from "@/lib/league-sync";
+import { syncLeagueSource, type ReviewNeededGame } from "@/lib/league-sync";
+import { sendNotificationEmail } from "@/lib/mailer";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,43 @@ const NO_STORE_HEADERS = {
   "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
   Pragma: "no-cache",
 };
+
+const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
+
+async function notifyReviewNeeded(
+  bySource: { id: number; label: string; reviewNeeded: ReviewNeededGame[] }[],
+) {
+  const withChanges = bySource.filter((source) => source.reviewNeeded.length > 0);
+  const totalCount = withChanges.reduce((sum, source) => sum + source.reviewNeeded.length, 0);
+  if (totalCount === 0) return;
+
+  const settings = await getSiteSettings();
+  const lines = withChanges.flatMap((source) => [
+    `${source.label} (${SITE_URL}/admin/league-sources/${source.id}/import):`,
+    ...source.reviewNeeded.map((game) => {
+      const changes: string[] = [];
+      if (game.oldStartTime !== game.newStartTime) {
+        changes.push(`laiks ${game.oldStartTime} → ${game.newStartTime}`);
+      }
+      if (game.oldLocation !== game.newLocation) {
+        changes.push(`stadions "${game.oldLocation}" → "${game.newLocation}"`);
+      }
+      return `  - ${game.date} ${game.homeTeam} - ${game.awayTeam}: ${changes.join(", ")}`;
+    }),
+    "",
+  ]);
+
+  await sendNotificationEmail({
+    to: settings.email,
+    subject: `FK Olaine: ${totalCount} spēlei(ēm) LFF dati atšķiras no datubāzes`,
+    text: [
+      `LFF sinhronizācija atrada ${totalCount} jau importētu spēli(es), kurām LFF tagad rāda citu laiku vai stadionu.`,
+      "Šīs izmaiņas NAV automātiski piemērotas — apskati un apstiprini katrā līgas avota \"Ielādēt spēles\" lapā.",
+      "",
+      ...lines,
+    ].join("\n"),
+  });
+}
 
 /** Hit on a schedule (e.g. a daily cPanel Cron Job) to pull in any new
  *  fixtures for every league source, with no admin review step — see
@@ -32,18 +71,27 @@ async function runSync(request: NextRequest) {
     startedAt,
   }).onConflictDoUpdate({
     target: cronJobStatuses.job,
-    set: { status: "running", startedAt, finishedAt: null, importedCount: 0, message: null },
+    set: {
+      status: "running",
+      startedAt,
+      finishedAt: null,
+      importedCount: 0,
+      needsReviewCount: 0,
+      message: null,
+    },
   });
 
   try {
     const sources = await db.select().from(leagueSources);
     const results = await Promise.all(
       sources.map(async (source) => ({
+        id: source.id,
         label: source.label,
         ...(await syncLeagueSource(source)),
       })),
     );
     const importedCount = results.reduce((sum, result) => sum + result.imported, 0);
+    const needsReviewCount = results.reduce((sum, result) => sum + result.reviewNeeded.length, 0);
     const errors = results.filter((result) => result.error);
     const finishedAt = Date.now();
     const status = errors.length === 0 ? "success" : errors.length === results.length ? "error" : "partial";
@@ -56,11 +104,14 @@ async function runSync(request: NextRequest) {
       finishedAt,
       lastSuccessAt: status === "success" ? finishedAt : undefined,
       importedCount,
+      needsReviewCount,
       message,
     }).where(eq(cronJobStatuses.job, "sync-fixtures"));
 
+    await notifyReviewNeeded(results);
+
     return NextResponse.json(
-      { status, recordedAt: new Date(finishedAt).toISOString(), importedCount, results },
+      { status, recordedAt: new Date(finishedAt).toISOString(), importedCount, needsReviewCount, results },
       { headers: NO_STORE_HEADERS },
     );
   } catch (error) {

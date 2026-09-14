@@ -7,8 +7,9 @@ import { games, leagueSources } from "@/db/schema";
 import { backfillClubLogos } from "@/lib/club-logos";
 import { scrapeFixtures } from "@/lib/fixtures";
 import { isOlaine } from "@/lib/games";
+import { cn } from "@/lib/utils";
 
-import { confirmImport } from "./actions";
+import { applyLffChanges, confirmImport } from "./actions";
 
 export default async function AdminLeagueSourceImportPage({
   params,
@@ -70,27 +71,69 @@ export default async function AdminLeagueSourceImportPage({
   await backfillClubLogos(scrapedLogos);
 
   const existingGames = await db
-    .select({ date: games.date, homeTeam: games.homeTeam, awayTeam: games.awayTeam })
+    .select({
+      id: games.id,
+      date: games.date,
+      homeTeam: games.homeTeam,
+      awayTeam: games.awayTeam,
+      startTime: games.startTime,
+      location: games.location,
+    })
     .from(games)
     .where(and(eq(games.teamId, source.teamId), eq(games.source, "lff")));
 
-  const existingKeys = new Set(existingGames.map((g) => `${g.date}|${g.homeTeam}|${g.awayTeam}`));
+  const existingByKey = new Map(
+    existingGames.map((g) => [`${g.date}|${g.homeTeam}|${g.awayTeam}`, g]),
+  );
 
-  const rows = candidates.map((fixture) => ({
-    fixture,
-    alreadyImported: existingKeys.has(`${fixture.date}|${fixture.home}|${fixture.away}`),
-  }));
+  const rows = candidates.map((fixture) => {
+    const existing = existingByKey.get(`${fixture.date}|${fixture.home}|${fixture.away}`);
+    const alreadyImported = existing !== undefined;
+    const fixtureLocation = fixture.stadium || "Nav norādīts";
+    const differs =
+      existing !== undefined &&
+      (existing.startTime !== fixture.time || existing.location !== fixtureLocation);
+    return { fixture, existing, alreadyImported, differs };
+  });
+
+  const differingCount = rows.filter((row) => row.differs).length;
+
+  const lffUpdates = rows
+    .filter((row) => row.differs)
+    .map((row) => ({
+      id: row.existing!.id,
+      startTime: row.fixture.time as string,
+      location: row.fixture.stadium || "Nav norādīts",
+    }));
 
   const boundConfirm = confirmImport.bind(null, source.teamId, source.label);
+  const boundApplyLffChanges = applyLffChanges.bind(null, sourceId);
 
   return (
     <div>
       <h1 className="mb-2 text-2xl font-extrabold text-club-navy">
         Ielādēt spēles: {source.label}
       </h1>
-      <p className="mb-6 text-sm text-slate-500">
+      <p className="mb-2 text-sm text-slate-500">
         Atrastas {candidates.length} FK Olaine spēles. Atzīmē, kuras pievienot, un apstiprini.
       </p>
+      {differingCount > 0 && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          <p>
+            {differingCount} jau importētām spēlēm LFF tagad rāda citu laiku vai stadionu, nekā
+            saglabāts datubāzē (veco vērtību redzi zemāk pasvītrotu).
+          </p>
+          <form action={boundApplyLffChanges}>
+            <input type="hidden" name="updates" value={JSON.stringify(lffUpdates)} />
+            <button
+              type="submit"
+              className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+            >
+              Piemērot LFF datus
+            </button>
+          </form>
+        </div>
+      )}
 
       {candidates.length === 0 ? (
         <p className="text-sm text-slate-400">
@@ -111,33 +154,70 @@ export default async function AdminLeagueSourceImportPage({
               </tr>
             </thead>
             <tbody>
-              {rows.map(({ fixture, alreadyImported }, index) => (
-                <tr key={index} className="border-b border-slate-100 last:border-0">
-                  <td className="p-4">
-                    <input
-                      type="checkbox"
-                      name="selected"
-                      disabled={alreadyImported}
-                      defaultChecked={!alreadyImported}
-                      value={JSON.stringify({
-                        homeTeam: fixture.home,
-                        awayTeam: fixture.away,
-                        date: fixture.date,
-                        startTime: fixture.time,
-                        location: fixture.stadium || "Nav norādīts",
-                      })}
-                    />
-                  </td>
-                  <td className="p-4 text-club-navy">{fixture.date}</td>
-                  <td className="p-4 text-slate-500">{fixture.time}</td>
-                  <td className="p-4 text-slate-500">{fixture.home}</td>
-                  <td className="p-4 text-slate-500">{fixture.away}</td>
-                  <td className="p-4 text-slate-500">{fixture.stadium || "—"}</td>
-                  <td className="p-4 text-slate-500">
-                    {alreadyImported ? "jau importēts" : fixture.played ? "aizvadīta" : "gaidāma"}
-                  </td>
-                </tr>
-              ))}
+              {rows.map(({ fixture, existing, alreadyImported, differs }, index) => {
+                const fixtureLocation = fixture.stadium || "Nav norādīts";
+                const timeDiffers = existing !== undefined && existing.startTime !== fixture.time;
+                const locationDiffers =
+                  existing !== undefined && existing.location !== fixtureLocation;
+
+                return (
+                  <tr
+                    key={index}
+                    className={cn(
+                      "border-b border-slate-100 last:border-0",
+                      differs && "bg-amber-50/60",
+                    )}
+                  >
+                    <td className="p-4">
+                      <input
+                        type="checkbox"
+                        name="selected"
+                        disabled={alreadyImported}
+                        defaultChecked={!alreadyImported}
+                        value={JSON.stringify({
+                          homeTeam: fixture.home,
+                          awayTeam: fixture.away,
+                          date: fixture.date,
+                          startTime: fixture.time,
+                          location: fixtureLocation,
+                        })}
+                      />
+                    </td>
+                    <td className="p-4 text-club-navy">{fixture.date}</td>
+                    <td className="p-4 text-slate-500">
+                      {timeDiffers && (
+                        <span className="mr-1.5 text-slate-400 line-through">
+                          {existing.startTime}
+                        </span>
+                      )}
+                      <span className={timeDiffers ? "font-semibold text-amber-700" : undefined}>
+                        {fixture.time}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-500">{fixture.home}</td>
+                    <td className="p-4 text-slate-500">{fixture.away}</td>
+                    <td className="p-4 text-slate-500">
+                      {locationDiffers && (
+                        <span className="mr-1.5 text-slate-400 line-through">
+                          {existing.location}
+                        </span>
+                      )}
+                      <span className={locationDiffers ? "font-semibold text-amber-700" : undefined}>
+                        {fixture.stadium || "—"}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-500">
+                      {differs
+                        ? "jau importēts, dati atšķiras"
+                        : alreadyImported
+                          ? "jau importēts"
+                          : fixture.played
+                            ? "aizvadīta"
+                            : "gaidāma"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 

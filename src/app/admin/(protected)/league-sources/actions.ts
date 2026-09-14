@@ -13,6 +13,7 @@ function parseLeagueSourceInput(formData: FormData) {
   const label = String(formData.get("label") ?? "").trim();
   const url = String(formData.get("url") ?? "").trim();
   const standingsUrl = String(formData.get("standingsUrl") ?? "").trim();
+  const topScorersUrl = String(formData.get("topScorersUrl") ?? "").trim();
   const displayOrderRaw = String(formData.get("displayOrder") ?? "").trim();
   const displayOrder = displayOrderRaw ? Number(displayOrderRaw) : 0;
 
@@ -35,7 +36,22 @@ function parseLeagueSourceInput(formData: FormData) {
     }
   }
 
-  return { teamId, label, url, standingsUrl: standingsUrl || null, displayOrder } as const;
+  if (topScorersUrl) {
+    try {
+      new URL(topScorersUrl);
+    } catch {
+      return { error: "Nederīgs vārtu guvēju URL." } as const;
+    }
+  }
+
+  return {
+    teamId,
+    label,
+    url,
+    standingsUrl: standingsUrl || null,
+    topScorersUrl: topScorersUrl || null,
+    displayOrder,
+  } as const;
 }
 
 export async function createLeagueSource(

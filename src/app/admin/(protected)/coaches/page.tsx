@@ -41,7 +41,13 @@ export default async function AdminCoachesPage() {
             >
               <div className="relative aspect-square bg-club-gray-light">
                 {coach.photoUrl ? (
-                  <Image src={coach.photoUrl} alt={coach.name} fill className="object-cover" />
+                  <Image
+                    src={coach.photoUrl}
+                    alt={coach.name}
+                    fill
+                    sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
                     <UserRound className="h-10 w-10 text-club-muted" strokeWidth={1.5} />

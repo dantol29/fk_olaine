@@ -41,7 +41,13 @@ export default async function AdminArticlesPage() {
             >
               <div className="relative aspect-video bg-club-gray-light">
                 {article.image ? (
-                  <Image src={article.image} alt={article.title} fill className="object-cover" />
+                  <Image
+                    src={article.image}
+                    alt={article.title}
+                    fill
+                    sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
                     <Newspaper className="h-10 w-10 text-club-muted" strokeWidth={1.5} />

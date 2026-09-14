@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, SportShoe } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";

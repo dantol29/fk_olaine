@@ -13,20 +13,33 @@ function parsePlayerInput(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const birthdate = String(formData.get("birthdate") ?? "").trim();
   const teamIds = formData.getAll("teamIds").map(Number).filter((n) => Number.isFinite(n));
-  const goalsRaw = Number(formData.get("goals"));
-  const goals = Number.isFinite(goalsRaw) && goalsRaw >= 0 ? Math.trunc(goalsRaw) : 0;
+  const numberRaw = String(formData.get("number") ?? "").trim();
+  const number = numberRaw === "" ? null : Number(numberRaw);
 
   if (!name) return { error: "Vārds, uzvārds ir obligāts." } as const;
   if (!birthdate) return { error: "Dzimšanas datums ir obligāts." } as const;
   if (teamIds.length === 0) return { error: "Jāizvēlas vismaz viena komanda." } as const;
+  if (number !== null && (!Number.isFinite(number) || number < 0)) {
+    return { error: "Numuram jābūt pozitīvam skaitlim." } as const;
+  }
 
-  return { name, birthdate, teamIds, goals } as const;
+  // Goals are tracked per team (a player can score a different tally in
+  // each league they play in) — one "goals-<teamId>" field per checked team.
+  const teamGoals = new Map<number, number>();
+  for (const teamId of teamIds) {
+    const raw = Number(formData.get(`goals-${teamId}`));
+    teamGoals.set(teamId, Number.isFinite(raw) && raw >= 0 ? Math.trunc(raw) : 0);
+  }
+
+  return { name, birthdate, teamGoals, number } as const;
 }
 
-async function syncPlayerTeams(playerId: number, teamIds: number[]) {
+async function syncPlayerTeams(playerId: number, teamGoals: Map<number, number>) {
   await db.delete(playerTeams).where(eq(playerTeams.playerId, playerId));
-  if (teamIds.length > 0) {
-    await db.insert(playerTeams).values(teamIds.map((teamId) => ({ playerId, teamId })));
+  if (teamGoals.size > 0) {
+    await db.insert(playerTeams).values(
+      [...teamGoals.entries()].map(([teamId, goals]) => ({ playerId, teamId, goals })),
+    );
   }
 }
 
@@ -49,12 +62,12 @@ export async function createPlayer(
     }
   }
 
-  const { teamIds, ...playerFields } = parsed;
+  const { teamGoals, ...playerFields } = parsed;
   const [inserted] = await db
     .insert(players)
     .values({ ...playerFields, photoUrl, createdAt: Date.now() })
     .returning({ id: players.id });
-  await syncPlayerTeams(inserted.id, teamIds);
+  await syncPlayerTeams(inserted.id, teamGoals);
 
   revalidatePath("/admin/players");
   revalidatePath("/komandas");
@@ -75,7 +88,7 @@ export async function updatePlayer(
   const photo = formData.get("photo");
   const removePhoto = formData.get("removePhoto") === "on";
 
-  const { teamIds, ...playerFields } = parsed;
+  const { teamGoals, ...playerFields } = parsed;
   const updates: typeof playerFields & { photoUrl?: string | null } = { ...playerFields };
 
   if (photo instanceof File && photo.size > 0) {
@@ -101,7 +114,7 @@ export async function updatePlayer(
   }
 
   await db.update(players).set(updates).where(eq(players.id, id));
-  await syncPlayerTeams(id, teamIds);
+  await syncPlayerTeams(id, teamGoals);
 
   revalidatePath("/admin/players");
   revalidatePath("/komandas");

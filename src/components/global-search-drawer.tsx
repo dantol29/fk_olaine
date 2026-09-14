@@ -27,7 +27,6 @@ export function GlobalSearchDrawer() {
   useEffect(() => {
     if (!open || !hasQuery) return;
 
-    setIsLoading(true);
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, { signal: controller.signal })
@@ -74,7 +73,11 @@ export function GlobalSearchDrawer() {
               autoFocus
               type="text"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                const nextQuery = event.target.value;
+                setQuery(nextQuery);
+                setIsLoading(nextQuery.trim().length >= 2);
+              }}
               placeholder="Meklēt spēlētājus, komandas, jaunumus..."
               className="min-w-0 flex-1 text-base text-club-navy outline-none placeholder:text-slate-400"
             />
@@ -148,7 +151,13 @@ export function GlobalSearchDrawer() {
                         >
                           <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
                             {player.photoUrl ? (
-                              <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
+                              <Image
+                                src={player.photoUrl}
+                                alt={player.name}
+                                fill
+                                sizes="(min-width: 640px) 112px, 96px"
+                                className="object-cover"
+                              />
                             ) : (
                               <span className="flex h-full w-full items-center justify-center">
                                 <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
@@ -184,7 +193,13 @@ export function GlobalSearchDrawer() {
                         >
                           <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
                             {coach.photoUrl ? (
-                              <Image src={coach.photoUrl} alt={coach.name} fill className="object-cover" />
+                              <Image
+                                src={coach.photoUrl}
+                                alt={coach.name}
+                                fill
+                                sizes="(min-width: 640px) 112px, 96px"
+                                className="object-cover"
+                              />
                             ) : (
                               <span className="flex h-full w-full items-center justify-center">
                                 <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
@@ -225,7 +240,13 @@ export function GlobalSearchDrawer() {
                           className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-slate-50"
                         >
                           <span className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-club-gray-light">
-                            <Image src={article.image} alt="" fill className="object-cover" />
+                            <Image
+                              src={article.image}
+                              alt=""
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
                           </span>
                           <span className="min-w-0 flex-1 truncate text-sm font-semibold text-club-navy">
                             {article.title}

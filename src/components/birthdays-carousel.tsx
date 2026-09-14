@@ -29,7 +29,7 @@ function BirthdayCard({
     >
       <div className="relative h-[60%] w-full shrink-0 bg-club-gray-light sm:h-[80%]">
         {player.photoUrl ? (
-          <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
+          <Image src={player.photoUrl} alt={player.name} fill sizes="210px" className="object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <UserRound

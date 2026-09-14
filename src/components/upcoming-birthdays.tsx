@@ -29,27 +29,33 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
           return (
             <div
               key={player.id}
-              className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 sm:gap-4"
+              className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
             >
               <div
                 className={cn(
-                  "relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-16 sm:w-16",
+                  "relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28",
                   isToday && "ring-2 ring-club-red/40",
                 )}
               >
                 {player.photoUrl ? (
-                  <Image src={player.photoUrl} alt={player.name} fill className="object-cover" />
+                  <Image
+                    src={player.photoUrl}
+                    alt={player.name}
+                    fill
+                    sizes="(min-width: 640px) 112px, 96px"
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
-                    <UserRound className="h-6 w-6 text-club-muted" strokeWidth={1.5} />
+                    <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
                   </div>
                 )}
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-club-navy">{player.name}</p>
+                <p className="truncate text-lg font-semibold text-club-navy">{player.name}</p>
                 {player.teamName && (
-                  <p className="truncate text-xs text-slate-400">{player.teamName}</p>
+                  <p className="truncate text-sm text-slate-400">{player.teamName}</p>
                 )}
               </div>
 

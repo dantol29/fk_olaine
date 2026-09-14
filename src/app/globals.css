@@ -2,6 +2,23 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+.rich-text-editor h2,
+.rich-page-content h2 { margin: 1.75em 0 0.55em; color: var(--color-club-navy); font-size: 1.5em; line-height: 1.25; }
+.rich-text-editor h3,
+.rich-page-content h3 { margin: 1.5em 0 0.5em; color: var(--color-club-navy); font-size: 1.2em; line-height: 1.3; }
+.rich-text-editor p,
+.rich-page-content p,
+.rich-text-editor > div,
+.rich-page-content > div { margin: 0 0 1.25em; }
+.rich-text-editor ul,
+.rich-page-content ul { margin: 1em 0 1.25em; list-style: disc; padding-left: 1.5em; }
+.rich-text-editor ol,
+.rich-page-content ol { margin: 1em 0 1.25em; list-style: decimal; padding-left: 1.5em; }
+.rich-text-editor blockquote,
+.rich-page-content blockquote { margin: 1.5em 0; border-left: 3px solid var(--color-club-red); padding-left: 1.25em; color: var(--color-club-navy); font-style: italic; }
+.rich-text-editor a,
+.rich-page-content a { color: var(--color-club-red); text-decoration: underline; text-underline-offset: 3px; }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -148,6 +165,17 @@
   }
   button:not(:disabled):active {
     transform: scale(0.9);
+  }
+  /* Consistent keyboard-focus ring for every plain button/link — most of
+   * this site's interactive elements are hand-styled buttons/anchors
+   * (filter chips, icon buttons, nav items) rather than the shadcn/ui
+   * primitives, which already ship their own focus-visible ring. A
+   * component-level focus-visible utility still wins over this. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 

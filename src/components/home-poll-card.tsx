@@ -26,15 +26,15 @@ function useVote(poll: Poll) {
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(storageKey);
-      setVotedForId(stored ? Number(stored) : null);
-    } catch {
-      setVotedForId(null);
-    }
-    // Only re-check on mount / if this card starts representing a
-    // different poll (its id changed).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const timeout = window.setTimeout(() => {
+      try {
+        const stored = window.localStorage.getItem(storageKey);
+        setVotedForId(stored ? Number(stored) : null);
+      } catch {
+        setVotedForId(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [storageKey]);
 
   function handleVote(optionId: number) {
@@ -144,7 +144,7 @@ function HeroPollCard({
       )}
     >
       <div className="relative flex min-h-[16rem] flex-col justify-end p-4 sm:order-2 sm:w-3/5 sm:p-8">
-        <Image src={imageSrc} alt="" fill className="object-cover" />
+        <Image src={imageSrc} alt="" fill sizes="(min-width: 640px) 60vw, 100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
 
         <div className="relative z-10">

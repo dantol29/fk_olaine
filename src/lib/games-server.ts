@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { eq, gte } from "drizzle-orm";
 
 import { db } from "@/db/client";
@@ -37,7 +38,7 @@ function weekdayAbbrFor(dateKey: string): string {
  *  Shared by the homepage showcase and the article "Nākamā spēle" widget so
  *  both stay in sync with the same real data. Server-only: never import this
  *  from a "use client" component — it touches the DB client. */
-export async function getUpcomingGamesFromDb(
+export const getUpcomingGamesFromDb = cache(async function getUpcomingGamesFromDb(
   limit: number,
 ): Promise<UpcomingGame[]> {
   try {
@@ -69,7 +70,7 @@ export async function getUpcomingGamesFromDb(
   } catch {
     return [];
   }
-}
+});
 
 export type GameListItem = UpcomingGame & {
   /** Which of the club's own teams plays this fixture (e.g. "U14", "Sieviešu 1"). */
@@ -81,7 +82,7 @@ export type GameListItem = UpcomingGame & {
 
 /** Every game on file — upcoming and past — for the public /speles listing.
  *  Server-only: never import this from a "use client" component. */
-export async function getAllGamesFromDb(): Promise<GameListItem[]> {
+export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promise<GameListItem[]> {
   try {
     const todayKey = toDateKey(new Date());
     const rows = await db
@@ -122,4 +123,4 @@ export async function getAllGamesFromDb(): Promise<GameListItem[]> {
   } catch {
     return [];
   }
-}
+});

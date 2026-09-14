@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
 import { createArticle, updateArticle } from "../actions";
 
@@ -9,7 +9,6 @@ const CATEGORIES = ["Klubs", "Komandas", "Spēles", "Treniņi", "Pasākumi"] as 
 
 type Article = {
   id: number;
-  slug: string;
   title: string;
   excerpt: string;
   date: string;
@@ -26,24 +25,6 @@ type Article = {
 type TeamOption = { id: number; name: string };
 type CoachOption = { id: number; name: string };
 
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[āä]/g, "a")
-    .replace(/[čć]/g, "c")
-    .replace(/[ēé]/g, "e")
-    .replace(/ģ/g, "g")
-    .replace(/[īí]/g, "i")
-    .replace(/ķ/g, "k")
-    .replace(/ļ/g, "l")
-    .replace(/ņ/g, "n")
-    .replace(/[šś]/g, "s")
-    .replace(/[ūü]/g, "u")
-    .replace(/[žź]/g, "z")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 export function ArticleForm(
   props:
     | { mode: "create"; teamOptions: TeamOption[]; coachOptions: CoachOption[] }
@@ -54,8 +35,6 @@ export function ArticleForm(
   const [state, formAction, pending] = useActionState(action, undefined);
   const article = props.mode === "edit" ? props.article : null;
 
-  const [slug, setSlug] = useState(article?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(props.mode === "edit");
   const highlightUrls = article?.highlights?.split("\n").filter(Boolean) ?? [];
 
   return (
@@ -71,24 +50,6 @@ export function ArticleForm(
           name="title"
           required
           defaultValue={article?.title ?? ""}
-          onChange={(event) => {
-            if (!slugTouched) setSlug(slugify(event.target.value));
-          }}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-        />
-      </label>
-
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Saite (slug)
-        <input
-          type="text"
-          name="slug"
-          required
-          value={slug}
-          onChange={(event) => {
-            setSlugTouched(true);
-            setSlug(event.target.value);
-          }}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>

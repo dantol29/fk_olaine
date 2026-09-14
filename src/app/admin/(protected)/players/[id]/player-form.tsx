@@ -10,8 +10,8 @@ type Player = {
   name: string;
   birthdate: string;
   photoUrl: string | null;
-  goals: number;
-  playerTeams: { teamId: number }[];
+  number: number | null;
+  playerTeams: { teamId: number; goals: number }[];
 };
 type TeamOption = { id: number; name: string };
 
@@ -55,31 +55,49 @@ export function PlayerForm(
       </label>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Gūtie vārti (šosezon)
+        Numurs (nav obligāts)
         <input
           type="number"
-          name="goals"
+          name="number"
           min={0}
           step={1}
-          defaultValue={player?.goals ?? 0}
+          defaultValue={player?.number ?? ""}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Komandas</legend>
-        <div className="mt-1.5 flex flex-col gap-1.5">
-          {props.teamOptions.map((team) => (
-            <label key={team.id} className="flex items-center gap-2 text-sm text-club-navy">
-              <input
-                type="checkbox"
-                name="teamIds"
-                value={team.id}
-                defaultChecked={selectedTeamIds.has(team.id)}
-              />
-              {team.name}
-            </label>
-          ))}
+        <legend className="text-sm font-semibold text-club-navy">Komandas un gūtie vārti</legend>
+        <p className="mt-1 text-xs text-slate-400">
+          Gūtie vārti tiek uzskaitīti atsevišķi katrai komandai/līgai — spēlētājs, kurš spēlē
+          vairākās komandās, var tajās būt guvis atšķirīgu vārtu skaitu.
+        </p>
+        <div className="mt-1.5 flex flex-col gap-2">
+          {props.teamOptions.map((team) => {
+            const existingGoals = player?.playerTeams.find((pt) => pt.teamId === team.id)?.goals ?? 0;
+            return (
+              <div key={team.id} className="flex items-center gap-3">
+                <label className="flex flex-1 items-center gap-2 text-sm text-club-navy">
+                  <input
+                    type="checkbox"
+                    name="teamIds"
+                    value={team.id}
+                    defaultChecked={selectedTeamIds.has(team.id)}
+                  />
+                  {team.name}
+                </label>
+                <input
+                  type="number"
+                  name={`goals-${team.id}`}
+                  min={0}
+                  step={1}
+                  placeholder="Vārti"
+                  defaultValue={existingGoals}
+                  className="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm text-club-navy outline-none focus:border-club-red"
+                />
+              </div>
+            );
+          })}
         </div>
       </fieldset>
 

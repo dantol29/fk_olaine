@@ -100,9 +100,9 @@ export async function HomeUpcomingGames() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[980px_1fr] lg:items-stretch lg:gap-0">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[980px_1fr] lg:items-stretch">
           {displayed.length > 0 ? (
-            <div className="divide-y divide-slate-100 sm:rounded-2xl sm:bg-white sm:px-6 lg:rounded-r-none lg:rounded-b-none">
+            <div className="divide-y divide-slate-100 sm:rounded-2xl sm:bg-white sm:px-6">
               {displayed.map((game) => (
                 <HomeGameRow key={game.id} game={game} />
               ))}
@@ -113,10 +113,7 @@ export async function HomeUpcomingGames() {
             </div>
           )}
 
-          <GamesMonthCalendar
-            games={games}
-            className="lg:h-full lg:rounded-b-none lg:rounded-l-none"
-          />
+          <GamesMonthCalendar games={games} className="lg:h-full lg:rounded-b-2xl" />
         </div>
       </div>
     </section>

@@ -55,7 +55,7 @@ export default async function AdminPlayersPage() {
                 {team.players.map((player) => (
                   <div
                     key={player.id}
-                    data-admin-search-item={`${player.name} ${player.birthdate} ${team.name}`}
+                    data-admin-search-item={`${player.name} ${player.birthdate} ${team.name} ${player.number ?? ""}`}
                     className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                   >
                     <div className="relative aspect-square bg-club-gray-light">
@@ -64,12 +64,18 @@ export default async function AdminPlayersPage() {
                           src={player.photoUrl}
                           alt={player.name}
                           fill
+                          sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
                           className="object-cover"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
                           <UserRound className="h-10 w-10 text-club-muted" strokeWidth={1.5} />
                         </div>
+                      )}
+                      {player.number !== null && (
+                        <span className="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-club-navy text-xs font-bold text-white">
+                          {player.number}
+                        </span>
                       )}
                     </div>
                     <div className="p-3">

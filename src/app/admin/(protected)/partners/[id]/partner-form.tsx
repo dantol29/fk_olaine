@@ -11,6 +11,7 @@ type Partner = {
   logoUrl: string;
   size: "lg" | "sm";
   needsWhite: boolean;
+  websiteUrl: string | null;
 };
 
 export function PartnerForm(
@@ -79,6 +80,20 @@ export function PartnerForm(
       <label className="mt-4 flex items-center gap-2 text-sm font-semibold text-club-navy">
         <input type="checkbox" name="needsWhite" defaultChecked={partner?.needsWhite ?? false} />
         Balts uz tumša fona (invertē logotipu kājenē)
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Saite (nav obligāta)
+        <input
+          type="url"
+          name="websiteUrl"
+          placeholder="https://example.com"
+          defaultValue={partner?.websiteUrl ?? ""}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+        <p className="mt-1.5 text-xs text-slate-400">
+          Ja aizpildīts, logotips būs klikšķināms un atvērs šo saiti jaunā cilnē.
+        </p>
       </label>
 
       {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}

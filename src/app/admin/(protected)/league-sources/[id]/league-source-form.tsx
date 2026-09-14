@@ -10,6 +10,7 @@ type LeagueSource = {
   label: string;
   url: string;
   standingsUrl: string | null;
+  topScorersUrl: string | null;
   displayOrder: number;
 };
 type TeamOption = { id: number; name: string };
@@ -86,6 +87,22 @@ export function LeagueSourceForm(
       <p className="mt-1.5 text-xs text-slate-400">
         Tas pats sacensību lapā, bet uz &quot;Tabula&quot; cilnes. Ja aizpildīts, šī liga parādās
         mājaslapas galvenajā tabulā.
+      </p>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        LFF vārtu guvēju URL (nav obligāts)
+        <input
+          type="url"
+          name="topScorersUrl"
+          placeholder="https://lff.lv/sacensibas/sievietes/sieviesu-futbola-liga/?tab=content_1_3"
+          defaultValue={source?.topScorersUrl ?? ""}
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+        />
+      </label>
+      <p className="mt-1.5 text-xs text-slate-400">
+        Tas pats sacensību lapā, bet uz &quot;Vārtu guvēji&quot; cilnes. Ja aizpildīts, šīs komandas
+        spēlētāju gūto vārtu skaits tiek sinhronizēts no LFF (pēc vārda sakritības, tikai skaits —
+        fotogrāfijas un citi lauki netiek mainīti).
       </p>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">

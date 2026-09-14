@@ -31,7 +31,13 @@ export function CoachesListView({ coaches }: { coaches: Coach[] }) {
         <div key={coach.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
             {coach.photoUrl ? (
-              <Image src={coach.photoUrl} alt={coach.name} fill className="object-cover" />
+              <Image
+                src={coach.photoUrl}
+                alt={coach.name}
+                fill
+                sizes="(min-width: 640px) 112px, 96px"
+                className="object-cover"
+              />
             ) : (
               <div className="flex h-full w-full items-center justify-center">
                 <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />

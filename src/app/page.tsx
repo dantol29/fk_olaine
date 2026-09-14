@@ -28,6 +28,7 @@ export default function Home() {
     <>
       <SiteHeader />
       <main className="bg-background">
+        <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />
         <HomeUpcomingGames />
         <div className="px-6 pt-8 sm:pt-10">

@@ -1,6 +1,7 @@
 // Custom Node entry point for cPanel's Node.js Selector (Phusion Passenger),
 // which needs a plain script to run rather than the `next start` CLI.
 // Passenger sets PORT itself; see node_modules/next/dist/docs/01-app/02-guides/custom-server.md.
+/* eslint-disable @typescript-eslint/no-require-imports -- Passenger loads this entry point as CommonJS. */
 const { createServer } = require("http");
 const next = require("next");
 
