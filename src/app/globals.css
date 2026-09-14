@@ -20,6 +20,15 @@
 .rich-page-content a { color: var(--color-club-red); text-decoration: underline; text-underline-offset: 3px; }
 .rich-text-editor p.is-editor-empty:first-child::before { float: left; height: 0; color: #94a3b8; content: attr(data-placeholder); pointer-events: none; }
 
+/* Safari can briefly paint crossfading image layers outside an overflow-hidden
+ * border radius while the page scrolls. A masked compositor layer keeps the
+ * article gallery clipped for the entire transition. */
+.article-gallery-frame {
+  isolation: isolate;
+  transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

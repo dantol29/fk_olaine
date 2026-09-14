@@ -51,8 +51,21 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
 
   return (
     <>
-      <div className="relative ml-[calc(50%-50vw)] h-[280px] w-screen overflow-hidden rounded-b-[2rem] sm:ml-0 sm:h-[420px] sm:w-full sm:rounded-[2rem] lg:h-[560px]">
-        <Image key={images[index]} src={images[index]} alt="" fill sizes="100vw" className="object-cover" />
+      <div className="article-gallery-frame relative ml-[calc(50%-50vw)] h-[280px] w-screen overflow-hidden rounded-b-[2rem] sm:ml-0 sm:h-[420px] sm:w-full sm:rounded-[2rem] lg:h-[560px]">
+        {images.map((image, imageIndex) => (
+          <Image
+            key={image}
+            src={image}
+            alt=""
+            fill
+            priority={imageIndex === 0}
+            sizes="100vw"
+            className={cn(
+              "will-change-[opacity] object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              imageIndex === index ? "opacity-100" : "opacity-0",
+            )}
+          />
+        ))}
 
         <button
           type="button"
@@ -129,14 +142,19 @@ function ArticleImagesCarousel({ images }: { images: string[] }) {
           </button>
 
           <div className="relative h-full w-full">
-            <Image
-              key={images[index]}
-              src={images[index]}
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
+            {images.map((image, imageIndex) => (
+              <Image
+                key={image}
+                src={image}
+                alt=""
+                fill
+                sizes="100vw"
+                className={cn(
+                  "object-contain transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  imageIndex === index ? "opacity-100" : "opacity-0",
+                )}
+              />
+            ))}
           </div>
 
           {images.length > 1 && (
@@ -226,7 +244,7 @@ export function ArticleDetail({ article }: { article: Article }) {
       <section className="px-6 pt-4 pb-24 sm:pt-8">
         <div className="ml-[calc(50%-50vw)] grid w-screen max-w-[1440px] grid-cols-1 gap-8 sm:mx-auto sm:w-full lg:grid-cols-2 lg:items-start">
           <div className="min-w-0">
-            <div className="rounded-[2rem] bg-white px-4 pt-8 pb-4 sm:p-10">
+            <div className="rounded-t-[2rem] bg-white px-4 pt-8 pb-4 sm:rounded-[2rem] sm:p-10">
               <nav className="mb-4 hidden items-center gap-1.5 text-xs font-medium text-slate-500 sm:flex">
                 <Link href="/" className="hover:text-club-navy">
                   Sākums
@@ -297,6 +315,10 @@ export function ArticleDetail({ article }: { article: Article }) {
               )}
             </div>
 
+            <div className="min-w-0 lg:hidden">
+              <ArticleImagesCarousel images={images} />
+            </div>
+
             <div className="mt-8 max-w-2xl min-w-0 pl-3 sm:pl-6">
               <div className="min-w-0 max-w-full break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] sm:text-base">
               {article.body.map((paragraph, index) => (
@@ -331,7 +353,7 @@ export function ArticleDetail({ article }: { article: Article }) {
               </div>
             )}
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6 pr-3 sm:pr-0">
               <Link
                 href="/jaunumi"
                 className="flex items-center gap-2 text-sm text-club-navy transition hover:text-club-red"
@@ -379,7 +401,7 @@ export function ArticleDetail({ article }: { article: Article }) {
           </div>
         </div>
 
-        <div className="min-w-0">
+        <div className="hidden min-w-0 lg:block">
           <ArticleImagesCarousel images={images} />
         </div>
         </div>

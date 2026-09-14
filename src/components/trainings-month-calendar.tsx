@@ -128,7 +128,7 @@ export function TrainingsMonthCalendar({
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 pr-4 pl-2 sm:px-0">
         <h3 className="text-3xl tracking-[-0.02em] sm:text-4xl">{FULL_MONTHS_LV[month]}</h3>
         <div className="flex shrink-0 items-center gap-2">
           <button

@@ -59,14 +59,18 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
         </div>
 
         <div className="league-scroll overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-          <table
-            key={`table-${activeLeague}`}
-            className="w-full border-collapse text-sm"
-          >
+          <table className="w-full table-fixed border-collapse text-sm">
+            <colgroup>
+              <col className="w-10 sm:w-12" />
+              <col />
+              {!compact && <col className="hidden w-16 sm:table-column" />}
+              {!compact && <col className="hidden w-16 sm:table-column" />}
+              <col className="w-8 sm:w-16" />
+            </colgroup>
             <thead>
               <tr className="text-left text-xs text-slate-400">
-                <th colSpan={2} className="pb-3">
-                  <div className="flex flex-wrap gap-2">
+                <th colSpan={2} className="min-w-0 pb-3 pr-4 sm:pr-6">
+                  <div className="flex w-[calc(100vw-1.5rem)] max-w-none flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-full sm:max-w-full">
                     {leagues.map((league, index) => (
                       <button
                         key={league.label}
@@ -74,7 +78,7 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
                         onClick={() => setActiveLeague(index)}
                         aria-pressed={index === activeLeague}
                         className={cn(
-                          "flex items-center gap-2 rounded-[1rem] px-4 py-2.5 text-xs font-semibold uppercase transition sm:px-5 sm:py-3 sm:text-sm",
+                          "flex shrink-0 items-center gap-2 rounded-[1rem] px-4 py-2.5 text-xs font-semibold uppercase transition sm:px-5 sm:py-3 sm:text-sm",
                           index === activeLeague
                             ? "bg-club-red text-white"
                             : "bg-slate-100 text-club-navy hover:bg-slate-200",
@@ -87,15 +91,16 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
                 </th>
                 {!compact && (
                   <th className="hidden pb-3 text-center sm:table-cell sm:pr-0">
-                    Spēles
+                    S
                   </th>
                 )}
                 {!compact && (
-                  <th className="hidden pb-3 text-center sm:table-cell">Vārti</th>
+                  <th className="hidden pb-3 text-center sm:table-cell">
+                    V
+                  </th>
                 )}
-                <th className="hidden min-[400px]:table-cell pb-3 pr-1 text-center">
-                  <span className="sm:hidden">P</span>
-                  <span className="hidden sm:inline">Punkti</span>
+                <th className="pb-3 pr-1 text-center">
+                  <span className="hidden sm:inline">P</span>
                 </th>
               </tr>
             </thead>
@@ -170,7 +175,7 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
                       )}
                       <td
                         className={cn(
-                          "hidden min-[400px]:table-cell py-4 pr-2 text-center font-mono text-base font-bold tabular-nums sm:py-5",
+                          "py-4 pr-2 text-center font-mono text-base font-bold tabular-nums sm:py-5",
                           row.isOlaine
                             ? "text-club-red rounded-r-xl"
                             : "text-club-navy",

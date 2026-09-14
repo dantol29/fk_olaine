@@ -40,6 +40,19 @@ const FALLBACK_STANDINGS: StandingRow[] = [
 
 export type LeagueStandings = { label: string; standings: StandingRow[]; url: string };
 
+function withDevelopmentTestLeagues(leagues: LeagueStandings[]): LeagueStandings[] {
+  if (process.env.NODE_ENV !== "development" || leagues.length === 0) return leagues;
+  const example = leagues.find((league) => league.standings.length > 0) ?? leagues[0];
+  return [
+    ...leagues,
+    ...["U18 testa līga", "U14 testa līga", "Attīstības līga"].map((label) => ({
+      label,
+      standings: example.standings,
+      url: example.url,
+    })),
+  ];
+}
+
 /** Every league source the admin has given a standings URL, live-fetched.
  *  Shared by the homepage hero and the /speles page so both stay in sync
  *  with the same real data. A per-source fetch failure just shows that one
@@ -56,7 +69,7 @@ export const getLeagueStandingsForDisplay = cache(async function getLeagueStandi
       .orderBy(leagueSources.displayOrder, leagueSources.label);
 
     if (sources.length === 0) {
-      return fallback;
+      return withDevelopmentTestLeagues(fallback);
     }
 
     const results = await Promise.all(
@@ -87,8 +100,8 @@ export const getLeagueStandingsForDisplay = cache(async function getLeagueStandi
       // Ignore — logos will simply stay unresolved until the next successful run.
     }
 
-    return results;
+    return withDevelopmentTestLeagues(results);
   } catch {
-    return fallback;
+    return withDevelopmentTestLeagues(fallback);
   }
 });

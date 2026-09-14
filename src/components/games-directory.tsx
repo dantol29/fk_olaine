@@ -197,7 +197,7 @@ export function GamesDirectory({
                 onSelectDate={setSelectedDateKey}
               />
 
-              <div className="relative flex h-[760px] flex-col overflow-hidden">
+              <div className="relative flex h-[760px] flex-col overflow-visible lg:overflow-hidden">
                 <LeagueSelector leagues={leagues} compact />
               </div>
             </div>

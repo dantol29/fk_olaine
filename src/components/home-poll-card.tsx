@@ -102,7 +102,7 @@ function PollOptionsList({
         return (
           <div
             key={option.id}
-            className="poll-result-enter"
+            className="poll-result-enter px-3 sm:px-0"
             style={{ animationDelay: `${index * 60}ms` }}
           >
             <p className="truncate text-sm font-semibold text-club-navy">{option.label}</p>
@@ -147,7 +147,7 @@ function HeroPollCard({
         <Image src={imageSrc} alt="" fill sizes="(min-width: 640px) 60vw, 100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
 
-        <div className="relative z-10">
+        <div className="relative z-10 px-3 sm:px-0">
           <p className="text-2xl text-white sm:text-3xl">{poll.question}</p>
           <p className="mt-1 text-sm text-white/70">{totalVotes} balsis</p>
         </div>
@@ -177,7 +177,7 @@ function PlainPollCard({ poll, className }: { poll: Poll; className?: string }) 
         className,
       )}
     >
-      <div>
+      <div className="px-3 sm:px-0">
         <p className="text-2xl text-club-navy sm:text-3xl">{poll.question}</p>
         <p className="mt-1 text-sm text-slate-400">{totalVotes} balsis</p>
       </div>

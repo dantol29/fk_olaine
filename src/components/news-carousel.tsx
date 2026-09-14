@@ -44,7 +44,7 @@ export function NewsCarousel({
     >
       <Link
         href={`/jaunumi/${article.slug}`}
-        className="relative flex flex-1 flex-col justify-end p-6 pb-20 sm:p-8 sm:pb-24"
+        className="relative flex flex-1 flex-col justify-end p-6 pb-24 sm:p-8 sm:pb-24"
       >
         {articles.map((item, i) => (
           <Image
@@ -97,10 +97,12 @@ export function NewsCarousel({
             </button>
           </div>
 
-          <span className="text-2xl text-white sm:text-3xl">
-            {String(index + 1).padStart(2, "0")}
-            <span className="ml-1.5 text-base font-medium text-white/50">
-              /{String(articles.length).padStart(2, "0")}
+          <span className="flex items-baseline text-2xl text-white tabular-nums sm:text-3xl">
+            <span className="inline-block w-[2ch] text-right">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="ml-1.5 flex items-baseline text-base font-medium text-white/50">
+              /<span className="inline-block w-[2ch] text-right">{String(articles.length).padStart(2, "0")}</span>
             </span>
           </span>
           <div className="flex gap-2">
