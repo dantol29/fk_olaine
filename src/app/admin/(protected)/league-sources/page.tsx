@@ -99,6 +99,12 @@ export default async function AdminLeagueSourcesPage() {
             {cronStatus.message}
           </p>
         )}
+        {cronStatus?.lastEmailError && (
+          <p className="mt-3 whitespace-pre-wrap rounded-lg bg-red-50 p-3 text-xs text-red-700">
+            <span className="font-bold">E-pasta paziņojums neizdevās:</span>{" "}
+            {cronStatus.lastEmailError}
+          </p>
+        )}
       </div>
       <AdminSearch placeholder="Meklēt līgu avotus…" />
 

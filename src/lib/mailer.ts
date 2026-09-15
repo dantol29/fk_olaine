@@ -15,10 +15,14 @@ function getTransporter() {
   });
 }
 
-/** Best-effort notification email — logs and returns false instead of
- *  throwing when SMTP isn't configured or the send fails, so a broken/unset
- *  mail setup never takes down whatever triggered the notification (e.g.
- *  the sync cron job). */
+export type SendEmailResult = { sent: true } | { sent: false; error: string };
+
+/** Best-effort notification email — never throws when SMTP isn't configured
+ *  or the send fails, so a broken/unset mail setup never takes down
+ *  whatever triggered the notification (e.g. the sync cron job). Still
+ *  logs, but also returns the failure reason so the caller can persist it
+ *  somewhere visible (e.g. cronJobStatuses.lastEmailError) instead of it
+ *  only ever existing in server logs. */
 export async function sendNotificationEmail({
   to,
   subject,
@@ -27,11 +31,12 @@ export async function sendNotificationEmail({
   to: string;
   subject: string;
   text: string;
-}): Promise<boolean> {
+}): Promise<SendEmailResult> {
   const transporter = getTransporter();
   if (!transporter) {
+    const error = "SMTP nav konfigurēts (trūkst SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD).";
     console.warn("sendNotificationEmail: SMTP is not configured, skipping send.", { subject });
-    return false;
+    return { sent: false, error };
   }
 
   try {
@@ -41,9 +46,10 @@ export async function sendNotificationEmail({
       subject,
       text,
     });
-    return true;
-  } catch (error) {
-    console.error("sendNotificationEmail: failed to send.", error);
-    return false;
+    return { sent: true };
+  } catch (caught) {
+    const error = caught instanceof Error ? caught.message : String(caught);
+    console.error("sendNotificationEmail: failed to send.", caught);
+    return { sent: false, error };
   }
 }

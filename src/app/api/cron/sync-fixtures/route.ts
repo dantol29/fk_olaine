@@ -16,12 +16,16 @@ const NO_STORE_HEADERS = {
 
 const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
 
+/** Sends the "N games need review" email when there's anything to report.
+ *  Returns the failure reason to persist in cronJobStatuses.lastEmailError,
+ *  or null when either no email was needed or it sent successfully — so an
+ *  SMTP problem is visible in the admin UI, not just server logs. */
 async function notifyReviewNeeded(
   bySource: { id: number; label: string; reviewNeeded: ReviewNeededGame[] }[],
-) {
+): Promise<string | null> {
   const withChanges = bySource.filter((source) => source.reviewNeeded.length > 0);
   const totalCount = withChanges.reduce((sum, source) => sum + source.reviewNeeded.length, 0);
-  if (totalCount === 0) return;
+  if (totalCount === 0) return null;
 
   const settings = await getSiteSettings();
   const lines = withChanges.flatMap((source) => [
@@ -39,7 +43,7 @@ async function notifyReviewNeeded(
     "",
   ]);
 
-  await sendNotificationEmail({
+  const result = await sendNotificationEmail({
     to: settings.email,
     subject: `FK Olaine: ${totalCount} spēlei(ēm) LFF dati atšķiras no datubāzes`,
     text: [
@@ -49,6 +53,8 @@ async function notifyReviewNeeded(
       ...lines,
     ].join("\n"),
   });
+
+  return result.sent ? null : result.error;
 }
 
 /** Hit on a schedule (e.g. a daily cPanel Cron Job) to pull in any new
@@ -78,6 +84,7 @@ async function runSync(request: NextRequest) {
       importedCount: 0,
       needsReviewCount: 0,
       message: null,
+      lastEmailError: null,
     },
   });
 
@@ -99,6 +106,8 @@ async function runSync(request: NextRequest) {
       ? errors.map((result) => `${result.label}: ${result.error}`).join("\n")
       : null;
 
+    const lastEmailError = await notifyReviewNeeded(results);
+
     await db.update(cronJobStatuses).set({
       status,
       finishedAt,
@@ -106,12 +115,18 @@ async function runSync(request: NextRequest) {
       importedCount,
       needsReviewCount,
       message,
+      lastEmailError,
     }).where(eq(cronJobStatuses.job, "sync-fixtures"));
 
-    await notifyReviewNeeded(results);
-
     return NextResponse.json(
-      { status, recordedAt: new Date(finishedAt).toISOString(), importedCount, needsReviewCount, results },
+      {
+        status,
+        recordedAt: new Date(finishedAt).toISOString(),
+        importedCount,
+        needsReviewCount,
+        lastEmailError,
+        results,
+      },
       { headers: NO_STORE_HEADERS },
     );
   } catch (error) {

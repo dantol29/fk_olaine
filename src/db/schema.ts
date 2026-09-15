@@ -175,6 +175,12 @@ export const cronJobStatuses = sqliteTable("cron_job_statuses", {
    *  league source's "Ielādēt spēles" screen. */
   needsReviewCount: integer("needs_review_count").notNull().default(0),
   message: text("message"),
+  /** Why the "N games need review" notification email failed to send on
+   *  the last run, if it did — e.g. an SMTP auth error, or "not configured"
+   *  when the SMTP_* env vars are missing. Null when no email was needed,
+   *  or the last one sent successfully. Surfaced in the admin UI so this
+   *  doesn't require server log access to diagnose. */
+  lastEmailError: text("last_email_error"),
 });
 
 export const teamsRelations = relations(teams, ({ many }) => ({
