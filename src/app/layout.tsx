@@ -3,6 +3,7 @@ import { Caveat, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
 import { getSiteSettings } from "@/lib/site-settings";
+import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,7 +20,7 @@ const caveat = Caveat({
   subsets: ["latin", "latin-ext"],
 });
 
-const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
+const SITE_URL = getSiteUrl();
 const SITE_DESCRIPTION =
   "FK Olaine futbola kluba oficiālā mājaslapa, dibināts 2008. gadā. Komandas, treneri, spēles un jaunumi.";
 

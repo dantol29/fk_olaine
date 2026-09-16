@@ -17,7 +17,7 @@ export async function fetchLffHtml(url: string, resource: string): Promise<strin
         headers: {
           Accept: "text/html,application/xhtml+xml",
           "Accept-Language": "lv-LV,lv;q=0.9,en;q=0.7",
-          "User-Agent": "Mozilla/5.0 (compatible; FKOlaineSite/1.0; +https://fkolaine.lv)",
+          "User-Agent": "Mozilla/5.0 (compatible; FKOlaineSite/1.0; +https://fkolaine.com)",
         },
         signal: controller.signal,
       });

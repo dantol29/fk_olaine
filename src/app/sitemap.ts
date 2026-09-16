@@ -3,9 +3,10 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { articles, clubPages } from "@/db/schema";
+import { getSiteUrl } from "@/lib/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, changeFrequency: "daily", priority: 1 },

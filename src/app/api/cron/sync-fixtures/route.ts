@@ -6,6 +6,7 @@ import { cronJobStatuses, leagueSources } from "@/db/schema";
 import { syncLeagueSource, type ReviewNeededGame } from "@/lib/league-sync";
 import { sendNotificationEmail } from "@/lib/mailer";
 import { getSiteSettings } from "@/lib/site-settings";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ const NO_STORE_HEADERS = {
   Pragma: "no-cache",
 };
 
-const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
+const SITE_URL = getSiteUrl();
 
 /** Sends the "N games need review" email when there's anything to report.
  *  Returns the failure reason to persist in cronJobStatuses.lastEmailError,

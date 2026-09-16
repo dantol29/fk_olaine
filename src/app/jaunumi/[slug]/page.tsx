@@ -6,8 +6,9 @@ import { ArticleDetail } from "@/components/article-detail";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
+const SITE_URL = getSiteUrl();
 
 export async function generateMetadata({
   params,

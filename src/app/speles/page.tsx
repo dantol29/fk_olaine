@@ -6,8 +6,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAllGamesFromDb } from "@/lib/games-server";
 import { getLeagueStandingsForDisplay } from "@/lib/league-standings-server";
+import { getSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
+const SITE_URL = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "Spēles",
