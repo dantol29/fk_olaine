@@ -37,7 +37,7 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
               <span aria-hidden className="pointer-events-none absolute top-1/2 left-0 max-w-full -translate-y-1/2 overflow-hidden text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl">
                 {page.title}
               </span>
-              <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl">{page.title}</h1>
+              <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl lg:pl-4">{page.title}</h1>
             </div>
           </div>
         </section>

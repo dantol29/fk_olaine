@@ -29,7 +29,7 @@ export default async function TreneriPage() {
               >
                 Treneri
               </span>
-              <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl">
+              <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl lg:pl-4">
                 Treneri
               </h1>
             </div>

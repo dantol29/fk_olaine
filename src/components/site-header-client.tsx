@@ -143,7 +143,7 @@ export function SiteHeaderClient({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="flex items-center justify-center text-club-navy transition-colors hover:text-club-red"
+              className="flex -translate-y-0.5 items-center justify-center text-club-navy transition-colors hover:text-club-red"
             >
               <FacebookIcon className="h-8 w-8" />
             </a>

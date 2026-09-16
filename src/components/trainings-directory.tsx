@@ -110,7 +110,7 @@ export function TrainingsDirectory({
             >
               Treniņi
             </span>
-            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl">
+            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl lg:pl-4">
               Treniņi
             </h1>
           </div>

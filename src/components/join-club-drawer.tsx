@@ -34,11 +34,11 @@ export function JoinClubDrawer({
           </DrawerHeader>
           <DrawerFooter className="p-0 pt-4">
             <a
-              href="mailto:info@afaolaine.lv"
+              href="mailto:info@fkolaine.com"
               className="flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-sm font-semibold text-club-navy transition hover:bg-club-gray-light"
             >
               <Mail className="h-4 w-4 shrink-0 text-club-red" />
-              info@afaolaine.lv
+              info@fkolaine.com
             </a>
             <a
               href="tel:+37129332883"

@@ -91,7 +91,7 @@ export async function HomeTeamsSection({ panelClassName }: { panelClassName?: st
           >
             Komandas
           </span>
-          <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
+          <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl lg:pl-4">
             Komandas
           </h2>
         </div>

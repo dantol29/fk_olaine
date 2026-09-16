@@ -84,7 +84,7 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
             >
               Jaunumi
             </span>
-            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl">
+            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl lg:pl-4">
               Jaunumi
             </h1>
           </div>

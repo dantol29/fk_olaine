@@ -76,7 +76,7 @@ export async function HomeUpcomingTrainings() {
             >
               Treniņi
             </span>
-            <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
+            <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl lg:pl-4">
               Treniņi
             </h2>
           </div>

@@ -71,9 +71,6 @@ export function NewsCarousel({
           </p>
         </div>
 
-        <span className="absolute right-6 bottom-6 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-transparent text-white sm:right-8 sm:bottom-8 sm:flex">
-          <ArrowRight className="h-5 w-5" />
-        </span>
       </Link>
 
       {articles.length > 1 && (

@@ -27,7 +27,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   bankCode: "HABALV22",
   stadiumAddress: "Zeiferta 4, Olaine",
   phone: "+371 29332883",
-  email: "info@afaolaine.lv",
+  email: "info@fkolaine.com",
 };
 
 const SETTINGS_ID = 1;
@@ -40,7 +40,15 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       .select()
       .from(siteSettings)
       .where(eq(siteSettings.id, SETTINGS_ID));
-    if (row) return row;
+    if (row) {
+      return {
+        ...row,
+        email:
+          row.email === "info@afaolaine.lv"
+            ? DEFAULT_SITE_SETTINGS.email
+            : row.email,
+      };
+    }
 
     await db.insert(siteSettings).values({
       id: SETTINGS_ID,

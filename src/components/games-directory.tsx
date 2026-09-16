@@ -121,7 +121,7 @@ export function GamesDirectory({
             >
               Spēles
             </span>
-            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl">
+            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl lg:pl-4">
               Spēles
             </h1>
           </div>
