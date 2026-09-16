@@ -9,7 +9,6 @@ import { HomeTeamsSection } from "@/components/home-teams-section";
 import { HomeUpcomingGames } from "@/components/home-upcoming-games";
 import { HomeUpcomingTrainings } from "@/components/home-upcoming-trainings";
 import { JoinTeamCta } from "@/components/join-team-cta";
-import { PartnersBar } from "@/components/partners-bar";
 import { SiteFooter } from "@/components/site-footer";
 import { CoachesList } from "@/components/coaches-list";
 import { SiteHeader } from "@/components/site-header";
@@ -36,12 +35,7 @@ export default function Home() {
             <HomePollsSection />
           </div>
         </div>
-        <div className="px-6 pt-16 pb-10 sm:pt-20">
-          <div className="relative mx-auto max-w-[1440px]">
-            <PartnersBar />
-          </div>
-        </div>
-        <section className="px-6 pb-8 pt-4 sm:pt-8">
+        <section className="px-6 pb-8 pt-16 sm:pt-20">
           <div className="relative mx-auto max-w-[1440px]">
             <HomeTeamsSection />
 

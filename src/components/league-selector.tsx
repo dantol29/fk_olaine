@@ -41,7 +41,7 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
             >
               {activeLabel}
             </span>
-            <h3 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl lg:pl-4">
+            <h3 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl">
               {leagues[activeLeague]?.label ?? ""}
             </h3>
           </div>
