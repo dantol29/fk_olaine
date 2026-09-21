@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { CalendarDrawer } from "@/components/calendar-drawer";
 import { TrainingFixtureCard } from "@/components/training-fixture-card";
 import type { TrainingListItem } from "@/lib/trainings-server";
 
@@ -223,21 +223,17 @@ export function TrainingsMonthCalendar({
         })}
       </div>
 
-      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent className="border-none bg-transparent shadow-none">
-          <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-5 text-club-navy shadow-xl">
-            {selectedTrainings.length === 0 ? (
-              <p className="text-sm text-slate-400">Šajā dienā nav ieplānotu treniņu.</p>
-            ) : (
-              <div className="flex flex-col divide-y divide-slate-100 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
-                {selectedTrainings.map((training) => (
-                  <TrainingFixtureCard key={training.id} training={training} dimPast={false} />
-                ))}
-              </div>
-            )}
+      <CalendarDrawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        {selectedTrainings.length === 0 ? (
+          <p className="text-sm text-slate-400">Šajā dienā nav ieplānotu treniņu.</p>
+        ) : (
+          <div className="flex flex-col divide-y divide-slate-100 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
+            {selectedTrainings.map((training) => (
+              <TrainingFixtureCard key={training.id} training={training} dimPast={false} />
+            ))}
           </div>
-        </DrawerContent>
-      </Drawer>
+        )}
+      </CalendarDrawer>
     </div>
   );
 }

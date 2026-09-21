@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { CalendarDrawer } from "@/components/calendar-drawer";
 import { GameFixtureCard } from "@/components/game-fixture-card";
 import type { GameListItem } from "@/lib/games-server";
 
@@ -226,21 +226,17 @@ export function GamesMonthCalendar({
         })}
       </div>
 
-      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent className="border-none bg-transparent shadow-none">
-          <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-5 text-club-navy shadow-xl">
-            {selectedGames.length === 0 ? (
-              <p className="text-sm text-slate-400">Šajā dienā nav ieplānotu spēļu.</p>
-            ) : (
-              <div className="flex flex-col divide-y divide-slate-100 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
-                {selectedGames.map((game) => (
-                  <GameFixtureCard key={game.id} game={game} dimPast={false} />
-                ))}
-              </div>
-            )}
+      <CalendarDrawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        {selectedGames.length === 0 ? (
+          <p className="text-sm text-slate-400">Šajā dienā nav ieplānotu spēļu.</p>
+        ) : (
+          <div className="flex flex-col divide-y divide-slate-100 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
+            {selectedGames.map((game) => (
+              <GameFixtureCard key={game.id} game={game} dimPast={false} />
+            ))}
           </div>
-        </DrawerContent>
-      </Drawer>
+        )}
+      </CalendarDrawer>
     </div>
   );
 }

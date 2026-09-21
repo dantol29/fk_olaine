@@ -58,7 +58,7 @@ export function LeagueSelector({ leagues, compact = false, flushLeft = false }: 
           </a>
         </div>
 
-        <div className="league-scroll overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <div className="no-scrollbar overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
           <table className="w-full table-fixed border-collapse text-sm">
             <colgroup>
               <col className="w-10 sm:w-12" />

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import {
   CalendarDays,
   ChevronLeft,
@@ -10,14 +9,15 @@ import {
   Dumbbell,
   MapPin,
   Volleyball,
-  X,
 } from "lucide-react";
 
 import { OPEN_CALENDAR_EVENT_NAME } from "@/lib/calendar-bridge";
 import { cn } from "@/lib/utils";
 import type { CalendarEvent } from "@/lib/calendar";
-import { colorFor, initialsFor } from "@/lib/games";
 import { CalendarDatePicker } from "@/components/calendar-date-picker";
+import { CalendarDrawer } from "@/components/calendar-drawer";
+import { GameFixtureCard } from "@/components/game-fixture-card";
+import { TrainingFixtureCard } from "@/components/training-fixture-card";
 import {
   Select,
   SelectContent,
@@ -375,23 +375,76 @@ function EventCard({
   );
 }
 
-function TeamBadgeMini({ name, logo }: { name: string; logo: string | null }) {
+function CalendarEventDrawer({
+  event,
+  open,
+  onOpenChange,
+}: {
+  event: CalendarEvent | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  if (!event) {
+    return (
+      <CalendarDrawer open={open} onOpenChange={onOpenChange}>
+        {null}
+      </CalendarDrawer>
+    );
+  }
+
+  const style = EVENT_TYPE_STYLES[event.eventType];
+  const Icon = style.icon;
+
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
-      {logo ? (
-        <Image src={logo} alt={name} width={40} height={40} className="h-10 w-10 object-contain" />
+    <CalendarDrawer open={open} onOpenChange={onOpenChange}>
+      {event.gameFixture ? (
+        <GameFixtureCard game={event.gameFixture} dimPast={false} />
+      ) : event.trainingFixture ? (
+        <TrainingFixtureCard training={event.trainingFixture} dimPast={false} />
       ) : (
-        <div
-          className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-full text-[10px] font-extrabold text-white",
-            colorFor(name),
+        <>
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-full text-white",
+                style.accent,
+              )}
+            >
+              <Icon className="h-4 w-4" />
+            </span>
+            <span className="text-xs font-bold text-slate-400 uppercase">
+              {style.singular}
+            </span>
+          </div>
+          <h3 className="mt-5 text-2xl leading-tight font-bold text-club-navy">
+            {event.title}
+          </h3>
+          {event.team && (
+            <span className="mt-4 inline-flex rounded-full bg-slate-100 px-4 py-2 text-sm text-club-navy">
+              {event.team}
+            </span>
           )}
-        >
-          {initialsFor(name)}
-        </div>
+          <div className="mt-6 flex flex-col gap-3 text-sm text-slate-600">
+            <span className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 shrink-0 text-club-red" />
+              {event.weekdayLabel}, {event.dateLabel}
+            </span>
+            {!event.allDay && (
+              <span className="flex items-center gap-2">
+                <Clock className="h-4 w-4 shrink-0 text-club-red" />
+                {formatClockTime(event.start)} – {formatClockTime(event.end)}
+              </span>
+            )}
+            {event.location && (
+              <span className="flex items-start gap-2">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-club-red" />
+                <span>{event.location}</span>
+              </span>
+            )}
+            </div>
+        </>
       )}
-      <span className="line-clamp-2 text-[11px] leading-tight text-club-navy">{name}</span>
-    </div>
+    </CalendarDrawer>
   );
 }
 
@@ -1070,77 +1123,13 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
         })}
       </div>
 
-      {selectedEvent && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setSelectedEvent(null)}
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span
-                  className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-white",
-                    EVENT_TYPE_STYLES[selectedEvent.eventType].accent,
-                  )}
-                >
-                  {(() => {
-                    const Icon =
-                      EVENT_TYPE_STYLES[selectedEvent.eventType].icon;
-                    return <Icon className="h-4 w-4" />;
-                  })()}
-                </span>
-                <span className="text-xs font-bold text-slate-400 uppercase">
-                  {EVENT_TYPE_STYLES[selectedEvent.eventType].singular}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedEvent(null)}
-                aria-label="Aizvērt"
-                className="rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {selectedEvent.eventType === "game" &&
-            selectedEvent.homeTeam &&
-            selectedEvent.awayTeam ? (
-              <div className="mt-3 flex items-center justify-between gap-2">
-                <TeamBadgeMini name={selectedEvent.homeTeam} logo={selectedEvent.homeLogo ?? null} />
-                <span className="shrink-0 text-xs font-extrabold text-slate-300">VS</span>
-                <TeamBadgeMini name={selectedEvent.awayTeam} logo={selectedEvent.awayLogo ?? null} />
-              </div>
-            ) : (
-              <h3 className="mt-3 text-lg font-bold text-club-navy">{selectedEvent.title}</h3>
-            )}
-
-            <div className="mt-3 flex flex-col gap-2 text-sm text-slate-600">
-              <span className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 shrink-0 text-club-red" />
-                {selectedEvent.weekdayLabel}, {selectedEvent.dateLabel}
-              </span>
-              {!selectedEvent.allDay && (
-                <span className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 shrink-0 text-club-red" />
-                  {formatClockTime(selectedEvent.start)} –{" "}
-                  {formatClockTime(selectedEvent.end)}
-                </span>
-              )}
-              {selectedEvent.location && (
-                <span className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-club-red" />
-                  <span>{selectedEvent.location}</span>
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <CalendarEventDrawer
+        event={selectedEvent}
+        open={Boolean(selectedEvent)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedEvent(null);
+        }}
+      />
     </div>
   );
 }

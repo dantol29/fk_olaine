@@ -38,7 +38,7 @@ export default async function KomandasPage() {
 
         <section className="px-6 py-8">
           <div className="mx-auto max-w-[1440px]">
-            <HomeTeamsPanel teams={teams} bare />
+            <HomeTeamsPanel teams={teams} bare showTabs={false} />
           </div>
         </section>
       </main>

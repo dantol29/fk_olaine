@@ -1,8 +1,10 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { events, games, teams, trainings } from "@/db/schema";
+import { coaches, events, games, teams, trainingCoaches, trainings } from "@/db/schema";
 import { resolveClubLogos } from "@/lib/club-logos";
+import type { GameListItem } from "@/lib/games-server";
+import type { TrainingCoach, TrainingListItem } from "@/lib/trainings-server";
 
 export type CalendarEvent = {
   uid: string;
@@ -29,6 +31,10 @@ export type CalendarEvent = {
   awayTeam?: string;
   homeLogo?: string | null;
   awayLogo?: string | null;
+  /** The exact fixture data used by the games calendar drawer. */
+  gameFixture?: GameListItem;
+  /** The exact fixture data used by the trainings calendar drawer. */
+  trainingFixture?: TrainingListItem;
 };
 
 function capitalize(value: string) {
@@ -152,6 +158,22 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
     .innerJoin(teams, eq(trainings.teamId, teams.id))
     .where(and(gte(trainings.date, afterKey), lte(trainings.date, beforeKey)));
 
+  const coachRows = await db
+    .select({
+      trainingId: trainingCoaches.trainingId,
+      name: coaches.name,
+      photoUrl: coaches.photoUrl,
+    })
+    .from(trainingCoaches)
+    .innerJoin(coaches, eq(trainingCoaches.coachId, coaches.id));
+  const coachesByTraining = new Map<number, TrainingCoach[]>();
+  for (const coach of coachRows) {
+    const list = coachesByTraining.get(coach.trainingId) ?? [];
+    list.push({ name: coach.name, photoUrl: coach.photoUrl });
+    coachesByTraining.set(coach.trainingId, list);
+  }
+  const todayKey = toDateKey(new Date());
+
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
     const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
@@ -166,6 +188,19 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
       end,
       eventType: "training",
       team: row.teamName,
+      trainingFixture: {
+        id: row.id,
+        day: String(day).padStart(2, "0"),
+        month: formatLabels(start, false).monthLabel.toUpperCase(),
+        year: String(year),
+        rawDate: row.date,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        location: row.location,
+        teamName: row.teamName,
+        coaches: coachesByTraining.get(row.id) ?? [],
+        isPast: row.date < todayKey,
+      },
       ...formatLabels(start, false),
     };
   });
@@ -221,6 +256,7 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       startTime: games.startTime,
       endTime: games.endTime,
       location: games.location,
+      league: games.league,
       teamName: teams.name,
     })
     .from(games)
@@ -228,6 +264,7 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
     .where(and(gte(games.date, afterKey), lte(games.date, beforeKey)));
 
   const logos = await resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam]));
+  const todayKey = toDateKey(new Date());
 
   return rows.map((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
@@ -247,6 +284,21 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       awayTeam: row.awayTeam,
       homeLogo: logos.get(row.homeTeam) ?? null,
       awayLogo: logos.get(row.awayTeam) ?? null,
+      gameFixture: {
+        id: row.id,
+        day: String(day).padStart(2, "0"),
+        month: formatLabels(start, false).monthLabel.toUpperCase(),
+        year: String(year),
+        weekday: "",
+        time: row.startTime,
+        league: row.league ?? "Draudzības spēle",
+        home: row.homeTeam === "" ? { name: row.homeTeam } : { name: row.homeTeam, logo: logos.get(row.homeTeam) ?? undefined },
+        away: row.awayTeam === "" ? { name: row.awayTeam } : { name: row.awayTeam, logo: logos.get(row.awayTeam) ?? undefined },
+        venue: row.location,
+        teamName: row.teamName,
+        rawDate: row.date,
+        isPast: row.date < todayKey,
+      },
       ...formatLabels(start, false),
     };
   });

@@ -245,24 +245,7 @@ export function ArticleDetail({ article }: { article: Article }) {
         <div className="ml-[calc(50%-50vw)] grid w-screen max-w-[1440px] grid-cols-1 gap-8 sm:mx-auto sm:w-full lg:grid-cols-2 lg:items-start">
           <div className="min-w-0">
             <div className="rounded-t-[2rem] bg-white px-4 pt-8 pb-4 sm:rounded-[2rem] sm:p-10">
-              <nav className="mb-4 hidden items-center gap-1.5 text-xs font-medium text-slate-500 sm:flex">
-                <Link href="/" className="hover:text-club-navy">
-                  Sākums
-                </Link>
-                <span>›</span>
-                <Link href="/jaunumi" className="hover:text-club-navy">
-                  Jaunumi
-                </Link>
-                <span>›</span>
-                <span className="max-w-[240px] truncate text-club-navy">
-                  {article.title}
-                </span>
-              </nav>
-
               <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-club-red px-3 py-1 text-xs font-semibold text-white uppercase">
-                  {article.category}
-                </span>
                 {article.team && (
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-club-navy">
                     {article.team}
