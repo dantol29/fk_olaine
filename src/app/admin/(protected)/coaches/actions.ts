@@ -66,7 +66,8 @@ export async function createCoach(
   await syncCoachTeams(inserted.id, teamIds);
 
   revalidatePath("/admin/coaches");
-  revalidatePath("/treneri");
+  revalidatePath("/komandas");
+  revalidatePath("/");
   redirect("/admin/coaches");
 }
 
@@ -112,7 +113,8 @@ export async function updateCoach(
   await syncCoachTeams(id, teamIds);
 
   revalidatePath("/admin/coaches");
-  revalidatePath("/treneri");
+  revalidatePath("/komandas");
+  revalidatePath("/");
   redirect("/admin/coaches");
 }
 
@@ -127,5 +129,6 @@ export async function deleteCoach(id: number) {
 
   await db.delete(coaches).where(eq(coaches.id, id));
   revalidatePath("/admin/coaches");
-  revalidatePath("/treneri");
+  revalidatePath("/komandas");
+  revalidatePath("/");
 }

@@ -46,6 +46,7 @@ export async function createEvent(
 
   await db.insert(events).values({ ...parsed, createdAt: Date.now() });
   revalidatePath("/admin/events");
+  revalidatePath("/kalendars");
   redirect("/admin/events");
 }
 
@@ -61,6 +62,7 @@ export async function updateEvent(
 
   await db.update(events).set(parsed).where(eq(events.id, id));
   revalidatePath("/admin/events");
+  revalidatePath("/kalendars");
   redirect("/admin/events");
 }
 
@@ -69,4 +71,5 @@ export async function deleteEvent(id: number) {
 
   await db.delete(events).where(eq(events.id, id));
   revalidatePath("/admin/events");
+  revalidatePath("/kalendars");
 }

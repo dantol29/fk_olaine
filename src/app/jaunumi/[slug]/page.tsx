@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { getArticleBySlug } from "@/lib/jaunumi-server";
 import { ArticleDetail } from "@/components/article-detail";
+import { RelatedNews } from "@/components/related-news";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -67,13 +69,28 @@ export default async function ArticlePage({
 
   return (
     <>
-      <SiteHeader />
       <main className="bg-background">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
         />
+        <section aria-labelledby="article-title" className="home-hero-stage relative bg-club-navy">
+          <SiteHeader overlay />
+          <div className="home-hero-frame home-hero-news relative flex flex-col">
+            <div className="hero-news-slide relative flex flex-1 flex-col justify-end">
+              <Image src={article.image} alt="" fill preload sizes="100vw" className="object-cover" />
+              <div className="hero-photo-shade absolute inset-0" />
+              <div className="hero-news-content article-news-content relative z-10">
+                <p className="hero-news-meta mb-4 flex flex-wrap items-center gap-3 font-medium text-white/85">
+                  <span>{article.date}</span><span>{article.team ?? "Jaunumi"}</span>
+                </p>
+                <h1 id="article-title" className="text-white">{article.title}</h1>
+              </div>
+            </div>
+          </div>
+        </section>
         <ArticleDetail article={article} />
+        <RelatedNews slug={slug} />
       </main>
       <JoinTeamCta />
       <SiteFooter />

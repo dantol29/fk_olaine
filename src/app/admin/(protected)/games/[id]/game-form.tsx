@@ -9,6 +9,8 @@ type Game = {
   teamId: number;
   homeTeam: string;
   awayTeam: string;
+  homeScore: number | null;
+  awayScore: number | null;
   date: string;
   startTime: string;
   endTime: string;
@@ -76,6 +78,14 @@ export function GameForm(
           />
         </label>
       </div>
+
+      <fieldset className="mt-4">
+        <legend className="text-sm font-semibold text-club-navy">Rezultāts (nav obligāts)</legend>
+        <div className="mt-2 flex gap-4">
+          <label className="flex-1 text-sm text-club-navy">Mājinieki<input type="number" name="homeScore" min={0} step={1} defaultValue={game?.homeScore ?? ""} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2" /></label>
+          <label className="flex-1 text-sm text-club-navy">Viesi<input type="number" name="awayScore" min={0} step={1} defaultValue={game?.awayScore ?? ""} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2" /></label>
+        </div>
+      </fieldset>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">
         Datums

@@ -7,9 +7,11 @@ import { NewsCarousel } from "@/components/news-carousel";
 
 export async function HomeNewsCarousel({
   embedded = false,
+  featured = false,
   className,
 }: {
   embedded?: boolean;
+  featured?: boolean;
   className?: string;
 }) {
   const articles = await getArticles();
@@ -22,7 +24,7 @@ export async function HomeNewsCarousel({
   }));
 
   if (embedded) {
-    return <NewsCarousel articles={items} className={cn("min-h-0", className)} />;
+    return <NewsCarousel articles={items} featured={featured} className={cn("min-h-0", className)} />;
   }
 
   return (

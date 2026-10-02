@@ -4,10 +4,7 @@ import { UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getUpcomingBirthdays } from "@/lib/birthdays-server";
 
-/** Compact "Dzimšanas dienas" list for narrow sidebar columns (currently
- *  /treninji, under the month calendar) — the homepage's own carousel
- *  (birthdays-carousel.tsx) needs the full page width, so this is a
- *  separate, simpler presentation of the same data. */
+/** Birthday list below the training schedule. */
 export async function UpcomingBirthdays({ className }: { className?: string } = {}) {
   const birthdays = await getUpcomingBirthdays(3);
   if (birthdays.length === 0) return null;
@@ -15,11 +12,11 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
   return (
     <div
       className={cn(
-        "pt-4 pr-4 pb-4 pl-4 sm:rounded-2xl sm:bg-white sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        "bg-transparent text-black",
         className,
       )}
     >
-      <h3 className="text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">
+      <h3 className="text-3xl font-semibold uppercase sm:text-4xl">
         Dzimšanas dienas
       </h3>
 
@@ -33,7 +30,7 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
             >
               <div
                 className={cn(
-                  "relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28",
+                  "relative size-16 shrink-0 overflow-hidden bg-white sm:size-20",
                   isToday && "ring-2 ring-club-red/40",
                 )}
               >
@@ -42,7 +39,7 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
                     src={player.photoUrl}
                     alt={player.name}
                     fill
-                    sizes="(min-width: 640px) 112px, 96px"
+                    sizes="(min-width: 640px) 80px, 64px"
                     className="object-cover"
                   />
                 ) : (
@@ -53,18 +50,18 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate text-lg font-semibold text-club-navy">{player.name}</p>
+                <p className="truncate text-lg font-semibold text-black">{player.name}</p>
                 {player.teamName && (
                   <p className="truncate text-sm text-slate-400">{player.teamName}</p>
                 )}
               </div>
 
               {player.daysUntil === 0 ? (
-                <span className="shrink-0 rounded-full bg-club-red px-2.5 py-1 text-xs font-semibold text-white">
+                <span className="shrink-0 bg-club-red px-2.5 py-1 text-xs font-semibold text-white">
                   Šodien!
                 </span>
               ) : (
-                <span className="shrink-0 text-sm font-semibold text-club-navy">
+                <span className="shrink-0 text-sm font-semibold text-black">
                   {String(player.birthDay).padStart(2, "0")}.{String(player.birthMonth).padStart(2, "0")}.
                   {player.birthYear}
                 </span>

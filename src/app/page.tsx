@@ -11,7 +11,6 @@ import { HomeUpcomingTrainings } from "@/components/home-upcoming-trainings";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { CoachesList } from "@/components/coaches-list";
-import { SiteHeader } from "@/components/site-header";
 import { TopScorersList } from "@/components/top-scorers-list";
 import { UpcomingBirthdays } from "@/components/upcoming-birthdays";
 
@@ -25,7 +24,6 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <SiteHeader />
       <main className="bg-background">
         <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />

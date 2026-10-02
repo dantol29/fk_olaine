@@ -11,10 +11,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, changeFrequency: "daily", priority: 1 },
     { url: `${siteUrl}/komandas`, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${siteUrl}/treneri`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${siteUrl}/speles`, changeFrequency: "daily", priority: 0.7 },
     { url: `${siteUrl}/treninji`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${siteUrl}/jaunumi`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${siteUrl}/kontakti`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${siteUrl}/kalendars`, changeFrequency: "daily", priority: 0.6 },
   ];
 
   const [rows, pageRows] = await Promise.all([

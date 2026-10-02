@@ -25,7 +25,7 @@ export function CoachesListView({ coaches }: { coaches: Coach[] }) {
       gridClassName="flex flex-col divide-y divide-slate-100"
       collapsedClassName="max-h-[19rem] sm:max-h-[21rem]"
       fadeFromClassName="from-white"
-      moreHref="/treneri"
+      moreHref="/komandas#roster-staff"
     >
       {coaches.map((coach) => (
         <div key={coach.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">

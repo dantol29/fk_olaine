@@ -257,6 +257,8 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       endTime: games.endTime,
       location: games.location,
       league: games.league,
+      homeScore: games.homeScore,
+      awayScore: games.awayScore,
       teamName: teams.name,
     })
     .from(games)
@@ -291,6 +293,9 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
         year: String(year),
         weekday: "",
         time: row.startTime,
+        endTime: row.endTime,
+        homeScore: row.homeScore,
+        awayScore: row.awayScore,
         league: row.league ?? "Draudzības spēle",
         home: row.homeTeam === "" ? { name: row.homeTeam } : { name: row.homeTeam, logo: logos.get(row.homeTeam) ?? undefined },
         away: row.awayTeam === "" ? { name: row.awayTeam } : { name: row.awayTeam, logo: logos.get(row.awayTeam) ?? undefined },

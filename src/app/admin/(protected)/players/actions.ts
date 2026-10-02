@@ -8,9 +8,14 @@ import { db } from "@/db/client";
 import { playerTeams, players } from "@/db/schema";
 import { requireAdminSession } from "@/lib/auth";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
+import { isNationality } from "@/lib/nationality";
 
 function parsePlayerInput(formData: FormData) {
+  const nationality = String(formData.get("nationality") ?? "LV").trim().toUpperCase() || "LV";
+  if (!isNationality(nationality)) return { error: "Nederīga pilsonība." } as const;
   const name = String(formData.get("name") ?? "").trim();
+  const position = String(formData.get("position") ?? "").trim() || null;
+  if (position && !["goalkeeper", "defender", "midfielder", "forward"].includes(position)) return { error: "Nederīga spēlētāja pozīcija." } as const;
   const birthdate = String(formData.get("birthdate") ?? "").trim();
   const teamIds = formData.getAll("teamIds").map(Number).filter((n) => Number.isFinite(n));
   const numberRaw = String(formData.get("number") ?? "").trim();
@@ -31,7 +36,7 @@ function parsePlayerInput(formData: FormData) {
     teamGoals.set(teamId, Number.isFinite(raw) && raw >= 0 ? Math.trunc(raw) : 0);
   }
 
-  return { name, birthdate, teamGoals, number } as const;
+  return { name, birthdate, teamGoals, number, position, nationality } as const;
 }
 
 async function syncPlayerTeams(playerId: number, teamGoals: Map<number, number>) {

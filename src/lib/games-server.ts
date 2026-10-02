@@ -1,9 +1,9 @@
 import "server-only";
 import { cache } from "react";
-import { eq, gte } from "drizzle-orm";
+import { and, eq, gt, gte, inArray, or } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { games as gamesTable, teams as teamsTable } from "@/db/schema";
+import { games as gamesTable, leagueSources, teams as teamsTable } from "@/db/schema";
 import { toDateKey } from "@/lib/calendar";
 import { resolveClubLogos } from "@/lib/club-logos";
 import { colorFor, initialsFor, MONTHS, type Team, type UpcomingGame } from "@/lib/games";
@@ -33,6 +33,38 @@ function weekdayAbbrFor(dateKey: string): string {
     .toLowerCase();
   return WEEKDAY_ABBR[weekday] ?? "";
 }
+
+export type HeaderMatch = { home: Team; away: Team; label: string; date: string; time: string; venue: string };
+
+export const getNextMatch = cache(async function getNextMatch(): Promise<HeaderMatch | null> {
+  try {
+    const now = new Date();
+    const today = toDateKey(now);
+    const time = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    }).format(now);
+    const [game] = await db.select({
+      home: gamesTable.homeTeam, away: gamesTable.awayTeam,
+      date: gamesTable.date, time: gamesTable.startTime, team: teamsTable.name, venue: gamesTable.location,
+    }).from(gamesTable).innerJoin(teamsTable, eq(gamesTable.teamId, teamsTable.id))
+      .where(or(gt(gamesTable.date, today), and(eq(gamesTable.date, today), gte(gamesTable.startTime, time))))
+      .orderBy(gamesTable.date, gamesTable.startTime).limit(1);
+    if (!game) return null;
+    const [, month, day] = game.date.split("-");
+    const displayDate = `${Number(day)}. ${["jan", "feb", "mar", "apr", "mai", "jūn", "jūl", "aug", "sep", "okt", "nov", "dec"][Number(month) - 1]}`;
+    const logos = await resolveClubLogos([game.home, game.away]);
+    return {
+      home: teamDisplay(game.home, logos.get(game.home) ?? null),
+      away: teamDisplay(game.away, logos.get(game.away) ?? null),
+      date: displayDate,
+      time: game.time,
+      venue: game.venue,
+      label: `${game.home} – ${game.away} (${game.team}) · ${day}.${month}. ${game.time}`,
+    };
+  } catch {
+    return null;
+  }
+});
 
 /** The club's own upcoming games, pulled straight from the `games` DB table.
  *  Shared by the homepage showcase and the article "Nākamā spēle" widget so
@@ -73,6 +105,10 @@ export const getUpcomingGamesFromDb = cache(async function getUpcomingGamesFromD
 });
 
 export type GameListItem = UpcomingGame & {
+  endTime?: string;
+  fixturesUrl?: string | null;
+  homeScore?: number | null;
+  awayScore?: number | null;
   /** Which of the club's own teams plays this fixture (e.g. "U14", "Sieviešu 1"). */
   teamName: string;
   /** "YYYY-MM-DD" — used for calendar-grid placement. */
@@ -88,10 +124,14 @@ export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promi
     const rows = await db
       .select({
         id: gamesTable.id,
+        teamId: gamesTable.teamId,
         homeTeam: gamesTable.homeTeam,
         awayTeam: gamesTable.awayTeam,
+        homeScore: gamesTable.homeScore,
+        awayScore: gamesTable.awayScore,
         date: gamesTable.date,
         startTime: gamesTable.startTime,
+        endTime: gamesTable.endTime,
         location: gamesTable.location,
         league: gamesTable.league,
         teamName: teamsTable.name,
@@ -100,10 +140,15 @@ export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promi
       .innerJoin(teamsTable, eq(gamesTable.teamId, teamsTable.id))
       .orderBy(gamesTable.date, gamesTable.startTime);
 
-    const logos = await resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam]));
+    const [logos, sources] = await Promise.all([
+      resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam])),
+      rows.length > 0 ? db.select({ teamId: leagueSources.teamId, label: leagueSources.label, url: leagueSources.url }).from(leagueSources).where(inArray(leagueSources.teamId, [...new Set(rows.map((row) => row.teamId))])) : Promise.resolve([]),
+    ]);
 
     return rows.map((row) => {
       const [year, month, day] = row.date.split("-").map(Number);
+      const teamSources = sources.filter((source) => source.teamId === row.teamId);
+      const source = teamSources.find((source) => source.label === row.league) ?? (teamSources.length === 1 ? teamSources[0] : undefined);
       return {
         id: row.id,
         day: String(day).padStart(2, "0"),
@@ -111,6 +156,10 @@ export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promi
         year: String(year),
         weekday: weekdayAbbrFor(row.date),
         time: row.startTime,
+        endTime: row.endTime,
+        fixturesUrl: source?.url ?? null,
+        homeScore: row.homeScore,
+        awayScore: row.awayScore,
         league: row.league ?? "Draudzības spēle",
         home: teamDisplay(row.homeTeam, logos.get(row.homeTeam) ?? null),
         away: teamDisplay(row.awayTeam, logos.get(row.awayTeam) ?? null),

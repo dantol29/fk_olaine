@@ -17,9 +17,6 @@ type Article = {
   authorCoachId: number | null;
   image: string;
   body: string;
-  quoteText: string | null;
-  quoteAuthor: string | null;
-  quoteRole: string | null;
   highlights: string | null;
 };
 type TeamOption = { id: number; name: string };
@@ -163,38 +160,6 @@ export function ArticleForm(
         />
       </label>
 
-      <fieldset className="mt-4 rounded-lg border border-slate-200 p-3">
-        <legend className="px-1 text-sm font-semibold text-club-navy">
-          Citāts (nav obligāts)
-        </legend>
-        <label className="block text-sm text-club-navy">
-          Teksts
-          <textarea
-            name="quoteText"
-            rows={2}
-            defaultValue={article?.quoteText ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-          />
-        </label>
-        <label className="mt-2 block text-sm text-club-navy">
-          Autors
-          <input
-            type="text"
-            name="quoteAuthor"
-            defaultValue={article?.quoteAuthor ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-          />
-        </label>
-        <label className="mt-2 block text-sm text-club-navy">
-          Amats
-          <input
-            type="text"
-            name="quoteRole"
-            defaultValue={article?.quoteRole ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
-          />
-        </label>
-      </fieldset>
 
       <div className="mt-4">
         <span className="block text-sm font-semibold text-club-navy">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { JaunumiDirectory } from "@/components/jaunumi-directory";
+import { FeaturedNews } from "@/components/featured-news";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -20,6 +21,7 @@ export default async function JaunumiPage() {
     <>
       <SiteHeader />
       <main className="bg-background">
+        <FeaturedNews articles={articles.slice(0, 4)} />
         <JaunumiDirectory articles={articles} />
       </main>
       <JoinTeamCta />

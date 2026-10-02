@@ -26,9 +26,6 @@ function rowToArticle(row: ArticleRow, teamName: string | null, authorCoach: Aut
     authorPosition: authorCoach?.position ?? undefined,
     authorAvatar: authorCoach?.photoUrl ?? undefined,
     body: row.body.split("\n").filter(Boolean),
-    quote: row.quoteText
-      ? { text: row.quoteText, author: row.quoteAuthor ?? "", role: row.quoteRole ?? "" }
-      : undefined,
     highlights: highlights && highlights.length > 0 ? highlights : undefined,
   };
 }

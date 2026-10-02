@@ -5,12 +5,6 @@ export type ArticleCategory =
   | "Treniņi"
   | "Pasākumi";
 
-export type ArticleQuote = {
-  text: string;
-  author: string;
-  role: string;
-};
-
 export type Article = {
   slug: string;
   title: string;
@@ -23,7 +17,6 @@ export type Article = {
   authorPosition?: string;
   authorAvatar?: string;
   body: string[];
-  quote?: ArticleQuote;
   highlights?: string[];
 };
 

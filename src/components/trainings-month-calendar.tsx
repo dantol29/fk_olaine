@@ -46,9 +46,7 @@ export function TrainingsMonthCalendar({
   /** The date currently shown in the desktop left-side list (see
    *  TrainingsDirectory) — highlighted here so the two stay visually linked. */
   activeDateKey?: string | null;
-  /** Desktop (lg+): clicking a day reports it here instead of opening the
-   *  mobile drawer, so TrainingsDirectory can show that day's trainings in
-   *  its left column. */
+  /** Clicking a training date reports it here instead of opening the detail drawer. */
   onSelectDate?: (dateKey: string) => void;
   /** Extra classes merged onto the root — lets callers override the default
    *  lg:rounded-b-none or stretch/match height elsewhere. */
@@ -75,13 +73,6 @@ export function TrainingsMonthCalendar({
     const now = new Date();
     return toDateKey(now.getFullYear(), now.getMonth(), now.getDate());
   }, []);
-
-  const nextFixtureKey = useMemo(() => {
-    const upcoming = trainings
-      .filter((training) => !training.isPast)
-      .sort((a, b) => a.rawDate.localeCompare(b.rawDate));
-    return upcoming[0]?.rawDate ?? null;
-  }, [trainings]);
 
   const { year, month } = cursor;
   const firstWeekdayIndex = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
@@ -124,7 +115,7 @@ export function TrainingsMonthCalendar({
   return (
     <div
       className={cn(
-        "ml-[calc(50%-50vw)] w-screen rounded-2xl bg-club-navy pt-6 pr-4 pb-4 pl-6 text-white sm:ml-0 sm:w-full sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8 lg:rounded-b-none",
+        "ml-[calc(50%-50vw)] w-screen rounded-2xl bg-club-navy pt-6 pr-4 pb-4 pl-6 text-white sm:ml-0 sm:w-full sm:min-w-0 sm:max-w-full sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8 lg:rounded-b-none",
         className,
       )}
     >
@@ -135,7 +126,7 @@ export function TrainingsMonthCalendar({
             type="button"
             onClick={() => goToMonth(-1)}
             aria-label="Iepriekšējais mēnesis"
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10"
+            className="flex h-10 w-10 items-center justify-center rounded-none border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -143,7 +134,7 @@ export function TrainingsMonthCalendar({
             type="button"
             onClick={() => goToMonth(1)}
             aria-label="Nākamais mēnesis"
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10"
+            className="flex h-10 w-10 items-center justify-center rounded-none border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -161,20 +152,18 @@ export function TrainingsMonthCalendar({
           const dateKey = toDateKey(cell.year, cell.month, cell.day);
           const dayTrainings = cell.muted ? [] : (trainingsByDate.get(dateKey) ?? []);
           const hasTrainings = dayTrainings.length > 0;
-          const isNextFixture = !cell.muted && dateKey === nextFixtureKey;
           const isToday = !cell.muted && dateKey === todayKey;
           const isActive = !cell.muted && dateKey === activeDateKey;
-          const showDot = hasTrainings && !isNextFixture;
+          const showDot = hasTrainings;
 
           const number = (
             <span
               className={cn(
                 "flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold transition sm:h-11 sm:w-11 sm:text-xl",
                 cell.muted && "text-white/20",
-                !cell.muted && !isNextFixture && !isToday && "text-white",
-                isToday && !isNextFixture && "bg-club-navy-light/70 text-white",
-                isNextFixture && "bg-club-red text-white",
-                isActive && "ring-2 ring-white ring-offset-2 ring-offset-club-navy",
+                !cell.muted && !isToday && "text-white",
+                isToday && "bg-club-navy-light/70 text-white",
+                isActive && "bg-club-red text-white",
               )}
             >
               {cell.day}
@@ -207,7 +196,7 @@ export function TrainingsMonthCalendar({
               key={`${cell.year}-${cell.month}-${index}`}
               type="button"
               onClick={() => {
-                if (onSelectDate && window.matchMedia("(min-width: 1024px)").matches) {
+                if (onSelectDate) {
                   onSelectDate(dateKey);
                   return;
                 }

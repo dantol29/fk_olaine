@@ -173,11 +173,10 @@ export function HomeTeamsPanel({
   teams: Team[];
   bare?: boolean;
   className?: string;
-  /** Which tab is active on first render — e.g. /treneri wants "coaches"
-   *  active by default instead of "players". */
+  /** Which tab is active on first render. */
   defaultTab?: TabKey;
   /** Hides the Spēlētāji/Treneri/Spēles/Treniņi tab pills, locking the
-   *  view to defaultTab — e.g. /treneri only ever shows coaches. */
+   *  view to defaultTab. */
   showTabs?: boolean;
 }) {
   const [activeTeamId, setActiveTeamId] = useState(teams[0]?.id ?? null);

@@ -20,6 +20,16 @@
 .rich-page-content a { color: var(--color-club-red); text-decoration: underline; text-underline-offset: 3px; }
 .rich-text-editor p.is-editor-empty:first-child::before { float: left; height: 0; color: #94a3b8; content: attr(data-placeholder); pointer-events: none; }
 
+.club-page-content h2 { color: #000; font-size: 1.65em; font-weight: 600; line-height: 1.2; text-transform: uppercase; }
+.club-page-content h3 { color: #000; font-size: 1.25em; font-weight: 600; }
+.club-page-content > :first-child { margin-top: 0; }
+.club-page-content blockquote { border-left-color: #000; color: #222; }
+.club-page-content img { max-width: 100%; height: auto; border-radius: 0; }
+.club-page-content table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.club-page-content th, .club-page-content td { border-bottom: 1px solid #e8e8e8; padding: 0.75em; text-align: left; }
+.club-page-content th { border-block: 2px solid #000; color: #000; font-weight: 600; }
+
+
 /* Safari can briefly paint crossfading image layers outside an overflow-hidden
  * border radius while the page scrolls. A masked compositor layer keeps the
  * article gallery clipped for the entire transition. */
@@ -40,7 +50,7 @@
   --color-club-navy-light: var(--club-navy-light);
   --color-club-gray-light: var(--club-gray-light);
   --color-club-muted: var(--club-muted);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-outfit), sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --font-signature: var(--font-caveat);
@@ -195,61 +205,15 @@
   }
 }
 
-@keyframes league-row-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.league-row-enter {
-  animation: league-row-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .league-row-enter {
-    animation: none;
-  }
-}
-
-/** Fades the news carousel's title/excerpt in on slide change, synced with
- *  the photo's own crossfade (same duration/curve) so the two halves of
- *  the card change together instead of the text popping instantly. */
-@keyframes news-text-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.news-text-fade-in {
-  animation: news-text-fade-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .news-text-fade-in {
-    animation: none;
-  }
-}
-
 /** Reveals each poll result row (label + bar) once the visitor votes —
  *  staggered per row via an inline animation-delay so the list cascades in
- *  instead of popping all at once. Same curve/duration as the news
- *  carousel's text fade for a consistent feel across the site. */
+ *  instead of popping all at once. */
 @keyframes poll-result-enter {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -298,4 +262,149 @@
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Compact two-row club header, following the supplied reference. */
+.club-masthead-light {
+  position: relative;
+  background: black;
+  color: white;
+  border-bottom: 0;
+}
+.club-compact-header { visibility: hidden; transform: translateY(-100%); transition: transform 200ms ease, visibility 200ms; }
+.club-compact-header[data-visible] { visibility: visible; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .club-compact-header { transition: none; }
+}
+.club-masthead-light .club-masthead-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 18px clamp(24px, 3vw, 64px) 8px;
+}
+.club-masthead-light .club-crest-badge {
+  grid-column: 1;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  justify-self: start;
+  color: inherit;
+}
+.club-masthead-light .club-crest-badge img { height: 76px; width: auto; object-fit: contain; }
+.club-header-name { font-size: 32px; line-height: 1; font-weight: 600; letter-spacing: -.025em; }
+.club-header-navigation-row {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  justify-self: start;
+  max-width: 100%;
+  width: 100%;
+}
+.club-masthead-light .club-masthead-nav { min-width: 0; }
+.club-masthead-light .club-masthead-nav > ul { flex-wrap: wrap; justify-content: flex-start; column-gap: 12px; row-gap: 0; }
+.club-masthead-light .club-masthead-nav > ul > li > a,
+.club-masthead-light .club-masthead-nav > ul > li > button {
+  height: 52px;
+  border-radius: 0;
+  padding-inline: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: inherit;
+}
+.club-masthead-light .club-masthead-actions { position: relative; grid-column: 2; grid-row: 1; align-self: start; }
+.club-masthead-light .club-masthead-actions > button { color: inherit; }
+.club-masthead-light .club-masthead-actions > button { width: 52px; height: 52px; }
+.club-masthead-light .club-masthead-actions > button svg { width: 26px; height: 26px; }
+.club-masthead-light .club-header-menu { width: 44px; height: 44px; margin-left: -6px; color: inherit; }
+.club-masthead-light .club-header-menu svg { width: 26px; height: 26px; }
+.club-masthead-light .club-header-join { padding-inline: 8px; color: inherit; }
+.club-masthead-light .club-header-menu:hover,
+.club-masthead-light .club-header-join:hover,
+.club-masthead-light .club-masthead-nav > ul > li > a:hover,
+.club-masthead-light .club-masthead-nav > ul > li > button:hover { background: rgb(255 255 255 / .1); }
+.club-masthead-light .club-masthead-inner :focus-visible { outline-color: white; }
+.club-masthead-light .club-header-account :focus-visible { outline-color: black; }
+.club-masthead-light[data-over-hero] {
+  position: absolute;
+  inset: 0 0 auto;
+  background: transparent;
+  color: white;
+  border: 0;
+}
+.club-masthead-light[data-over-hero] .club-header-menu:hover,
+.club-masthead-light[data-over-hero] .club-header-join:hover,
+.club-masthead-light[data-over-hero] .club-masthead-nav > ul > li > a:hover,
+.club-masthead-light[data-over-hero] .club-masthead-nav > ul > li > button:hover { background: rgb(255 255 255 / .1); color: white; }
+.club-masthead-light[data-over-hero] .club-masthead-inner :focus-visible { outline-color: white; }
+@media (max-width: 639px) {
+  .club-header-name { font-size: 26px; }
+  .club-masthead-light .club-crest-badge img { height: 60px; width: auto; }
+}
+
+.home-hero-frame { min-height: max(640px, 100svh); }
+.home-hero-news > .hero-news-slide {
+  padding: 208px clamp(24px, 2.5vw, 64px) 32px;
+}
+.hero-photo-shade {
+  background: linear-gradient(180deg, rgb(0 0 0 / .7), transparent 180px), linear-gradient(0deg, rgb(0 0 0 / .75), transparent 60%), linear-gradient(90deg, rgb(0 0 0 / .2), transparent 65%);
+}
+.hero-news-content { width: min(100%, 900px); max-width: 900px; }
+.hero-news-content h2,
+.hero-news-content h1 {
+  max-width: 850px;
+  font-size: clamp(40px, 3.5vw, 72px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+}
+.article-news-content { width: 100%; max-width: none; }
+.article-news-content h1 { max-width: 1000px; }
+.hero-news-content > p:not(.hero-news-meta) {
+  max-width: 850px;
+  font-size: clamp(18px, 1.1vw, 20px);
+  line-height: 1.5;
+}
+.hero-news-content .hero-news-meta { font-size: 14px; line-height: 1.5; }
+.hero-news-read { border-radius: 0; font-size: 14px; }
+.hero-standings > div {
+  background: rgb(6 16 24 / .94);
+  color: white;
+  border: 1px solid rgb(255 255 255 / .14);
+  border-radius: 6px;
+  padding: 24px;
+}
+.hero-standings h3 { color: white; text-transform: uppercase; }
+.hero-standings a { color: rgb(255 255 255 / .88); }
+.hero-standings a > span { background: transparent; }
+.hero-standings button { background: rgb(255 255 255 / .08); color: white; }
+.hero-standings button:hover { background: rgb(255 255 255 / .16); }
+.hero-standings button[aria-pressed="true"] { background: var(--club-red); color: white; }
+.hero-standings :focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.hero-league-table thead { background: #08121b; color: rgb(255 255 255 / .72); }
+.hero-league-table th { padding-block: 12px; font-weight: 600; text-transform: uppercase; font-size: 10px; }
+.hero-league-table td { height: 60px; padding-block: 10px; border-top: 1px solid rgb(255 255 255 / .1); color: rgb(255 255 255 / .9); }
+.hero-league-table tr[data-club] { background: rgb(201 0 53 / .24); }
+.hero-league-table tr[data-club] td:first-child,
+.hero-league-table tr[data-club] td:last-child { color: #ff7c9e; }
+.hero-league-table tr[data-club] td:first-child { border-radius: 6px 0 0 6px; }
+.hero-league-table tr[data-club] td:last-child { border-radius: 0 6px 6px 0; }
+@media (min-width: 768px) {
+  .home-hero-news > .hero-news-slide { padding-bottom: 32px; }
+}
+@media (max-width: 639px) {
+  .hero-standings > div { padding: 20px 12px; }
+  .hero-league-table { min-width: 440px; }
+  .hero-standings [role="region"] {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / .35) transparent;
+  }
+  .hero-standings [role="region"]::-webkit-scrollbar { display: block; height: 6px; }
+  .hero-league-table td { height: 56px; }
+  .hero-league-table td:nth-child(2) span { font-size: 10px; }
 }

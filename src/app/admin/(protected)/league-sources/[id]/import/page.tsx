@@ -76,6 +76,8 @@ export default async function AdminLeagueSourceImportPage({
       date: games.date,
       homeTeam: games.homeTeam,
       awayTeam: games.awayTeam,
+      homeScore: games.homeScore,
+      awayScore: games.awayScore,
       startTime: games.startTime,
       location: games.location,
     })
@@ -92,7 +94,8 @@ export default async function AdminLeagueSourceImportPage({
     const fixtureLocation = fixture.stadium || "Nav norādīts";
     const differs =
       existing !== undefined &&
-      (existing.startTime !== fixture.time || existing.location !== fixtureLocation);
+      (existing.startTime !== fixture.time || existing.location !== fixtureLocation ||
+        (fixture.played && (existing.homeScore !== fixture.homeScore || existing.awayScore !== fixture.awayScore)));
     return { fixture, existing, alreadyImported, differs };
   });
 
@@ -104,6 +107,8 @@ export default async function AdminLeagueSourceImportPage({
       id: row.existing!.id,
       startTime: row.fixture.time as string,
       location: row.fixture.stadium || "Nav norādīts",
+      homeScore: row.fixture.homeScore,
+      awayScore: row.fixture.awayScore,
     }));
 
   const boundConfirm = confirmImport.bind(null, source.teamId, source.label);
@@ -120,7 +125,7 @@ export default async function AdminLeagueSourceImportPage({
       {differingCount > 0 && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">
           <p>
-            {differingCount} jau importētām spēlēm LFF tagad rāda citu laiku vai stadionu, nekā
+            {differingCount} jau importētām spēlēm LFF tagad rāda citu laiku, stadionu vai rezultātu, nekā
             saglabāts datubāzē (veco vērtību redzi zemāk pasvītrotu).
           </p>
           <form action={boundApplyLffChanges}>
@@ -149,6 +154,7 @@ export default async function AdminLeagueSourceImportPage({
                 <th className="p-4 font-semibold">Laiks</th>
                 <th className="p-4 font-semibold">Mājinieki</th>
                 <th className="p-4 font-semibold">Viesi</th>
+                <th className="p-4 font-semibold">Rezultāts</th>
                 <th className="p-4 font-semibold">Stadions</th>
                 <th className="p-4 font-semibold">Statuss</th>
               </tr>
@@ -180,6 +186,8 @@ export default async function AdminLeagueSourceImportPage({
                           date: fixture.date,
                           startTime: fixture.time,
                           location: fixtureLocation,
+                          homeScore: fixture.homeScore,
+                          awayScore: fixture.awayScore,
                         })}
                       />
                     </td>
@@ -196,6 +204,10 @@ export default async function AdminLeagueSourceImportPage({
                     </td>
                     <td className="p-4 text-slate-500">{fixture.home}</td>
                     <td className="p-4 text-slate-500">{fixture.away}</td>
+                    <td className="p-4 text-slate-500">
+                      {fixture.played ? `${fixture.homeScore} : ${fixture.awayScore}` : "—"}
+                      {existing && fixture.played && (existing.homeScore !== fixture.homeScore || existing.awayScore !== fixture.awayScore) && <span className="ml-2 text-slate-400 line-through">{existing.homeScore ?? "—"} : {existing.awayScore ?? "—"}</span>}
+                    </td>
                     <td className="p-4 text-slate-500">
                       {locationDiffers && (
                         <span className="mr-1.5 text-slate-400 line-through">

@@ -56,6 +56,8 @@ export async function getTeamsRoster() {
         photoUrl: player.photoUrl,
         birthdate: player.birthdate,
         number: player.number,
+        position: player.position,
+        nationality: player.nationality,
         teams: goalsByPlayerId.get(player.id) ?? [],
       })),
     coaches: team.coachTeams

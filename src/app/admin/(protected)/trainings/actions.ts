@@ -60,6 +60,7 @@ export async function createTraining(
   await syncTrainingCoaches(inserted.id, coachIds);
 
   revalidatePath("/admin/trainings");
+  revalidatePath("/kalendars");
   revalidatePath("/treninji");
   redirect("/admin/trainings");
 }
@@ -79,6 +80,7 @@ export async function updateTraining(
   await syncTrainingCoaches(id, coachIds);
 
   revalidatePath("/admin/trainings");
+  revalidatePath("/kalendars");
   revalidatePath("/treninji");
   redirect("/admin/trainings");
 }
@@ -88,5 +90,6 @@ export async function deleteTraining(id: number) {
 
   await db.delete(trainings).where(eq(trainings.id, id));
   revalidatePath("/admin/trainings");
+  revalidatePath("/kalendars");
   revalidatePath("/treninji");
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Image from "next/image";
 
 import { createLeagueSource, updateLeagueSource } from "../actions";
 
@@ -8,6 +9,7 @@ type LeagueSource = {
   id: number;
   teamId: number;
   label: string;
+  logoUrl: string | null;
   url: string;
   standingsUrl: string | null;
   topScorersUrl: string | null;
@@ -42,6 +44,20 @@ export function LeagueSourceForm(
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
       </label>
+
+      <div className="mt-4">
+        <label className="block text-sm font-semibold text-club-navy">
+          Līgas logo (nav obligāts)
+          <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" className="mt-2 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2" />
+        </label>
+        <p className="mt-2 text-xs text-slate-400">JPEG, PNG vai WebP, līdz 5 MB. Ja logo nav pievienots, tabulā parādās FK Olaine logo.</p>
+        {source?.logoUrl && (
+          <div className="mt-3">
+            <Image src={source.logoUrl} alt={source.label} width={80} height={80} className="size-20 object-contain" />
+            <label className="mt-2 flex items-center gap-2 text-sm text-club-navy"><input type="checkbox" name="removeLogo" />Noņemt logo</label>
+          </div>
+        )}
+      </div>
 
       <label className="mt-4 block text-sm font-semibold text-club-navy">
         Komanda

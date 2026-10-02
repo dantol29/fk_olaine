@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "flagcdn.com",
+        pathname: "/w80/**",
+      },
+      {
+        protocol: "https",
         hostname: "picsum.photos",
       },
       {

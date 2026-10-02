@@ -1,7 +1,7 @@
 "use client";
 
 import { Mail, Phone } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import {
   Drawer,
@@ -16,14 +16,20 @@ import {
 export function JoinClubDrawer({
   children,
   triggerClassName,
+  open,
+  onOpenChange,
+  finalFocus,
 }: {
   children: ReactNode;
   triggerClassName?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  finalFocus?: ComponentProps<typeof DrawerContent>["finalFocus"];
 }) {
   return (
-    <Drawer>
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerTrigger className={triggerClassName}>{children}</DrawerTrigger>
-      <DrawerContent className="border-none bg-transparent shadow-none">
+      <DrawerContent finalFocus={finalFocus} className="border-none bg-transparent shadow-none">
         <div className="mx-auto w-full max-w-md rounded-t-2xl border border-border bg-popover p-4 shadow-lg">
           <DrawerHeader className="p-0">
             <DrawerTitle>Pievienojies FK Olaine</DrawerTitle>

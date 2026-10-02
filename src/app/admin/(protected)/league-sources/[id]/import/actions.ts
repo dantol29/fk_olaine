@@ -14,13 +14,24 @@ type SelectedFixture = {
   date: string;
   startTime: string;
   location: string;
+  homeScore: number | null;
+  awayScore: number | null;
 };
 
 type LffGameUpdate = {
   id: number;
   startTime: string;
   location: string;
+  homeScore: number | null;
+  awayScore: number | null;
 };
+
+function knownScores(value: { homeScore: number | null; awayScore: number | null }) {
+  return typeof value.homeScore === "number" && typeof value.awayScore === "number" &&
+    Number.isSafeInteger(value.homeScore) && value.homeScore >= 0 &&
+    Number.isSafeInteger(value.awayScore) && value.awayScore >= 0
+    ? { homeScore: value.homeScore, awayScore: value.awayScore } : {};
+}
 
 function addMinutes(time: string, minutes: number): string {
   const [hour, minute] = time.split(":").map(Number);
@@ -43,6 +54,7 @@ export async function confirmImport(teamId: number, league: string, formData: Fo
         teamId,
         homeTeam: fixture.homeTeam,
         awayTeam: fixture.awayTeam,
+        ...knownScores(fixture),
         date: fixture.date,
         startTime: fixture.startTime,
         endTime: addMinutes(fixture.startTime, 90),
@@ -55,6 +67,7 @@ export async function confirmImport(teamId: number, league: string, formData: Fo
   }
 
   revalidatePath("/admin/games");
+  revalidatePath("/speles");
   revalidatePath("/");
   redirect("/admin/games");
 }
@@ -76,11 +89,13 @@ export async function applyLffChanges(sourceId: number, formData: FormData) {
         startTime: update.startTime,
         endTime: addMinutes(update.startTime, 90),
         location: update.location,
+        ...knownScores(update),
       })
       .where(eq(games.id, update.id));
   }
 
   revalidatePath("/admin/games");
+  revalidatePath("/speles");
   revalidatePath("/");
   redirect(`/admin/league-sources/${sourceId}/import`);
 }

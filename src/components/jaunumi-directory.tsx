@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Newspaper } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { Article, ArticleCategory } from "@/lib/jaunumi";
@@ -17,13 +17,6 @@ const CATEGORIES: ArticleCategory[] = [
 ];
 
 const PAGE_SIZE = 6;
-
-// Varying the image aspect ratio card-to-card (rather than one fixed
-// height) is what actually produces the masonry/waterfall look in a CSS
-// `columns` layout — a uniform ratio would just make evenly-tall cards
-// wrap into columns, no visual rhythm. Kept short/wide so photos stay
-// small relative to the card.
-const ARTICLE_ASPECTS = ["aspect-video", "aspect-[2/1]", "aspect-[16/10]"];
 
 function getPageNumbers(current: number, total: number): (number | "…")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -73,92 +66,55 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
   );
 
   return (
-    <>
-      {/* Title */}
-      <section className="px-6 pt-14 sm:pt-14">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="relative flex min-h-24 flex-col justify-center sm:min-h-32">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
-            >
-              Jaunumi
-            </span>
-            <h1 className="relative text-4xl tracking-[-0.02em] text-club-navy sm:text-5xl lg:pl-4">
-              Jaunumi
-            </h1>
-          </div>
+    <div className="bg-white">
+      <nav aria-label="Jaunumu kategorijas" className="bg-white px-6 shadow-[0_5px_16px_rgb(0_0_0/0.08)] sm:px-10 lg:px-14">
+        <div className="mx-auto flex max-w-[1920px] gap-6 overflow-x-auto sm:gap-10">
+          {(["Visi", ...CATEGORIES] as const).map((category) => (
+            <button key={category} type="button" onClick={() => setActiveCategory(category)} aria-pressed={activeCategory === category} className={cn(
+              "relative flex h-16 shrink-0 items-center text-base font-medium text-[#262626] uppercase hover:text-black focus-visible:outline-black sm:text-lg",
+              activeCategory === category && "after:absolute after:inset-x-0 after:bottom-2 after:h-[3px] after:bg-club-red",
+            )}>{category}</button>
+          ))}
         </div>
-      </section>
+      </nav>
 
-      {/* Main list */}
-      <section className="px-6 pt-6 pb-8">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="mb-6 flex flex-wrap gap-2">
-            {(["Visi", ...CATEGORIES] as const).map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                aria-pressed={activeCategory === category}
-                className={cn(
-                  "rounded-full px-4 py-2 text-sm transition",
-                  activeCategory === category
-                    ? "bg-club-navy text-white"
-                    : "bg-slate-100 text-club-navy hover:bg-slate-200",
-                )}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+      <section aria-labelledby="all-news-heading" className="px-6 pt-12 pb-10 sm:px-10 sm:pt-14 lg:px-14">
+        <div className="mx-auto max-w-[1920px]">
+          <h2 id="all-news-heading" className="mb-8 text-4xl leading-tight font-semibold text-[#262626] uppercase sm:mb-10 sm:text-5xl lg:text-6xl">{activeCategory === "Visi" ? "Visi jaunumi" : activeCategory}</h2>
 
           {pageArticles.length > 0 ? (
-            <div className="columns-1 gap-4 sm:columns-2 sm:gap-5 lg:columns-3">
-              {pageArticles.map((article, index) => (
-                <Link
-                  key={article.slug}
-                  href={`/jaunumi/${article.slug}`}
-                  className="group mb-4 flex break-inside-avoid flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm sm:mb-5"
-                >
-                  <div
-                    className={cn(
-                      "relative w-full shrink-0 overflow-hidden",
-                      ARTICLE_ASPECTS[index % ARTICLE_ASPECTS.length],
-                    )}
-                  >
-                    <Image
-                      src={article.image}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {pageArticles.map((article) => (
+                <Link key={article.slug} href={`/jaunumi/${article.slug}`} className="flex min-w-0 flex-col overflow-hidden border border-black/10 bg-white text-[#171717] focus-visible:outline-black">
+                  <div className="relative aspect-video w-full shrink-0 overflow-hidden">
+                    <Image src={article.image} alt="" fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
                   </div>
-
-                  <div className="relative z-10 -mt-4 flex flex-1 flex-col gap-2 rounded-t-2xl bg-white p-6">
-                    <span className="text-xs font-medium text-slate-400">
-                      {article.date}
-                    </span>
-                    <h3 className="text-xl text-club-navy">
-                      {article.title}
-                    </h3>
-                    <p className="line-clamp-3 text-sm text-slate-500">
-                      {article.excerpt}
+                  <div className="flex min-h-[160px] flex-1 flex-col p-4 sm:p-5">
+                    <p className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                      <Newspaper className="size-4 shrink-0" aria-hidden="true" />{article.team ?? article.category}
                     </p>
-                    <span className="mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold text-club-navy transition group-hover:text-club-red">
-                      Lasīt vairāk
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 transition group-hover:border-club-red group-hover:bg-club-red group-hover:text-white">
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </span>
-                    </span>
+                    <h3 className="text-xl leading-tight font-semibold xl:text-2xl">{article.title}</h3>
+                    <p className="mt-4 text-sm text-black/75">{article.date}</p>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="rounded-[2rem] border border-slate-200 bg-white py-16 text-center text-slate-400">
-              Raksti nav atrasti.
+            <div className="flex min-h-[320px] flex-col items-center justify-center border border-black/10 bg-[#fafafa] px-6 py-14 text-center sm:min-h-[380px]">
+              <Newspaper className="mb-6 size-12 text-black/30" strokeWidth={1.25} aria-hidden="true" />
+              <h3 className="text-2xl font-semibold text-[#262626] sm:text-3xl">
+                {activeCategory === "Visi" ? "Jaunumi vēl nav publicēti" : "Šajā kategorijā vēl nav jaunumu"}
+              </h3>
+              <p className="mt-3 max-w-md text-base leading-relaxed text-black/55">
+                {activeCategory === "Visi"
+                  ? "Atgriezies vēlāk, lai uzzinātu jaunākos kluba notikumus."
+                  : "Apskati citas kategorijas vai visus kluba jaunumus."}
+              </p>
+              {activeCategory !== "Visi" && (
+                <button type="button" onClick={() => setActiveCategory("Visi")} className="mt-7 inline-flex min-h-12 items-center justify-center border border-black px-6 text-sm font-semibold text-black uppercase hover:bg-black hover:text-white focus-visible:outline-black">
+                  Skatīt visus jaunumus
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -173,7 +129,7 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
               disabled={currentPage === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               aria-label="Iepriekšējā lapa"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-club-navy transition hover:bg-slate-100 disabled:pointer-events-none disabled:text-slate-300"
+              className="flex h-9 w-9 items-center justify-center border border-black/20 text-black transition hover:bg-slate-100 disabled:pointer-events-none disabled:text-slate-300"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -192,9 +148,9 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
                   onClick={() => setPage(pageNumber)}
                   aria-current={pageNumber === currentPage ? "page" : undefined}
                   className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition",
+                    "flex h-9 w-9 items-center justify-center border border-black/20 text-sm font-semibold transition",
                     pageNumber === currentPage
-                      ? "bg-club-navy text-white"
+                      ? "bg-black text-white"
                       : "text-slate-400 hover:bg-slate-100",
                   )}
                 >
@@ -207,13 +163,13 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
               disabled={currentPage === totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               aria-label="Nākamā lapa"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-club-navy transition hover:bg-slate-100 disabled:pointer-events-none disabled:text-slate-300"
+              className="flex h-9 w-9 items-center justify-center border border-black/20 text-black transition hover:bg-slate-100 disabled:pointer-events-none disabled:text-slate-300"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </section>
       )}
-    </>
+    </div>
   );
 }

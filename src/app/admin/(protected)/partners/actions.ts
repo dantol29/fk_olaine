@@ -39,7 +39,7 @@ disableTypes([
 
 // Every page that renders the marquee or the footer, both of which show
 // the partners list — see src/components/partners-bar.tsx / site-footer.tsx.
-const PARTNER_VISIBLE_PATHS = ["/", "/treneri", "/jaunumi", "/komandas"] as const;
+const PARTNER_VISIBLE_PATHS = ["/", "/jaunumi", "/komandas"] as const;
 
 function revalidatePartnerPaths() {
   revalidatePath("/admin/partners");

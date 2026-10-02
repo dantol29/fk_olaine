@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { cronJobStatuses, leagueSources } from "@/db/schema";
 import { syncLeagueSource, type ReviewNeededGame } from "@/lib/league-sync";
+import { syncPlayerPositionsForSource } from "@/lib/player-positions";
 import { sendNotificationEmail } from "@/lib/mailer";
 import { getSiteSettings } from "@/lib/site-settings";
 import { getSiteUrl } from "@/lib/site-url";
@@ -92,13 +94,32 @@ async function runSync(request: NextRequest) {
   try {
     const sources = await db.select().from(leagueSources);
     const results = await Promise.all(
-      sources.map(async (source) => ({
-        id: source.id,
-        label: source.label,
-        ...(await syncLeagueSource(source)),
-      })),
+      sources.map(async (source) => {
+        const fixtures = await syncLeagueSource(source);
+        let positionSync;
+        try {
+          positionSync = await syncPlayerPositionsForSource(source);
+        } catch (error) {
+          positionSync = { updated: 0, error: error instanceof Error ? error.message : "Position sync failed" };
+        }
+        return {
+          id: source.id,
+          label: source.label,
+          ...fixtures,
+          positionSync,
+          error: [fixtures.error, "error" in positionSync ? positionSync.error : null].filter(Boolean).join("; ") || undefined,
+        };
+      }),
     );
     const importedCount = results.reduce((sum, result) => sum + result.imported, 0);
+    const updatedScores = results.reduce((sum, result) => sum + result.updatedScores, 0);
+    if (importedCount > 0 || updatedScores > 0) revalidatePath("/kalendars");
+    const updatedPlayerPositions = results.reduce((sum, result) => sum + result.positionSync.updated, 0);
+    if (updatedPlayerPositions > 0) {
+      revalidatePath("/komandas");
+      revalidatePath("/admin/players");
+      revalidatePath("/");
+    }
     const needsReviewCount = results.reduce((sum, result) => sum + result.reviewNeeded.length, 0);
     const errors = results.filter((result) => result.error);
     const finishedAt = Date.now();
@@ -124,6 +145,8 @@ async function runSync(request: NextRequest) {
         status,
         recordedAt: new Date(finishedAt).toISOString(),
         importedCount,
+        updatedScores,
+        updatedPlayerPositions,
         needsReviewCount,
         lastEmailError,
         results,

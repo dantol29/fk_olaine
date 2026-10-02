@@ -5,6 +5,7 @@ import { db } from "@/db/client";
 import { games } from "@/db/schema";
 import { backfillClubLogos } from "@/lib/club-logos";
 import { scrapeFixtures } from "@/lib/fixtures";
+import { updateFixtureScores } from "@/lib/fixture-scores";
 import { isOlaine } from "@/lib/games";
 
 function addMinutes(time: string, minutes: number): string {
@@ -31,7 +32,8 @@ export type ReviewNeededGame = {
  *  sync calls for every league source; the manual "Ielādēt spēles" review
  *  screen has its own confirm-based flow and doesn't use this.
  *
- *  Also *detects* (never applies) drift on games that already exist: if
+ *  Refreshes known scores on existing LFF games automatically. Also
+ *  detects (never applies) time/venue drift on games that already exist: if
  *  LFF now shows a different time/venue for one than what's saved locally,
  *  it's reported back in `reviewNeeded` — same diff the "Ielādēt spēles"
  *  screen already surfaces, applied there via its own explicit button. */
@@ -39,12 +41,12 @@ export async function syncLeagueSource(source: {
   teamId: number;
   label: string;
   url: string;
-}): Promise<{ imported: number; reviewNeeded: ReviewNeededGame[]; error?: string }> {
+}): Promise<{ imported: number; updatedScores: number; reviewNeeded: ReviewNeededGame[]; error?: string }> {
   let fixtures;
   try {
     fixtures = await scrapeFixtures(source.url);
   } catch (error) {
-    return { imported: 0, reviewNeeded: [], error: (error as Error).message };
+    return { imported: 0, updatedScores: 0, reviewNeeded: [], error: (error as Error).message };
   }
 
   const candidates = fixtures.filter(
@@ -53,6 +55,7 @@ export async function syncLeagueSource(source: {
   if (candidates.length === 0) {
     return {
       imported: 0,
+      updatedScores: 0,
       reviewNeeded: [],
       error: `LFF returned ${fixtures.length} fixtures, but none with a valid time matched FK Olaine`,
     };
@@ -91,6 +94,8 @@ export async function syncLeagueSource(source: {
           teamId: source.teamId,
           homeTeam: fixture.home,
           awayTeam: fixture.away,
+          homeScore: fixture.homeScore,
+          awayScore: fixture.awayScore,
           date: fixture.date,
           startTime,
           endTime: addMinutes(startTime, 90),
@@ -103,6 +108,7 @@ export async function syncLeagueSource(source: {
     );
   }
 
+  const updatedScores = await updateFixtureScores(source.teamId, source.label, fixtures);
   const reviewNeeded: ReviewNeededGame[] = [];
   for (const fixture of candidates) {
     const existing = existingByKey.get(`${fixture.date}|${fixture.home}|${fixture.away}`);
@@ -120,5 +126,5 @@ export async function syncLeagueSource(source: {
     });
   }
 
-  return { imported: newFixtures.length, reviewNeeded };
+  return { imported: newFixtures.length, updatedScores, reviewNeeded };
 }

@@ -45,6 +45,9 @@ next-env.d.ts
 local.db
 local.db-*
 
+.codex/
+.impeccable/
+
 # locally-uploaded photos (admin backoffice dev) — served dynamically via
 # src/app/uploads/[...path]/route.ts, deliberately kept out of public/
 /uploads/

@@ -7,6 +7,13 @@ import { redirect } from "next/navigation";
 import { db } from "@/db/client";
 import { leagueSources } from "@/db/schema";
 import { requireAdminSession } from "@/lib/auth";
+import { saveUploadedPhoto } from "@/lib/uploads";
+
+async function leagueLogo(formData: FormData, existing: string | null = null) {
+  const file = formData.get("logo");
+  if (file instanceof File && file.size > 0) return saveUploadedPhoto(file, "leagues");
+  return formData.get("removeLogo") === "on" ? null : existing;
+}
 
 function parseLeagueSourceInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
@@ -63,8 +70,12 @@ export async function createLeagueSource(
   const parsed = parseLeagueSourceInput(formData);
   if ("error" in parsed) return parsed;
 
-  await db.insert(leagueSources).values({ ...parsed, createdAt: Date.now() });
+  let logoUrl: string | null;
+  try { logoUrl = await leagueLogo(formData); }
+  catch (error) { return { error: error instanceof Error ? error.message : "Neizdevās saglabāt logo." }; }
+  await db.insert(leagueSources).values({ ...parsed, logoUrl, createdAt: Date.now() });
   revalidatePath("/admin/league-sources");
+  revalidatePath("/speles");
   revalidatePath("/");
   redirect("/admin/league-sources");
 }
@@ -79,8 +90,14 @@ export async function updateLeagueSource(
   const parsed = parseLeagueSourceInput(formData);
   if ("error" in parsed) return parsed;
 
-  await db.update(leagueSources).set(parsed).where(eq(leagueSources.id, id));
+  const [source] = await db.select().from(leagueSources).where(eq(leagueSources.id, id));
+  if (!source) return { error: "Līgas avots nav atrasts." };
+  let logoUrl: string | null;
+  try { logoUrl = await leagueLogo(formData, source.logoUrl); }
+  catch (error) { return { error: error instanceof Error ? error.message : "Neizdevās saglabāt logo." }; }
+  await db.update(leagueSources).set({ ...parsed, logoUrl }).where(eq(leagueSources.id, id));
   revalidatePath("/admin/league-sources");
+  revalidatePath("/speles");
   revalidatePath("/");
   redirect("/admin/league-sources");
 }
@@ -90,5 +107,6 @@ export async function deleteLeagueSource(id: number) {
 
   await db.delete(leagueSources).where(eq(leagueSources.id, id));
   revalidatePath("/admin/league-sources");
+  revalidatePath("/speles");
   revalidatePath("/");
 }

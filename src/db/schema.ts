@@ -39,6 +39,8 @@ export const players = sqliteTable("players", {
   name: text("name").notNull(),
   birthdate: text("birthdate").notNull(),
   photoUrl: text("photo_url"),
+  position: text("position"),
+  nationality: text("nationality").notNull().default("LV"),
   /** Jersey number — optional, not every roster tracks these. */
   number: integer("number"),
   createdAt: integer("created_at").notNull(),
@@ -129,6 +131,8 @@ export const games = sqliteTable("games", {
     .references(() => teams.id, { onDelete: "cascade" }),
   homeTeam: text("home_team").notNull(),
   awayTeam: text("away_team").notNull(),
+  homeScore: integer("home_score"),
+  awayScore: integer("away_score"),
   date: text("date").notNull(),
   startTime: text("start_time").notNull(),
   endTime: text("end_time").notNull(),
@@ -145,6 +149,7 @@ export const leagueSources = sqliteTable("league_sources", {
     .notNull()
     .references(() => teams.id, { onDelete: "cascade" }),
   label: text("label").notNull(),
+  logoUrl: text("logo_url"),
   url: text("url").notNull(),
   /** The same competition's standings-table page (a different tab of the
    *  same LFF competition). Optional — a source with none set never shows
@@ -263,9 +268,6 @@ export const articles = sqliteTable("articles", {
   authorCoachId: integer("author_coach_id").references(() => coaches.id, { onDelete: "set null" }),
   // Paragraphs, one per line.
   body: text("body").notNull(),
-  quoteText: text("quote_text"),
-  quoteAuthor: text("quote_author"),
-  quoteRole: text("quote_role"),
   // Highlight image URLs, one per line.
   highlights: text("highlights"),
   createdAt: integer("created_at").notNull(),

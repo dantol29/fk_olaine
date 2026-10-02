@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useActionState } from "react";
 
 import { createPlayer, updatePlayer } from "../actions";
+import { NATIONALITIES } from "@/lib/nationality";
 
 type Player = {
   id: number;
@@ -11,6 +12,8 @@ type Player = {
   birthdate: string;
   photoUrl: string | null;
   number: number | null;
+  position: string | null;
+  nationality: string;
   playerTeams: { teamId: number; goals: number }[];
 };
 type TeamOption = { id: number; name: string };
@@ -64,6 +67,24 @@ export function PlayerForm(
           defaultValue={player?.number ?? ""}
           className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
         />
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Pozīcija (nav obligāta)
+        <select name="position" defaultValue={player?.position ?? ""} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+          <option value="">Nav norādīta</option>
+          <option value="goalkeeper">Vārtsargs</option>
+          <option value="defender">Aizsargs</option>
+          <option value="midfielder">Pussargs</option>
+          <option value="forward">Uzbrucējs</option>
+        </select>
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-club-navy">
+        Pilsonība
+        <select name="nationality" defaultValue={player?.nationality ?? "LV"} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+          {NATIONALITIES.map((country) => <option key={country.code} value={country.code}>{country.name}</option>)}
+        </select>
       </label>
 
       <fieldset className="mt-4">

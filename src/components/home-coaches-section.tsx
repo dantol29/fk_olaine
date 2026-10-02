@@ -45,7 +45,7 @@ export async function HomeCoachesSection() {
           </h2>
         </div>
         <Link
-          href="/treneri"
+          href="/komandas#roster-staff"
           className="hidden shrink-0 items-center gap-2 rounded-full border border-slate-200 py-1.5 pr-1.5 pl-4 text-sm font-semibold text-club-navy transition-colors hover:border-slate-300 sm:flex"
         >
           Visi treneri
@@ -59,7 +59,7 @@ export async function HomeCoachesSection() {
         {coaches.map((coach) => (
           <Link
             key={coach.id}
-            href="/treneri"
+            href="/komandas#roster-staff"
             className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-[1.5rem] bg-club-navy"
           >
             {coach.photo ? (

@@ -4,7 +4,6 @@ import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { TrainingsDirectory } from "@/components/trainings-directory";
-import { UpcomingBirthdays } from "@/components/upcoming-birthdays";
 import { getAllTrainingsFromDb } from "@/lib/trainings-server";
 
 export const metadata: Metadata = {
@@ -19,8 +18,8 @@ export default async function TreninjiPage() {
   return (
     <>
       <SiteHeader />
-      <main className="bg-background">
-        <TrainingsDirectory trainings={trainings} birthdays={<UpcomingBirthdays />} />
+      <main className="bg-[#fafafa]">
+        <TrainingsDirectory trainings={trainings} />
       </main>
       <JoinTeamCta />
       <SiteFooter />

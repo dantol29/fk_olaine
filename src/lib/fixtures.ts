@@ -12,6 +12,8 @@ export type ScrapedFixture = {
   awayLogo: string | null;
   stadium: string;
   played: boolean;
+  homeScore: number | null;
+  awayScore: number | null;
 };
 
 const MONTHS: Record<string, number> = {
@@ -58,12 +60,21 @@ function tabSelector(url: string): string | null {
 export function parseFixturesHtml(html: string, pageUrl: string): ScrapedFixture[] {
   const $ = cheerio.load(html);
   const requestedTab = tabSelector(pageUrl);
-  const scope = requestedTab && $(requestedTab).length ? $(requestedTab) : $.root();
+  let scope = requestedTab && $(requestedTab).length ? $(requestedTab) : $.root();
   const fallbackYear = Number($(".pageSelect option[selected], .pageSelect option:selected").first().text().match(/20\d{2}/)?.[0]) || Number($("h1, title").text().match(/20\d{2}/)?.[0]) || null;
 
   let candidates: AnyNode[] = scope.find(".tr.match, [data-id].match, [data-match-id]").toArray();
   if (candidates.length === 0) {
     candidates = scope.find('a[href*="/speles/"]').map((_, link) => $(link).closest(".tr, article, li, tr").get(0)).get();
+  }
+  // Some competitions number their fixtures tab differently. A configured
+  // URL can point to standings while the same page still contains fixtures.
+  if (candidates.length === 0 && requestedTab) {
+    scope = $.root();
+    candidates = scope.find(".tr.match, [data-id].match, [data-match-id]").toArray();
+    if (candidates.length === 0) {
+      candidates = scope.find('a[href*="/speles/"]').map((_, link) => $(link).closest(".tr, article, li, tr").get(0)).get();
+    }
   }
 
   const fixtures: ScrapedFixture[] = [];
@@ -83,7 +94,8 @@ export function parseFixturesHtml(html: string, pageUrl: string): ScrapedFixture
       const image = node.find("img").first();
       const logo = absoluteLffUrl(image.attr("src") ?? image.attr("data-src"), pageUrl);
       const scoreText = normalizeLffText(node.find(".result, [class*=score]").first().text());
-      return { name, logo, score: scoreText.match(/\d+/)?.[0] ?? null };
+      const score = scoreText.match(/^\s*(\d{1,3})(?:\s*\([^)]*\))?\s*$/);
+      return { name, logo, score: score ? Number(score[1]) : null };
     });
     if (!clubs[0].name || !clubs[1].name) continue;
 
@@ -101,7 +113,7 @@ export function parseFixturesHtml(html: string, pageUrl: string): ScrapedFixture
     const key = `${date}|${time ?? ""}|${clubs[0].name}|${clubs[1].name}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    fixtures.push({ date, time, home: clubs[0].name, away: clubs[1].name, homeLogo: clubs[0].logo, awayLogo: clubs[1].logo, stadium, played: clubs[0].score !== null && clubs[1].score !== null });
+    fixtures.push({ date, time, home: clubs[0].name, away: clubs[1].name, homeLogo: clubs[0].logo, awayLogo: clubs[1].logo, stadium, played: clubs[0].score !== null && clubs[1].score !== null, homeScore: clubs[0].score, awayScore: clubs[1].score });
   }
 
   if (fixtures.length === 0) {

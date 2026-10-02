@@ -38,9 +38,6 @@ function parseArticleInput(formData: FormData) {
   const teamIdRaw = String(formData.get("teamId") ?? "");
   const authorCoachIdRaw = String(formData.get("authorCoachId") ?? "");
   const body = String(formData.get("body") ?? "").trim();
-  const quoteText = String(formData.get("quoteText") ?? "").trim();
-  const quoteAuthor = String(formData.get("quoteAuthor") ?? "").trim();
-  const quoteRole = String(formData.get("quoteRole") ?? "").trim();
   const baseSlug = slugify(title);
 
   if (!title) return { error: "Virsraksts ir obligāts." } as const;
@@ -66,9 +63,6 @@ function parseArticleInput(formData: FormData) {
     teamId: teamIdRaw ? Number(teamIdRaw) : null,
     authorCoachId: authorCoachIdRaw ? Number(authorCoachIdRaw) : null,
     body: bodyLines.join("\n"),
-    quoteText: quoteText || null,
-    quoteAuthor: quoteText ? quoteAuthor || null : null,
-    quoteRole: quoteText ? quoteRole || null : null,
   } as const;
 }
 

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { Caveat, Geist_Mono, Inter } from "next/font/google";
+import { Caveat, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
 import { getSiteSettings } from "@/lib/site-settings";
 import { getSiteUrl } from "@/lib/site-url";
 
-const inter = Inter({
-  variable: "--font-inter",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin", "latin-ext"],
+  display: "swap",
+  fallback: ["sans-serif"],
 });
 
 const geistMono = Geist_Mono({
@@ -76,7 +78,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="lv"
-      className={`${inter.variable} ${geistMono.variable} ${caveat.variable} h-full scroll-smooth antialiased`}
+      className={`${outfit.variable} ${geistMono.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <script

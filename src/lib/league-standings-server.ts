@@ -1,9 +1,9 @@
 import "server-only";
 import { cache } from "react";
-import { isNotNull } from "drizzle-orm";
+import { eq, isNotNull } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { leagueSources } from "@/db/schema";
+import { leagueSources, teams } from "@/db/schema";
 import { backfillClubLogos } from "@/lib/club-logos";
 import { getStandings, type StandingRow } from "@/lib/standings";
 
@@ -38,7 +38,7 @@ const FALLBACK_STANDINGS: StandingRow[] = [
   },
 ];
 
-export type LeagueStandings = { label: string; standings: StandingRow[]; url: string };
+export type LeagueStandings = { label: string; standings: StandingRow[]; url: string; teamName?: string; logoUrl?: string | null };
 
 function withDevelopmentTestLeagues(leagues: LeagueStandings[]): LeagueStandings[] {
   if (process.env.NODE_ENV !== "development" || leagues.length === 0) return leagues;
@@ -63,8 +63,9 @@ export const getLeagueStandingsForDisplay = cache(async function getLeagueStandi
 
   try {
     const sources = await db
-      .select({ label: leagueSources.label, standingsUrl: leagueSources.standingsUrl })
+      .select({ label: leagueSources.label, standingsUrl: leagueSources.standingsUrl, teamName: teams.name, logoUrl: leagueSources.logoUrl })
       .from(leagueSources)
+      .innerJoin(teams, eq(leagueSources.teamId, teams.id))
       .where(isNotNull(leagueSources.standingsUrl))
       .orderBy(leagueSources.displayOrder, leagueSources.label);
 
@@ -77,9 +78,9 @@ export const getLeagueStandingsForDisplay = cache(async function getLeagueStandi
         const url = source.standingsUrl as string;
         try {
           const standings = await getStandings(url);
-          return { label: source.label, standings, url };
+          return { label: source.label, standings, url, teamName: source.teamName, logoUrl: source.logoUrl };
         } catch {
-          return { label: source.label, standings: [], url };
+          return { label: source.label, standings: [], url, teamName: source.teamName, logoUrl: source.logoUrl };
         }
       }),
     );
