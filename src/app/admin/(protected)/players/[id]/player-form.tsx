@@ -30,22 +30,22 @@ export function PlayerForm(
 
   return (
     <form action={formAction} className="max-w-md">
-      <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-6 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauns spēlētājs" : "Rediģēt spēlētāju"}
       </h1>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Vārds, uzvārds
         <input
           type="text"
           name="name"
           required
           defaultValue={player?.name ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Dzimšanas datums (DD.MM.GGGG.)
         <input
           type="text"
@@ -53,11 +53,11 @@ export function PlayerForm(
           placeholder="12.04.1998."
           required
           defaultValue={player?.birthdate ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Numurs (nav obligāts)
         <input
           type="number"
@@ -65,14 +65,13 @@ export function PlayerForm(
           min={0}
           step={1}
           defaultValue={player?.number ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
-        Pozīcija (nav obligāta)
-        <select name="position" defaultValue={player?.position ?? ""} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
-          <option value="">Nav norādīta</option>
+      <label className="mt-4 block text-sm font-semibold text-black">
+        Pozīcija
+        <select name="position" defaultValue={player?.position ?? "defender"} className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm">
           <option value="goalkeeper">Vārtsargs</option>
           <option value="defender">Aizsargs</option>
           <option value="midfielder">Pussargs</option>
@@ -80,16 +79,16 @@ export function PlayerForm(
         </select>
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Pilsonība
-        <select name="nationality" defaultValue={player?.nationality ?? "LV"} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+        <select name="nationality" defaultValue={player?.nationality ?? "LV"} className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm">
           {NATIONALITIES.map((country) => <option key={country.code} value={country.code}>{country.name}</option>)}
         </select>
       </label>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Komandas un gūtie vārti</legend>
-        <p className="mt-1 text-xs text-slate-400">
+        <legend className="text-sm font-semibold text-black">Komandas un gūtie vārti</legend>
+        <p className="mt-1 text-xs text-black/45">
           Gūtie vārti tiek uzskaitīti atsevišķi katrai komandai/līgai — spēlētājs, kurš spēlē
           vairākās komandās, var tajās būt guvis atšķirīgu vārtu skaitu.
         </p>
@@ -98,7 +97,7 @@ export function PlayerForm(
             const existingGoals = player?.playerTeams.find((pt) => pt.teamId === team.id)?.goals ?? 0;
             return (
               <div key={team.id} className="flex items-center gap-3">
-                <label className="flex flex-1 items-center gap-2 text-sm text-club-navy">
+                <label className="flex flex-1 items-center gap-2 text-sm text-black">
                   <input
                     type="checkbox"
                     name="teamIds"
@@ -114,7 +113,7 @@ export function PlayerForm(
                   step={1}
                   placeholder="Vārti"
                   defaultValue={existingGoals}
-                  className="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm text-club-navy outline-none focus:border-club-red"
+                  className="w-20 rounded-none border border-black/15 px-2 py-1 text-sm text-black outline-none focus:border-black"
                 />
               </div>
             );
@@ -123,24 +122,24 @@ export function PlayerForm(
       </fieldset>
 
       <div className="mt-4">
-        <span className="block text-sm font-semibold text-club-navy">Foto (nav obligāts)</span>
+        <span className="block text-sm font-semibold text-black">Foto (nav obligāts)</span>
         {player?.photoUrl && (
           <Image
             src={player.photoUrl}
             alt={player.name}
             width={80}
             height={80}
-            className="mt-1.5 h-20 w-20 rounded-lg object-cover"
+            className="mt-1.5 h-20 w-20 rounded-none object-cover"
           />
         )}
         <input
           type="file"
           name="photo"
           accept="image/*"
-          className="mt-1.5 block w-full text-sm text-club-navy file:mr-3 file:rounded-lg file:border-0 file:bg-club-gray-light file:px-3 file:py-2 file:text-sm file:font-semibold file:text-club-navy hover:file:bg-slate-200"
+          className="mt-1.5 block w-full text-sm text-black file:mr-3 file:rounded-none file:border-0 file:bg-[#f5f5f5] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-black hover:file:bg-black/15"
         />
         {player?.photoUrl && (
-          <label className="mt-2 flex items-center gap-2 text-sm text-club-navy">
+          <label className="mt-2 flex items-center gap-2 text-sm text-black">
             <input type="checkbox" name="removePhoto" />
             Noņemt foto
           </label>
@@ -152,7 +151,7 @@ export function PlayerForm(
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>

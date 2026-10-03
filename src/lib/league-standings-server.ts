@@ -40,6 +40,13 @@ const FALLBACK_STANDINGS: StandingRow[] = [
 
 export type LeagueStandings = { label: string; standings: StandingRow[]; url: string; teamName?: string; logoUrl?: string | null };
 
+export const getLeagueLogosForDisplay = cache(async function getLeagueLogosForDisplay(): Promise<LeagueStandings[]> {
+  const sources = await db.select({ label: leagueSources.label, teamName: teams.name, logoUrl: leagueSources.logoUrl, url: leagueSources.url })
+    .from(leagueSources).innerJoin(teams, eq(leagueSources.teamId, teams.id))
+    .orderBy(leagueSources.displayOrder, leagueSources.label);
+  return sources.map((source) => ({ ...source, url: source.url ?? "", standings: [] }));
+});
+
 function withDevelopmentTestLeagues(leagues: LeagueStandings[]): LeagueStandings[] {
   if (process.env.NODE_ENV !== "development" || leagues.length === 0) return leagues;
   const example = leagues.find((league) => league.standings.length > 0) ?? leagues[0];

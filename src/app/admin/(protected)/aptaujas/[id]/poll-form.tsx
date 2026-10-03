@@ -47,11 +47,11 @@ export function PollForm(props: { mode: "create" } | { mode: "edit"; poll: Poll 
 
   return (
     <form action={formAction} className="max-w-md">
-      <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-6 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauna aptauja" : "Rediģēt aptauju"}
       </h1>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Jautājums
         <input
           type="text"
@@ -59,12 +59,12 @@ export function PollForm(props: { mode: "create" } | { mode: "edit"; poll: Poll 
           required
           placeholder="Kurai komandai tu sekosi visvairāk šosezon?"
           defaultValue={props.mode === "edit" ? props.poll.question : ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Atbilžu varianti</legend>
+        <legend className="text-sm font-semibold text-black">Atbilžu varianti</legend>
         <div className="mt-1.5 flex flex-col gap-2">
           {options.map((option) => (
             <div key={option.key} className="flex items-center gap-2">
@@ -75,14 +75,14 @@ export function PollForm(props: { mode: "create" } | { mode: "edit"; poll: Poll 
                 required
                 value={option.label}
                 onChange={(event) => updateLabel(option.key, event.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+                className="w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
               />
               <button
                 type="button"
                 onClick={() => removeOption(option.key)}
                 disabled={options.length <= 2}
                 aria-label="Noņemt variantu"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-club-red transition hover:bg-club-red/10 disabled:pointer-events-none disabled:opacity-30"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none text-club-red transition hover:bg-club-red/10 disabled:pointer-events-none disabled:opacity-30"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -92,7 +92,7 @@ export function PollForm(props: { mode: "create" } | { mode: "edit"; poll: Poll 
         <button
           type="button"
           onClick={addOption}
-          className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-club-navy hover:text-club-red"
+          className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-black hover:text-club-red"
         >
           <Plus className="h-4 w-4" />
           Pievienot variantu
@@ -104,7 +104,7 @@ export function PollForm(props: { mode: "create" } | { mode: "edit"; poll: Poll 
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>

@@ -14,7 +14,7 @@ function parsePlayerInput(formData: FormData) {
   const nationality = String(formData.get("nationality") ?? "LV").trim().toUpperCase() || "LV";
   if (!isNationality(nationality)) return { error: "Nederīga pilsonība." } as const;
   const name = String(formData.get("name") ?? "").trim();
-  const position = String(formData.get("position") ?? "").trim() || null;
+  const position = String(formData.get("position") ?? "").trim() || "defender";
   if (position && !["goalkeeper", "defender", "midfielder", "forward"].includes(position)) return { error: "Nederīga spēlētāja pozīcija." } as const;
   const birthdate = String(formData.get("birthdate") ?? "").trim();
   const teamIds = formData.getAll("teamIds").map(Number).filter((n) => Number.isFinite(n));

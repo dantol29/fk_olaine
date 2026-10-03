@@ -17,7 +17,12 @@ export async function createTeam(
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nosaukums ir obligāts." };
 
-  await db.insert(teams).values({ name, createdAt: Date.now() });
+  const isMain = formData.get("isMain") === "on";
+  await db.transaction(async (transaction) => {
+    if (isMain) await transaction.update(teams).set({ isMain: false }).where(eq(teams.isMain, true));
+    await transaction.insert(teams).values({ name, isMain, createdAt: Date.now() });
+  });
+  revalidatePath("/");
   revalidatePath("/admin/teams");
   revalidatePath("/komandas");
   redirect("/admin/teams");
@@ -33,7 +38,14 @@ export async function updateTeam(
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nosaukums ir obligāts." };
 
-  await db.update(teams).set({ name }).where(eq(teams.id, id));
+  const isMain = formData.get("isMain") === "on";
+  const existing = await db.query.teams.findFirst({ where: eq(teams.id, id) });
+  if (!existing) return { error: "Komanda nav atrasta." };
+  await db.transaction(async (transaction) => {
+    if (isMain) await transaction.update(teams).set({ isMain: false }).where(eq(teams.isMain, true));
+    await transaction.update(teams).set({ name, isMain }).where(eq(teams.id, id));
+  });
+  revalidatePath("/");
   revalidatePath("/admin/teams");
   revalidatePath("/komandas");
   redirect("/admin/teams");
@@ -43,6 +55,7 @@ export async function deleteTeam(id: number) {
   await requireAdminSession();
 
   await db.delete(teams).where(eq(teams.id, id));
+  revalidatePath("/");
   revalidatePath("/admin/teams");
   revalidatePath("/komandas");
 }

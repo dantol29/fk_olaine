@@ -41,10 +41,6 @@ async function getTopScorers(limit: number): Promise<TopScorer[]> {
     .slice(0, limit);
 }
 
-/** Compact "Rezultatīvākie spēlētāji" list — styled to match
- *  upcoming-birthdays.tsx exactly (same card shell, divide-y rows, a
- *  ring-highlighted leader row) since the two sit side by side on the
- *  homepage, directly under the Komandas panel. */
 export async function TopScorersList({
   className,
 }: { className?: string } = {}) {
@@ -54,33 +50,34 @@ export async function TopScorersList({
   return (
     <div
       className={cn(
-        "h-full pt-4 pr-4 pb-4 pl-4 sm:rounded-2xl sm:bg-white sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        "h-full bg-black p-6 text-white sm:p-8",
         className,
       )}
     >
-      <h3 className="text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">
+      <h3 className="text-2xl font-semibold uppercase sm:text-3xl">
         Bombardieri
       </h3>
 
-      <div className="mt-4 flex flex-col divide-y divide-slate-100">
-        {scorers.map((scorer) => (
+      <div className="mt-6 flex flex-col divide-y divide-white/20">
+        {scorers.map((scorer, index) => (
           <div
             key={scorer.id}
-            className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+            className="flex items-center gap-3 py-5 sm:gap-4"
           >
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
+            <span className="w-5 shrink-0 text-sm tabular-nums text-white/50">{String(index + 1).padStart(2, "0")}</span>
+            <div className="relative size-14 shrink-0 overflow-hidden bg-white/10 sm:size-16">
               {scorer.photoUrl ? (
                 <Image
                   src={scorer.photoUrl}
                   alt={scorer.name}
                   fill
-                  sizes="(min-width: 640px) 112px, 96px"
+                  sizes="(min-width: 640px) 64px, 56px"
                   className="object-cover"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
                   <UserRound
-                    className="h-9 w-9 text-club-muted"
+                    className="size-8 text-white/40"
                     strokeWidth={1.5}
                   />
                 </div>
@@ -88,14 +85,14 @@ export async function TopScorersList({
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-lg font-semibold text-club-navy">
+              <p className="text-base font-semibold leading-snug sm:text-lg">
                 {scorer.name}
               </p>
               <div className="mt-0.5 flex flex-col">
                 {scorer.teamBreakdown.map((entry) => (
                   <p
                     key={entry.teamName}
-                    className="truncate text-sm text-slate-400"
+                    className="text-xs text-white/50 sm:text-sm"
                   >
                     {entry.teamName} - {entry.goals}
                   </p>
@@ -103,9 +100,10 @@ export async function TopScorersList({
               </div>
             </div>
 
-            <span className="shrink-0 text-lg font-semibold text-club-navy">
-              {scorer.totalGoals}
-            </span>
+            <div className="ml-auto w-12 shrink-0 text-right">
+              <span className="block text-3xl font-semibold leading-none tabular-nums text-club-red sm:text-4xl">{scorer.totalGoals}</span>
+              <span className="mt-1 block text-xs text-white/50">Vārti</span>
+            </div>
           </div>
         ))}
       </div>

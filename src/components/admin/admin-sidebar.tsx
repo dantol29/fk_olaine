@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { logout } from "@/app/admin/login/actions";
 
 const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
@@ -49,16 +50,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div>
-        <Link href="/admin" onClick={onNavigate}>
+        <Link href="/admin" onClick={onNavigate} className="flex items-center gap-3">
           <Image
             src="/fk-olaine-crest-v2.png"
             alt="FK Olaine"
             width={80}
             height={83}
-            className="h-20 w-auto"
+            className="h-14 w-auto"
           />
+          <span><span className="block text-xl font-semibold">FK OLAINE</span><span className="mt-1 block text-[10px] uppercase tracking-wider text-white/45">Administrācija</span></span>
         </Link>
-        <nav className="mt-6 flex flex-col gap-1">
+        <nav aria-label="Administrācijas navigācija" className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -67,11 +69,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 key={item.href}
                 href={item.href}
                 onClick={onNavigate}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition",
+                  "flex min-h-11 items-center gap-3 px-3 py-2 text-sm font-medium focus-visible:outline-white",
                   isActive
-                    ? "bg-club-red/10 text-club-red"
-                    : "text-club-navy hover:bg-club-gray-light",
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:bg-white/5 hover:text-white",
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -84,7 +87,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <form action={logout}>
         <button
           type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-club-navy transition hover:bg-club-gray-light"
+          className="mt-8 flex min-h-11 w-full items-center justify-center gap-2 border border-white/25 px-3 py-2 text-xs font-semibold text-white uppercase hover:bg-white/10"
         >
           <LogOut className="h-4 w-4" />
           Iziet
@@ -99,52 +102,19 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile top bar */}
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 lg:hidden">
-        <Link href="/admin">
-          <Image
-            src="/fk-olaine-crest-v2.png"
-            alt="FK Olaine"
-            width={80}
-            height={83}
-            className="h-10 w-auto"
-          />
-        </Link>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Atvērt izvēlni"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+      <div className="flex items-center justify-between bg-black px-5 py-3 text-white lg:hidden">
+        <Link href="/admin" className="flex items-center gap-3"><Image src="/fk-olaine-crest-v2.png" alt="" width={48} height={50} className="h-10 w-auto" /><span className="text-lg font-semibold">FK OLAINE</span></Link>
+        <button type="button" onClick={() => setOpen(true)} aria-label="Atvērt izvēlni" className="flex size-11 items-center justify-center focus-visible:outline-white"><Menu className="size-7" /></button>
       </div>
-
-      {/* Desktop sidebar */}
-      <aside className="hidden w-56 shrink-0 flex-col justify-between border-r border-slate-200 bg-white p-6 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto bg-black p-5 text-white lg:flex">
         <SidebarContent />
       </aside>
-
-      {/* Mobile slide-out menu */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute inset-y-0 right-0 flex h-full w-64 flex-col justify-between bg-white p-6 shadow-xl">
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Aizvērt izvēlni"
-              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <SidebarContent onNavigate={() => setOpen(false)} />
-          </div>
-        </div>
-      )}
+      <Drawer swipeDirection="right" open={open} onOpenChange={setOpen}>
+        <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,400px)] border-none bg-black text-white shadow-xl data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
+          <div className="flex items-center justify-between px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3"><DrawerTitle className="text-2xl font-normal text-white">Administrācija</DrawerTitle><DrawerClose aria-label="Aizvērt izvēlni" className="-mr-2 flex size-11 items-center justify-center focus-visible:outline-white"><X className="size-6" /></DrawerClose></div>
+          <div className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><SidebarContent onNavigate={() => setOpen(false)} /></div>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }

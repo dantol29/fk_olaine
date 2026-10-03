@@ -2,6 +2,36 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+.admin-shell { --color-club-navy: #000; --color-club-gray-light: #f5f5f5; }
+.admin-content h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 600; line-height: 1.15; text-transform: uppercase; }
+.admin-content h2 { font-weight: 600; }
+.admin-content table { border-collapse: collapse; border-top: 2px solid #000; }
+.admin-content thead { border-bottom: 2px solid #000; color: #000; }
+.admin-content thead tr { color: #000; }
+.admin-content th { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .025em; }
+.admin-content tbody tr:hover { background: #f5f5f5; }
+.admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+.admin-content select { min-height: 44px; background-color: #fff; }
+.admin-content textarea { background-color: #fff; }
+.admin-content input[type="checkbox"], .admin-content input[type="radio"] { accent-color: #000; }
+.admin-content :is(button, a)[class~="bg-club-red"] { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; text-transform: uppercase; font-size: .75rem; letter-spacing: .025em; }
+.admin-content .rich-text-editor :is(h2, h3) { color: #000; }
+.admin-content :is(button, a, input, select, textarea):focus-visible { outline: 2px solid #000; outline-offset: 3px; }
+.home-content { --color-club-navy: #000; --color-club-gray-light: #f5f5f5; }
+.home-calendar-section [class*="rounded-"] { border-radius: 0; }
+.home-calendar-section [class*="shadow-"] { box-shadow: none; }
+.home-calendar-section [class*="text-slate-"] { color: rgb(0 0 0 / .55); }
+.home-calendar-section [class*="border-slate-"] { border-color: rgb(0 0 0 / .15); }
+.home-calendar-section [class*="bg-club-navy"] { background-color: #000; }
+.home-content .text-slate-400 { color: rgb(0 0 0 / .45); }
+.home-content .divide-slate-100 > :not(:last-child) { border-color: rgb(0 0 0 / .1); }
+.home-content :is(button, a):focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.home-content a[class*="rounded-full"],
+.home-content button[class*="rounded-full"] { border-radius: 0; }
+@media (max-width: 639px) {
+  .admin-content > div > div > .flex:has(> h1) { flex-wrap: wrap; gap: 16px; }
+}
+
 .rich-text-editor h2,
 .rich-page-content h2 { margin: 1.75em 0 0.55em; color: var(--color-club-navy); font-size: 1.5em; line-height: 1.25; }
 .rich-text-editor h3,
@@ -273,6 +303,13 @@
 }
 .club-compact-header { visibility: hidden; transform: translateY(-100%); transition: transform 200ms ease, visibility 200ms; }
 .club-compact-header[data-visible] { visibility: visible; transform: translateY(0); }
+.club-header-nav-link:hover,
+.club-header-nav-link:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: white;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
 @media (prefers-reduced-motion: reduce) {
   .club-compact-header { transition: none; }
 }
@@ -323,9 +360,7 @@
 .club-masthead-light .club-header-menu svg { width: 26px; height: 26px; }
 .club-masthead-light .club-header-join { padding-inline: 8px; color: inherit; }
 .club-masthead-light .club-header-menu:hover,
-.club-masthead-light .club-header-join:hover,
-.club-masthead-light .club-masthead-nav > ul > li > a:hover,
-.club-masthead-light .club-masthead-nav > ul > li > button:hover { background: rgb(255 255 255 / .1); }
+.club-masthead-light .club-header-join:hover { background: rgb(255 255 255 / .1); }
 .club-masthead-light .club-masthead-inner :focus-visible { outline-color: white; }
 .club-masthead-light .club-header-account :focus-visible { outline-color: black; }
 .club-masthead-light[data-over-hero] {
@@ -336,34 +371,47 @@
   border: 0;
 }
 .club-masthead-light[data-over-hero] .club-header-menu:hover,
-.club-masthead-light[data-over-hero] .club-header-join:hover,
-.club-masthead-light[data-over-hero] .club-masthead-nav > ul > li > a:hover,
-.club-masthead-light[data-over-hero] .club-masthead-nav > ul > li > button:hover { background: rgb(255 255 255 / .1); color: white; }
+.club-masthead-light[data-over-hero] .club-header-join:hover { background: rgb(255 255 255 / .1); color: white; }
+.club-masthead-light .club-masthead-nav .club-header-nav-link:hover,
+.club-masthead-light .club-masthead-nav .club-header-nav-link:focus {
+  background: transparent;
+  color: white;
+}
 .club-masthead-light[data-over-hero] .club-masthead-inner :focus-visible { outline-color: white; }
 @media (max-width: 639px) {
-  .club-header-name { font-size: 26px; }
-  .club-masthead-light .club-crest-badge img { height: 60px; width: auto; }
+  .club-header-name { font-size: 22px; }
+  .club-masthead-light .club-crest-badge { gap: 10px; }
+  .club-masthead-light .club-crest-badge img { height: 48px; width: auto; }
+}
+@media (max-width: 1023px) {
+  .club-header-navigation-row { display: none; }
+  .club-masthead-light .club-masthead-actions { align-self: center; }
+  .club-masthead-light .club-masthead-actions > button { width: 44px; height: 44px; }
 }
 
 .home-hero-frame { min-height: max(640px, 100svh); }
+.home-page-hero-frame { min-height: clamp(680px, 95svh, 980px); }
+@media (max-width: 639px) {
+  .home-hero-frame.home-hero-news { min-height: clamp(480px, 75svh, 620px); }
+}
 .home-hero-news > .hero-news-slide {
   padding: 208px clamp(24px, 2.5vw, 64px) 32px;
 }
 .hero-photo-shade {
-  background: linear-gradient(180deg, rgb(0 0 0 / .7), transparent 180px), linear-gradient(0deg, rgb(0 0 0 / .75), transparent 60%), linear-gradient(90deg, rgb(0 0 0 / .2), transparent 65%);
+  background: linear-gradient(180deg, rgb(0 0 0 / .85) 0%, rgb(0 0 0 / .4) 160px, transparent 360px), linear-gradient(0deg, rgb(0 0 0 / .75), transparent 60%), linear-gradient(90deg, rgb(0 0 0 / .2), transparent 65%);
 }
 .hero-news-content { width: min(100%, 900px); max-width: 900px; }
 .hero-news-content h2,
 .hero-news-content h1 {
   max-width: 850px;
-  font-size: clamp(40px, 3.5vw, 72px);
+  font-size: clamp(32px, 3vw, 60px);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -.02em;
   text-transform: uppercase;
 }
 .article-news-content { width: 100%; max-width: none; }
-.article-news-content h1 { max-width: 1000px; }
+.article-news-content h1 { max-width: 1000px; font-size: clamp(32px, 3vw, 60px); }
 .hero-news-content > p:not(.hero-news-meta) {
   max-width: 850px;
   font-size: clamp(18px, 1.1vw, 20px);

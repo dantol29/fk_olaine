@@ -28,22 +28,22 @@ export function CoachForm(
 
   return (
     <form action={formAction} className="max-w-md">
-      <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-6 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauns treneris" : "Rediģēt treneri"}
       </h1>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Vārds, uzvārds
         <input
           type="text"
           name="name"
           required
           defaultValue={coach?.name ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Amats
         <input
           type="text"
@@ -51,11 +51,11 @@ export function CoachForm(
           placeholder="Galvenais treneris"
           required
           defaultValue={coach?.position ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Licence
         <input
           type="text"
@@ -63,15 +63,15 @@ export function CoachForm(
           placeholder="UEFA A licence"
           required
           defaultValue={coach?.license ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Licences izdevējs</legend>
+        <legend className="text-sm font-semibold text-black">Licences izdevējs</legend>
         <div className="mt-1.5 flex gap-4">
           {(["UEFA", "LFF"] as const).map((option) => (
-            <label key={option} className="flex items-center gap-2 text-sm text-club-navy">
+            <label key={option} className="flex items-center gap-2 text-sm text-black">
               <input
                 type="radio"
                 name="authority"
@@ -86,24 +86,24 @@ export function CoachForm(
       </fieldset>
 
       <div className="mt-4">
-        <span className="block text-sm font-semibold text-club-navy">Foto (nav obligāts)</span>
+        <span className="block text-sm font-semibold text-black">Foto (nav obligāts)</span>
         {coach?.photoUrl && (
           <Image
             src={coach.photoUrl}
             alt={coach.name}
             width={80}
             height={80}
-            className="mt-1.5 h-20 w-20 rounded-lg object-cover"
+            className="mt-1.5 h-20 w-20 rounded-none object-cover"
           />
         )}
         <input
           type="file"
           name="photo"
           accept="image/*"
-          className="mt-1.5 block w-full text-sm text-club-navy file:mr-3 file:rounded-lg file:border-0 file:bg-club-gray-light file:px-3 file:py-2 file:text-sm file:font-semibold file:text-club-navy hover:file:bg-slate-200"
+          className="mt-1.5 block w-full text-sm text-black file:mr-3 file:rounded-none file:border-0 file:bg-[#f5f5f5] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-black hover:file:bg-black/15"
         />
         {coach?.photoUrl && (
-          <label className="mt-2 flex items-center gap-2 text-sm text-club-navy">
+          <label className="mt-2 flex items-center gap-2 text-sm text-black">
             <input type="checkbox" name="removePhoto" />
             Noņemt foto
           </label>
@@ -111,10 +111,10 @@ export function CoachForm(
       </div>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Komandas</legend>
+        <legend className="text-sm font-semibold text-black">Komandas</legend>
         <div className="mt-1.5 flex flex-col gap-1.5">
           {props.teamOptions.map((team) => (
-            <label key={team.id} className="flex items-center gap-2 text-sm text-club-navy">
+            <label key={team.id} className="flex items-center gap-2 text-sm text-black">
               <input
                 type="checkbox"
                 name="teamIds"
@@ -132,7 +132,7 @@ export function CoachForm(
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>

@@ -12,7 +12,7 @@ export async function Hero() {
     <section aria-label="Kluba jaunumi" className="relative bg-club-navy">
       <div className="home-hero-stage relative">
         <SiteHeader overlay />
-        <div className="home-hero-frame flex min-w-0 flex-col">
+        <div className="home-hero-frame home-page-hero-frame flex min-w-0 flex-col">
           <HomeNewsCarousel embedded featured className="flex-1" />
         </div>
       </div>

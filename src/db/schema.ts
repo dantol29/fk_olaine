@@ -1,11 +1,12 @@
-import { relations } from "drizzle-orm";
-import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { relations, sql } from "drizzle-orm";
+import { integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const teams = sqliteTable("teams", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
+  isMain: integer("is_main", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at").notNull(),
-});
+}, (table) => [uniqueIndex("teams_one_main").on(table.isMain).where(sql`${table.isMain} = 1`)]);
 
 /** Homepage poll cards — up to 3 shown in a row, oldest first. Options and
  *  their vote tallies are freeform (not tied to teams/players), so any

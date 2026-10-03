@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
 
 import { BirthdaysSection } from "@/components/birthdays-section";
-import { CalendarSection } from "@/components/calendar-section";
 import { Hero } from "@/components/hero";
-import { HomeCoachesSection } from "@/components/home-coaches-section";
 import { HomePollsSection } from "@/components/home-polls-section";
 import { HomeTeamsSection } from "@/components/home-teams-section";
 import { HomeUpcomingGames } from "@/components/home-upcoming-games";
-import { HomeUpcomingTrainings } from "@/components/home-upcoming-trainings";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
-import { CoachesList } from "@/components/coaches-list";
 import { TopScorersList } from "@/components/top-scorers-list";
 import { UpcomingBirthdays } from "@/components/upcoming-birthdays";
 
@@ -24,50 +20,34 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <main className="bg-background">
+      <main className="home-content bg-white text-black">
         <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />
         <HomeUpcomingGames />
-        <div className="px-6 pt-8 sm:pt-10">
-          <div className="relative mx-auto max-w-[1440px]">
+        <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+          <div className="mx-auto max-w-[1600px]">
             <HomePollsSection />
           </div>
-        </div>
-        <section className="px-6 pb-8 pt-16 sm:pt-20">
-          <div className="relative mx-auto max-w-[1440px]">
+        </section>
+        <section className="border-t border-black/10 bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+          <div className="mx-auto max-w-[1600px]">
             <HomeTeamsSection />
 
-            <div className="relative mt-12 flex min-h-24 flex-col items-center justify-center sm:mt-16 sm:min-h-32 sm:items-start">
-              <span
-                aria-hidden
-                className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
-              >
-                Kluba dzīve
-              </span>
-              <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl lg:pl-4">
-                Kluba dzīve
-              </h2>
-            </div>
-
-            <div className="mt-6 ml-[calc(50%-50vw)] grid w-screen grid-cols-1 gap-4 sm:mt-8 sm:ml-0 sm:w-full lg:grid-cols-3 lg:gap-0">
-              <CoachesList className="lg:rounded-r-none" />
-              <TopScorersList className="lg:rounded-l-none lg:rounded-r-none" />
-              <UpcomingBirthdays className="lg:rounded-l-none" />
+          </div>
+        </section>
+        <section className="border-t border-black/10 bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+          <div className="mx-auto max-w-[1280px]">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <TopScorersList />
+              <UpcomingBirthdays />
             </div>
           </div>
         </section>
-        <HomeUpcomingTrainings />
         {/* Hidden per request — kept mounted (not removed) so it's a
          *  one-line toggle to bring back. */}
         <div className="hidden">
-          <section className="px-6 pb-8 sm:pb-10">
-            <div className="relative mx-auto max-w-[1440px]">
-              <HomeCoachesSection />
-            </div>
-          </section>
           <BirthdaysSection />
         </div>
-        <CalendarSection />
         <JoinTeamCta />
       </main>
       <SiteFooter />

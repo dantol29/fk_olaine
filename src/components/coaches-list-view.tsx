@@ -22,20 +22,20 @@ type Coach = {
 export function CoachesListView({ coaches }: { coaches: Coach[] }) {
   return (
     <CollapsibleGrid
-      gridClassName="flex flex-col divide-y divide-slate-100"
+      gridClassName="flex flex-col divide-y divide-black/10"
       collapsedClassName="max-h-[19rem] sm:max-h-[21rem]"
       fadeFromClassName="from-white"
       moreHref="/komandas#roster-staff"
     >
       {coaches.map((coach) => (
         <div key={coach.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-club-gray-light sm:h-20 sm:w-20">
             {coach.photoUrl ? (
               <Image
                 src={coach.photoUrl}
                 alt={coach.name}
                 fill
-                sizes="(min-width: 640px) 112px, 96px"
+                sizes="(min-width: 640px) 80px, 64px"
                 className="object-cover"
               />
             ) : (
@@ -45,15 +45,15 @@ export function CoachesListView({ coaches }: { coaches: Coach[] }) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-lg font-semibold text-club-navy">{coach.name}</p>
-            <p className="truncate text-sm text-slate-400">{coach.position}</p>
-            <p className="mt-1 flex items-center gap-1.5 text-xs text-club-navy">
+            <p className="truncate text-lg font-semibold text-black">{coach.name}</p>
+            <p className="truncate text-sm text-black/45">{coach.position}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-black">
               <Image
                 src={AUTHORITY_LOGO[coach.authority]}
                 alt={coach.authority}
                 width={16}
                 height={16}
-                className="h-4 w-4 shrink-0 rounded-full object-contain"
+                className="h-4 w-4 shrink-0 rounded-none object-contain"
               />
               <span className="truncate">{coach.license}</span>
             </p>

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const BUTTON = "flex h-9 w-9 items-center justify-center rounded-md text-club-navy transition hover:bg-white hover:text-club-red disabled:pointer-events-none disabled:opacity-35";
+const BUTTON = "flex h-9 w-9 items-center justify-center rounded-none text-black transition hover:bg-white hover:text-club-red disabled:pointer-events-none disabled:opacity-35";
 
 export function RichTextEditor({ name, defaultValue }: { name: string; defaultValue: string }) {
   const [value, setValue] = useState(defaultValue);
@@ -27,7 +27,7 @@ export function RichTextEditor({ name, defaultValue }: { name: string; defaultVa
     content: defaultValue || "<p></p>",
     editorProps: {
       attributes: {
-        class: "rich-text-editor min-h-72 px-4 py-3 text-base leading-7 text-slate-700 outline-none",
+        class: "rich-text-editor min-h-72 px-4 py-3 text-base leading-7 text-black/80 outline-none",
         "aria-label": "Lapas teksts",
       },
     },
@@ -52,28 +52,28 @@ export function RichTextEditor({ name, defaultValue }: { name: string; defaultVa
   ) => (
     <button key={label} type="button" title={label} aria-label={label} aria-pressed={active}
       disabled={disabled} onClick={action}
-      className={`${BUTTON} ${active ? "bg-white text-club-red shadow-sm" : ""}`}>
+      className={`${BUTTON} ${active ? "bg-white text-club-red shadow-none" : ""}`}>
       <Icon className="h-4 w-4" />
     </button>
   );
 
   return (
-    <div className="mt-1.5 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-club-red">
-      <div className="flex flex-wrap items-center gap-1 border-b border-slate-200 bg-slate-50 p-2">
+    <div className="mt-1.5 overflow-hidden rounded-none border border-black/15 bg-white focus-within:border-black">
+      <div className="flex flex-wrap items-center gap-1 border-b border-black/15 bg-[#f5f5f5] p-2">
         {tool("Rindkopa", Pilcrow, () => editor?.chain().focus().setParagraph().run(), editor?.isActive("paragraph"))}
         {tool("2. līmeņa virsraksts", Heading2, () => editor?.chain().focus().toggleHeading({ level: 2 }).run(), editor?.isActive("heading", { level: 2 }))}
         {tool("3. līmeņa virsraksts", Heading3, () => editor?.chain().focus().toggleHeading({ level: 3 }).run(), editor?.isActive("heading", { level: 3 }))}
-        <span className="mx-1 h-5 w-px bg-slate-200" />
+        <span className="mx-1 h-5 w-px bg-black/15" />
         {tool("Treknraksts", Bold, () => editor?.chain().focus().toggleBold().run(), editor?.isActive("bold"))}
         {tool("Slīpraksts", Italic, () => editor?.chain().focus().toggleItalic().run(), editor?.isActive("italic"))}
         {tool("Pasvītrots", Underline, () => editor?.chain().focus().toggleUnderline().run(), editor?.isActive("underline"))}
         {tool("Saite", Link2, setLink, editor?.isActive("link"))}
-        <span className="mx-1 h-5 w-px bg-slate-200" />
+        <span className="mx-1 h-5 w-px bg-black/15" />
         {tool("Aizzīmju saraksts", List, () => editor?.chain().focus().toggleBulletList().run(), editor?.isActive("bulletList"))}
         {tool("Numurēts saraksts", ListOrdered, () => editor?.chain().focus().toggleOrderedList().run(), editor?.isActive("orderedList"))}
         {tool("Citāts", Quote, () => editor?.chain().focus().toggleBlockquote().run(), editor?.isActive("blockquote"))}
         {tool("Notīrīt formatējumu", RemoveFormatting, () => editor?.chain().focus().unsetAllMarks().clearNodes().run())}
-        <span className="mx-1 h-5 w-px bg-slate-200" />
+        <span className="mx-1 h-5 w-px bg-black/15" />
         {tool("Atsaukt", Undo2, () => editor?.chain().focus().undo().run(), false, !editor?.can().undo())}
         {tool("Atkārtot", Redo2, () => editor?.chain().focus().redo().run(), false, !editor?.can().redo())}
       </div>

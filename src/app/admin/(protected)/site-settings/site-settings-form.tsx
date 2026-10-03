@@ -7,7 +7,7 @@ import type { SiteSettings } from "@/lib/site-settings";
 import { updateSiteSettings } from "./actions";
 
 const FIELD_CLASS =
-  "mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red";
+  "mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black";
 
 function Field({
   label,
@@ -21,7 +21,7 @@ function Field({
   type?: string;
 }) {
   return (
-    <label className="block text-sm font-semibold text-club-navy">
+    <label className="block text-sm font-semibold text-black">
       {label}
       <input
         type={type}
@@ -42,10 +42,10 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
 
   return (
     <form action={formAction} className="max-w-lg">
-      <h1 className="mb-1 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-1 text-2xl font-semibold text-black">
         Iestatījumi
       </h1>
-      <p className="mb-6 text-sm text-slate-500">
+      <p className="mb-6 text-sm text-black/55">
         Šī informācija tiek rādīta mājaslapas kājenē (Biedrība, Kontakti).
       </p>
 
@@ -66,8 +66,8 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
           defaultValue={settings.regNr}
         />
 
-        <div className="mt-2 border-t border-slate-200 pt-4">
-          <p className="text-xs font-bold tracking-[0.15em] text-slate-400 uppercase">
+        <div className="mt-2 border-t border-black/15 pt-4">
+          <p className="text-xs font-bold tracking-[0.15em] text-black/45 uppercase">
             Bankas rekvizīti
           </p>
         </div>
@@ -83,8 +83,8 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
         />
         <Field label="Kods" name="bankCode" defaultValue={settings.bankCode} />
 
-        <div className="mt-2 border-t border-slate-200 pt-4">
-          <p className="text-xs font-bold tracking-[0.15em] text-slate-400 uppercase">
+        <div className="mt-2 border-t border-black/15 pt-4">
+          <p className="text-xs font-bold tracking-[0.15em] text-black/45 uppercase">
             Kontakti
           </p>
         </div>
@@ -116,7 +116,7 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>

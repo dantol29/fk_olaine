@@ -17,7 +17,7 @@ type ClubPage = {
   isPublished: boolean;
 };
 
-const FIELD = "mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red";
+const FIELD = "mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black";
 
 function slugify(value: string) {
   return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -34,42 +34,42 @@ export function ClubPageForm(props: { mode: "create" } | { mode: "edit"; page: C
 
   return (
     <form action={formAction} className="max-w-2xl">
-      <h1 className="mb-1 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-1 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauna kluba lapa" : "Rediģēt kluba lapu"}
       </h1>
-      <p className="mb-6 text-sm text-slate-500">Publicēta lapa automātiski parādīsies izvēlnē “Klubs”.</p>
+      <p className="mb-6 text-sm text-black/55">Publicēta lapa automātiski parādīsies izvēlnē “Klubs”.</p>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Virsraksts
         <input name="title" required maxLength={120} defaultValue={page?.title ?? ""}
           onChange={(event) => { if (!slugTouched) setSlug(slugify(event.target.value)); }} className={FIELD} />
       </label>
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Lapas saite
-        <div className="mt-1.5 flex items-center rounded-lg border border-slate-200 bg-white focus-within:border-club-red">
-          <span className="shrink-0 pl-3 text-sm text-slate-400">/klubs/</span>
+        <div className="mt-1.5 flex items-center rounded-none border border-black/15 bg-white focus-within:border-black">
+          <span className="shrink-0 pl-3 text-sm text-black/45">/klubs/</span>
           <input name="slug" required maxLength={100} value={slug}
             onChange={(event) => { setSlugTouched(true); setSlug(slugify(event.target.value)); }}
-            className="min-w-0 flex-1 rounded-lg px-1 py-2 text-sm text-club-navy outline-none" />
+            className="min-w-0 flex-1 rounded-none px-1 py-2 text-sm text-black outline-none" />
         </div>
       </label>
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Īsais apraksts
         <textarea name="description" required maxLength={240} rows={2} defaultValue={page?.description ?? ""} className={FIELD} />
-        <span className="mt-1 block text-xs font-normal text-slate-400">Redzams zem lapas virsraksta un meklētāju rezultātos.</span>
+        <span className="mt-1 block text-xs font-normal text-black/45">Redzams zem lapas virsraksta un meklētāju rezultātos.</span>
       </label>
-      <div className="mt-4 text-sm font-semibold text-club-navy">
+      <div className="mt-4 text-sm font-semibold text-black">
         Lapas teksts
         <RichTextEditor name="body" defaultValue={page?.body ?? ""} />
       </div>
       <div className="mt-4">
-        <span className="block text-sm font-semibold text-club-navy">Labās kolonnas attēli</span>
+        <span className="block text-sm font-semibold text-black">Labās kolonnas attēli</span>
         {images.length > 0 && (
           <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {images.map((url) => (
-              <label key={url} className="relative overflow-hidden rounded-lg border border-slate-200 bg-white">
+              <label key={url} className="relative overflow-hidden rounded-none border border-black/15 bg-white">
                 <span className="relative block aspect-[4/3]"><Image src={url} alt="" fill sizes="180px" className="object-cover" /></span>
-                <span className="flex items-center gap-2 p-2 text-xs font-medium text-slate-600">
+                <span className="flex items-center gap-2 p-2 text-xs font-medium text-black/65">
                   <input type="checkbox" name="removeImages" value={url} className="accent-club-red" /> Noņemt
                 </span>
               </label>
@@ -77,20 +77,20 @@ export function ClubPageForm(props: { mode: "create" } | { mode: "edit"; page: C
           </div>
         )}
         <input type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple
-          className="mt-2 block w-full text-sm text-club-navy file:mr-3 file:rounded-lg file:border-0 file:bg-club-gray-light file:px-3 file:py-2 file:text-sm file:font-semibold file:text-club-navy hover:file:bg-slate-200" />
-        <span className="mt-1 block text-xs text-slate-400">Līdz 6 attēliem, katrs ne lielāks par 5 MB.</span>
+          className="mt-2 block w-full text-sm text-black file:mr-3 file:rounded-none file:border-0 file:bg-[#f5f5f5] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-black hover:file:bg-black/15" />
+        <span className="mt-1 block text-xs text-black/45">Līdz 6 attēliem, katrs ne lielāks par 5 MB.</span>
       </div>
-      <label className="mt-4 block max-w-40 text-sm font-semibold text-club-navy">
+      <label className="mt-4 block max-w-40 text-sm font-semibold text-black">
         Secība izvēlnē
         <input type="number" name="displayOrder" step={1} defaultValue={page?.displayOrder ?? 0} className={FIELD} />
       </label>
-      <label className="mt-4 flex items-center gap-3 text-sm font-semibold text-club-navy">
+      <label className="mt-4 flex items-center gap-3 text-sm font-semibold text-black">
         <input type="checkbox" name="isPublished" defaultChecked={page?.isPublished ?? true} className="h-4 w-4 accent-club-red" />
         Publicēta un redzama izvēlnē
       </label>
       {state?.error && <p className="mt-4 text-sm font-semibold text-club-red">{state.error}</p>}
       <button type="submit" disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50">
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50">
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>
     </form>

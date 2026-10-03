@@ -29,16 +29,16 @@ export default async function AdminLeagueSourceImportPage({
     console.error(`Failed to fetch fixtures from ${source.url}:`, error);
     return (
       <div>
-        <h1 className="mb-2 text-2xl font-extrabold text-club-navy">
+        <h1 className="mb-2 text-2xl font-semibold text-black">
           Ielādēt spēles: {source.label}
         </h1>
-        <div className="rounded-xl border border-club-red/20 bg-club-red/5 p-4 text-sm text-club-red">
+        <div className="rounded-none border border-club-red/20 bg-club-red/5 p-4 text-sm text-club-red">
           <p>
             Neizdevās ielādēt spēles no šī URL. Pārliecinies, ka tas ir derīgs LFF spēļu saraksta
             URL — atver savu sacensību lapu lff.lv, izvēlies pareizo grupu un atver
             &quot;Visas spēles&quot; cilni, tad kopē šo URL:
           </p>
-          <div className="mt-4 overflow-hidden rounded-lg border border-club-red/20">
+          <div className="mt-4 overflow-hidden rounded-none border border-club-red/20">
             <Image
               src="/lff-url-instructions.png"
               alt='LFF vietnē izvēlies sacensības un atver "Visas spēles" cilni, tad kopē šīs lapas URL'
@@ -116,14 +116,14 @@ export default async function AdminLeagueSourceImportPage({
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-2 text-2xl font-semibold text-black">
         Ielādēt spēles: {source.label}
       </h1>
-      <p className="mb-2 text-sm text-slate-500">
+      <p className="mb-2 text-sm text-black/55">
         Atrastas {candidates.length} FK Olaine spēles. Atzīmē, kuras pievienot, un apstiprini.
       </p>
       {differingCount > 0 && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-none bg-amber-50 px-4 py-3 text-sm text-amber-700">
           <p>
             {differingCount} jau importētām spēlēm LFF tagad rāda citu laiku, stadionu vai rezultātu, nekā
             saglabāts datubāzē (veco vērtību redzi zemāk pasvītrotu).
@@ -132,7 +132,7 @@ export default async function AdminLeagueSourceImportPage({
             <input type="hidden" name="updates" value={JSON.stringify(lffUpdates)} />
             <button
               type="submit"
-              className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+              className="shrink-0 rounded-none bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
             >
               Piemērot LFF datus
             </button>
@@ -141,14 +141,14 @@ export default async function AdminLeagueSourceImportPage({
       )}
 
       {candidates.length === 0 ? (
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-black/45">
           Šajā URL neizdevās atrast nevienu FK Olaine spēli ar apstiprinātu laiku.
         </p>
       ) : (
         <form action={boundConfirm}>
-          <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
+          <table className="w-full overflow-hidden rounded-none bg-white text-left text-sm shadow-none">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-400">
+              <tr className="border-b border-black/15 text-black/45">
                 <th className="p-4" />
                 <th className="p-4 font-semibold">Datums</th>
                 <th className="p-4 font-semibold">Laiks</th>
@@ -170,7 +170,7 @@ export default async function AdminLeagueSourceImportPage({
                   <tr
                     key={index}
                     className={cn(
-                      "border-b border-slate-100 last:border-0",
+                      "border-b border-black/10 last:border-0",
                       differs && "bg-amber-50/60",
                     )}
                   >
@@ -191,10 +191,10 @@ export default async function AdminLeagueSourceImportPage({
                         })}
                       />
                     </td>
-                    <td className="p-4 text-club-navy">{fixture.date}</td>
-                    <td className="p-4 text-slate-500">
+                    <td className="p-4 text-black">{fixture.date}</td>
+                    <td className="p-4 text-black/55">
                       {timeDiffers && (
-                        <span className="mr-1.5 text-slate-400 line-through">
+                        <span className="mr-1.5 text-black/45 line-through">
                           {existing.startTime}
                         </span>
                       )}
@@ -202,15 +202,15 @@ export default async function AdminLeagueSourceImportPage({
                         {fixture.time}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-500">{fixture.home}</td>
-                    <td className="p-4 text-slate-500">{fixture.away}</td>
-                    <td className="p-4 text-slate-500">
+                    <td className="p-4 text-black/55">{fixture.home}</td>
+                    <td className="p-4 text-black/55">{fixture.away}</td>
+                    <td className="p-4 text-black/55">
                       {fixture.played ? `${fixture.homeScore} : ${fixture.awayScore}` : "—"}
-                      {existing && fixture.played && (existing.homeScore !== fixture.homeScore || existing.awayScore !== fixture.awayScore) && <span className="ml-2 text-slate-400 line-through">{existing.homeScore ?? "—"} : {existing.awayScore ?? "—"}</span>}
+                      {existing && fixture.played && (existing.homeScore !== fixture.homeScore || existing.awayScore !== fixture.awayScore) && <span className="ml-2 text-black/45 line-through">{existing.homeScore ?? "—"} : {existing.awayScore ?? "—"}</span>}
                     </td>
-                    <td className="p-4 text-slate-500">
+                    <td className="p-4 text-black/55">
                       {locationDiffers && (
-                        <span className="mr-1.5 text-slate-400 line-through">
+                        <span className="mr-1.5 text-black/45 line-through">
                           {existing.location}
                         </span>
                       )}
@@ -218,7 +218,7 @@ export default async function AdminLeagueSourceImportPage({
                         {fixture.stadium || "—"}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-500">
+                    <td className="p-4 text-black/55">
                       {differs
                         ? "jau importēts, dati atšķiras"
                         : alreadyImported
@@ -235,7 +235,7 @@ export default async function AdminLeagueSourceImportPage({
 
           <button
             type="submit"
-            className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
+            className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
           >
             Apstiprināt
           </button>

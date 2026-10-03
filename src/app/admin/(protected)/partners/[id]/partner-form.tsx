@@ -24,11 +24,11 @@ export function PartnerForm(
 
   return (
     <form action={formAction} className="max-w-md">
-      <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-6 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauns partneris" : "Rediģēt partneri"}
       </h1>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Nosaukums
         <input
           type="text"
@@ -36,19 +36,19 @@ export function PartnerForm(
           required
           placeholder="Latvijas Futbola Federācija"
           defaultValue={partner?.name ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
       <div className="mt-4">
-        <span className="block text-sm font-semibold text-club-navy">Logotips</span>
+        <span className="block text-sm font-semibold text-black">Logotips</span>
         {partner?.logoUrl && (
           <Image
             src={partner.logoUrl}
             alt={partner.name}
             width={120}
             height={80}
-            className="mt-1.5 h-16 w-28 rounded-lg bg-club-gray-light object-contain p-1"
+            className="mt-1.5 h-16 w-28 rounded-none bg-[#f5f5f5] object-contain p-1"
           />
         )}
         <input
@@ -56,42 +56,42 @@ export function PartnerForm(
           name="logo"
           accept="image/*"
           required={props.mode === "create"}
-          className="mt-1.5 block w-full text-sm text-club-navy file:mr-3 file:rounded-lg file:border-0 file:bg-club-gray-light file:px-3 file:py-2 file:text-sm file:font-semibold file:text-club-navy hover:file:bg-slate-200"
+          className="mt-1.5 block w-full text-sm text-black file:mr-3 file:rounded-none file:border-0 file:bg-[#f5f5f5] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-black hover:file:bg-black/15"
         />
-        <p className="mt-1.5 text-xs text-slate-400">
+        <p className="mt-1.5 text-xs text-black/45">
           Šis pats logotips tiek rādīts arī kājenē (tumšā fonā) — vajadzības gadījumā to var
           invertēt uz baltu ar zemāk esošo opciju.
         </p>
       </div>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Izmērs
         <select
           name="size"
           required
           defaultValue={partner?.size ?? "lg"}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         >
           <option value="lg">Liels</option>
           <option value="sm">Mazs</option>
         </select>
       </label>
 
-      <label className="mt-4 flex items-center gap-2 text-sm font-semibold text-club-navy">
+      <label className="mt-4 flex items-center gap-2 text-sm font-semibold text-black">
         <input type="checkbox" name="needsWhite" defaultChecked={partner?.needsWhite ?? false} />
         Balts uz tumša fona (invertē logotipu kājenē)
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Saite (nav obligāta)
         <input
           type="url"
           name="websiteUrl"
           placeholder="https://example.com"
           defaultValue={partner?.websiteUrl ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
-        <p className="mt-1.5 text-xs text-slate-400">
+        <p className="mt-1.5 text-xs text-black/45">
           Ja aizpildīts, logotips būs klikšķināms un atvērs šo saiti jaunā cilnē.
         </p>
       </label>
@@ -101,7 +101,7 @@ export function PartnerForm(
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>

@@ -17,10 +17,10 @@ export default async function AdminArticlesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold text-club-navy">Jaunumi</h1>
+        <h1 className="text-2xl font-semibold text-black">Jaunumi</h1>
         <Link
           href="/admin/jaunumi/new"
-          className="rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
+          className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
         </Link>
@@ -28,7 +28,7 @@ export default async function AdminArticlesPage() {
       <AdminSearch placeholder="Meklēt jaunumus…" />
 
       {rows.length === 0 ? (
-        <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
+        <p className="rounded-none bg-white p-8 text-center text-sm text-black/45 shadow-none">
           Vēl nav neviena raksta.
         </p>
       ) : (
@@ -37,9 +37,9 @@ export default async function AdminArticlesPage() {
             <div
               key={article.id}
               data-admin-search-item={`${article.title} ${article.date} ${article.category} ${article.team?.name ?? ""}`}
-              className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+              className="overflow-hidden rounded-none border border-black/15 bg-white shadow-none"
             >
-              <div className="relative aspect-video bg-club-gray-light">
+              <div className="relative aspect-video bg-[#f5f5f5]">
                 {article.image ? (
                   <Image
                     src={article.image}
@@ -55,18 +55,18 @@ export default async function AdminArticlesPage() {
                 )}
               </div>
               <div className="p-3">
-                <p className="truncate text-sm font-semibold text-club-navy">{article.title}</p>
-                <p className="text-xs text-slate-400">{article.date}</p>
+                <p className="truncate text-sm font-semibold text-black">{article.title}</p>
+                <p className="text-xs text-black/45">{article.date}</p>
                 <p className="mt-1 truncate text-xs font-semibold text-club-red">
                   {article.category}
                   {article.team ? ` · ${article.team.name}` : ""}
                 </p>
-                <div className="mt-3 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
+                <div className="mt-3 flex items-center justify-end gap-2 border-t border-black/10 pt-2">
                   <Link
                     href={`/admin/jaunumi/${article.id}`}
                     aria-label={`Rediģēt rakstu "${article.title}"`}
                     title="Rediģēt"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
+                    className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
                   </Link>

@@ -28,11 +28,11 @@ export async function CoachesList({ className }: { className?: string } = {}) {
   return (
     <div
       className={cn(
-        "h-full pt-4 pr-4 pb-4 pl-4 sm:rounded-2xl sm:bg-white sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8",
+        "h-full border border-black/15 bg-white p-5 sm:p-6",
         className,
       )}
     >
-      <h3 className="text-3xl tracking-[-0.02em] text-club-navy sm:text-4xl">Treneri</h3>
+      <h3 className="text-2xl font-semibold text-black uppercase">Treneri</h3>
 
       <div className="mt-4">
         <CoachesListView coaches={coaches} />

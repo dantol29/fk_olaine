@@ -5,7 +5,9 @@ import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { CalendarDrawer } from "@/components/calendar-drawer";
-import { GameFixtureCard } from "@/components/game-fixture-card";
+import { MatchListCard } from "@/components/upcoming-matches";
+import { leagueForGame } from "@/lib/game-league";
+import type { LeagueStandings } from "@/lib/league-standings-server";
 import type { GameListItem } from "@/lib/games-server";
 
 const FULL_MONTHS_LV = [
@@ -38,11 +40,13 @@ type Cell = { day: number; year: number; month: number; muted: boolean };
 
 export function GamesMonthCalendar({
   games,
+  leagues = [],
   activeDateKey,
   onSelectDate,
   className,
 }: {
   games: GameListItem[];
+  leagues?: LeagueStandings[];
   /** The date currently shown in the desktop left-side list (see
    *  GamesDirectory) — highlighted here so the two stay visually linked. */
   activeDateKey?: string | null;
@@ -221,7 +225,7 @@ export function GamesMonthCalendar({
         ) : (
           <div className="flex flex-col divide-y divide-slate-100 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
             {selectedGames.map((game) => (
-              <GameFixtureCard key={game.id} game={game} dimPast={false} />
+              <MatchListCard key={game.id} game={game} league={leagueForGame(game, leagues)} completed={game.isPast} drawer showInfo={false} />
             ))}
           </div>
         )}

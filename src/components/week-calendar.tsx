@@ -702,17 +702,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="relative flex min-h-24 min-w-0 flex-1 flex-col items-center justify-center sm:min-h-32 sm:items-start">
-          <span
-            aria-hidden
-            className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-[4.75rem] leading-none font-extrabold tracking-tight whitespace-nowrap text-club-navy/[0.06] uppercase select-none sm:text-8xl"
-          >
-            Kalendārs
-          </span>
-          <h2 className="relative text-center text-3xl tracking-[-0.02em] text-club-navy sm:text-left sm:text-4xl lg:pl-4">
-            Kalendārs
-          </h2>
-        </div>
+        <h2 className="text-3xl font-semibold text-black uppercase sm:text-4xl lg:text-5xl">Kalendārs</h2>
         <span className="hidden text-2xl text-club-navy sm:block sm:text-3xl">
           {rangeLabel}
         </span>

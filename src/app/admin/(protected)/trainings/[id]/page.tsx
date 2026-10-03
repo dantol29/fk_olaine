@@ -49,7 +49,7 @@ export default async function AdminTrainingFormPage({
       )}
 
       <div className="mt-10">
-        <h2 className="mb-4 text-lg font-bold text-club-navy">
+        <h2 className="mb-4 text-lg font-bold text-black">
           Esošais grafiks (lai zinātu, kas jau ir aizņemts)
         </h2>
         <WeekCalendar events={events} />

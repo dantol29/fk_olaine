@@ -22,7 +22,7 @@ export function DeleteButton({
         type="submit"
         aria-label="Dzēst"
         title="Dzēst"
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-club-red transition hover:bg-club-red/10"
+        className="flex h-8 w-8 items-center justify-center rounded-none text-club-red transition hover:bg-club-red/10"
       >
         <Trash2 className="h-4 w-4" />
       </button>

@@ -1,16 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Calendar, Goal, UserRound, Users } from "lucide-react";
+import { Calendar, Goal, UserRound, Users, X } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import type { GameListItem } from "@/lib/games-server";
 import type { TrainingListItem } from "@/lib/trainings-server";
 import { CollapsibleGrid } from "@/components/collapsible-grid";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { GameFixtureCard } from "@/components/game-fixture-card";
-import { TrainingFixtureCard } from "@/components/training-fixture-card";
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
+import { MatchListCard } from "@/components/upcoming-matches";
+import { TrainingRow } from "@/components/trainings-directory";
 
 type Player = {
   id: number;
@@ -74,12 +74,12 @@ function PlayerCell({
     <button
       type="button"
       onClick={() => onSelect(player)}
-      className="flex flex-col items-center gap-3 text-center"
+      className="flex min-w-0 flex-col items-start gap-3 text-left"
     >
-      <div className="relative shrink-0">
+      <div className="relative w-full shrink-0">
         <div
           className={cn(
-            "relative overflow-hidden rounded-full bg-club-gray-light",
+            "relative overflow-hidden rounded-none bg-club-gray-light",
             avatarClassName,
           )}
         >
@@ -89,7 +89,7 @@ function PlayerCell({
               alt={player.name}
               fill
               sizes="(min-width: 640px) 112px, 96px"
-              className="object-cover"
+              className="object-contain object-bottom"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
@@ -98,7 +98,7 @@ function PlayerCell({
           )}
         </div>
       </div>
-      <span className={cn("font-medium text-club-navy", nameClassName)}>{player.name}</span>
+      <span className={cn("font-medium text-black", nameClassName)}>{player.name}</span>
     </button>
   );
 }
@@ -121,11 +121,11 @@ function CoachCell({
     <button
       type="button"
       onClick={() => onSelect(coach)}
-      className="flex flex-col items-center gap-3 text-center"
+      className="flex min-w-0 flex-col items-start gap-3 text-left"
     >
       <div
         className={cn(
-          "relative shrink-0 overflow-hidden rounded-full bg-club-gray-light",
+          "relative shrink-0 overflow-hidden rounded-none bg-club-gray-light",
           avatarClassName,
         )}
       >
@@ -135,7 +135,7 @@ function CoachCell({
             alt={coach.name}
             fill
             sizes="(min-width: 640px) 112px, 96px"
-            className="object-cover"
+            className="object-contain object-bottom"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
@@ -144,10 +144,10 @@ function CoachCell({
         )}
       </div>
       <div>
-        <span className={cn("block font-medium text-club-navy", nameClassName)}>
+        <span className={cn("block font-medium text-black", nameClassName)}>
           {coach.name}
         </span>
-        <span className="block text-xs text-slate-400">{coach.position}</span>
+        <span className="block text-xs text-black/45">{coach.position}</span>
       </div>
     </button>
   );
@@ -190,22 +190,18 @@ export function HomeTeamsPanel({
   const displayedGames = onlyUpcoming(activeTeam.games, 6);
   const displayedTrainings = onlyUpcoming(activeTeam.trainings, 6);
 
-  const avatarClassName = "h-24 w-24 sm:h-28 sm:w-28";
-  const nameClassName = "text-sm";
+  const avatarClassName = "aspect-square w-full";
+  const nameClassName = "text-sm leading-snug sm:text-base";
 
   return (
     <div
       className={cn(
-        "ml-[calc(50%-50vw)] grid w-screen grid-cols-1 sm:ml-0 sm:w-full lg:grid-cols-[200px_1fr]",
-        !bare && "sm:overflow-hidden sm:rounded-2xl sm:bg-white",
-        bare ? "lg:min-h-[48rem] lg:max-h-[48rem]" : "lg:min-h-[40rem] lg:max-h-[40rem]",
+        "grid w-full min-w-0 grid-cols-1 border border-black/15",
+        !bare && "overflow-hidden bg-white",
         className,
       )}
     >
-      {/* Mobile/tablet: a horizontally scrollable row of team pills — the
-       *  sidebar list below would otherwise push the actual roster content
-       *  well below the fold on a phone. */}
-      <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-slate-100 bg-slate-50 px-4 py-3 lg:hidden">
+      <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-black/10 bg-black px-4 py-3">
         {teams.map((team) => {
           const isActive = team.id === activeTeam.id;
           return (
@@ -218,10 +214,10 @@ export function HomeTeamsPanel({
               }}
               aria-pressed={isActive}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition",
+                "shrink-0 rounded-none px-4 py-2 text-sm font-semibold transition",
                 isActive
-                  ? "bg-club-navy text-white"
-                  : "bg-white text-club-navy hover:bg-slate-100",
+                  ? "border-b-2 border-white text-white"
+                  : "border-b-2 border-transparent text-white/55 hover:text-white",
               )}
             >
               {team.name}
@@ -230,44 +226,10 @@ export function HomeTeamsPanel({
         })}
       </div>
 
-      <nav
-        className={cn(
-          "hidden bg-slate-50 lg:flex lg:flex-col lg:overflow-y-auto",
-          bare ? "rounded-2xl" : "lg:rounded-br-2xl",
-        )}
-      >
-        {teams.map((team) => {
-          const isActive = team.id === activeTeam.id;
-          return (
-            <button
-              key={team.id}
-              type="button"
-              onClick={() => {
-                setActiveTeamId(team.id);
-                setActiveTab(defaultTab);
-              }}
-              aria-pressed={isActive}
-              className={cn(
-                "flex items-center gap-3 px-5 py-4 text-left transition",
-                isActive ? "bg-white" : "hover:bg-slate-100",
-              )}
-            >
-              <span
-                className={cn(
-                  "min-w-0 flex-1 truncate text-xl tracking-[-0.02em]",
-                  isActive ? "text-club-red" : "text-club-navy/80",
-                )}
-              >
-                {team.name}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
 
       <div className="px-4 pt-4 pb-6 sm:px-8 sm:pt-5 sm:pb-8 lg:overflow-y-auto">
         {showTabs && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-3 overflow-x-auto">
             {TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -275,10 +237,10 @@ export function HomeTeamsPanel({
                 onClick={() => setActiveTab(tab.key)}
                 aria-pressed={activeTab === tab.key}
                 className={cn(
-                  "rounded-full px-4 py-2 text-sm transition",
+                  "shrink-0 border-b-2 px-1 py-2 text-xs font-semibold uppercase",
                   activeTab === tab.key
-                    ? "bg-club-navy text-white"
-                    : "bg-slate-100 text-club-navy hover:bg-slate-200",
+                    ? "border-black text-black"
+                    : "border-transparent text-black/45 hover:text-black",
                 )}
               >
                 {tab.label}
@@ -291,7 +253,7 @@ export function HomeTeamsPanel({
           {activeTab === "players" &&
             (activeTeam.players.length > 0 ? (
               bare ? (
-                <div className="grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+                <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
                   {activeTeam.players.map((player) => (
                     <PlayerCell
                       key={player.id}
@@ -305,7 +267,7 @@ export function HomeTeamsPanel({
               ) : (
                 <CollapsibleGrid
                   key={activeTeam.id}
-                  gridClassName="grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
+                  gridClassName="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4"
                   collapsedClassName="max-h-[24rem] sm:max-h-[27rem]"
                   fadeFromClassName="from-white"
                   moreHref="/komandas"
@@ -322,14 +284,14 @@ export function HomeTeamsPanel({
                 </CollapsibleGrid>
               )
             ) : (
-              <p className="py-16 text-center text-slate-400">
+              <p className="py-16 text-center text-black/45">
                 Šai komandai vēl nav pievienoti spēlētāji.
               </p>
             ))}
 
           {activeTab === "coaches" &&
             (activeTeam.coaches.length > 0 ? (
-              <div className="grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+              <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
                 {activeTeam.coaches.map((coach) => (
                   <CoachCell
                     key={coach.id}
@@ -341,7 +303,7 @@ export function HomeTeamsPanel({
                 ))}
               </div>
             ) : (
-              <p className="py-16 text-center text-slate-400">
+              <p className="py-16 text-center text-black/45">
                 Šai komandai vēl nav piesaistīts treneris.
               </p>
             ))}
@@ -350,13 +312,11 @@ export function HomeTeamsPanel({
             (displayedGames.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {displayedGames.map((game) => (
-                  <div key={game.id} className="rounded-2xl border border-slate-100">
-                    <GameFixtureCard game={game} />
-                  </div>
+                  <MatchListCard key={game.id} game={game} compact />
                 ))}
               </div>
             ) : (
-              <p className="py-16 text-center text-slate-400">
+              <p className="py-16 text-center text-black/45">
                 Šai komandai nav ieplānotu spēļu.
               </p>
             ))}
@@ -365,13 +325,11 @@ export function HomeTeamsPanel({
             (displayedTrainings.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {displayedTrainings.map((training) => (
-                  <div key={training.id} className="rounded-2xl border border-slate-100">
-                    <TrainingFixtureCard training={training} />
-                  </div>
+                  <TrainingRow key={training.id} training={training} compact />
                 ))}
               </div>
             ) : (
-              <p className="py-16 text-center text-slate-400">
+              <p className="py-16 text-center text-black/45">
                 Šai komandai nav ieplānotu treniņu.
               </p>
             ))}
@@ -379,24 +337,26 @@ export function HomeTeamsPanel({
       </div>
 
       <Drawer
+        swipeDirection="right"
         open={Boolean(selectedPlayer)}
         onOpenChange={(open) => {
           if (!open) setSelectedPlayer(null);
         }}
       >
-        <DrawerContent className="border-none bg-transparent shadow-none">
+        <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,400px)] border-none bg-white shadow-xl data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
+          <div className="flex items-center justify-between bg-black px-4 py-3 text-white"><DrawerTitle className="text-2xl font-normal text-white">Informācija</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 items-center justify-center"><X className="size-6" /></DrawerClose></div>
           {selectedPlayer && (
-            <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-6 shadow-xl">
+            <div className="min-h-0 flex-1 overflow-y-auto bg-white p-5 text-black">
               <div className="flex items-center gap-4">
                 <div className="relative h-20 w-20 shrink-0">
-                  <div className="relative h-full w-full overflow-hidden rounded-full bg-club-gray-light">
+                  <div className="relative h-full w-full overflow-hidden rounded-none bg-club-gray-light">
                     {selectedPlayer.photoUrl ? (
                       <Image
                         src={selectedPlayer.photoUrl}
                         alt={selectedPlayer.name}
                         fill
                         sizes="80px"
-                        className="object-cover"
+                        className="object-contain object-bottom"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
@@ -405,20 +365,20 @@ export function HomeTeamsPanel({
                     )}
                   </div>
                   {selectedPlayer.number !== null && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-white px-3 text-base text-black">
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-none bg-white px-3 text-base text-black">
                       {selectedPlayer.number}
                     </span>
                   )}
                 </div>
-                <h3 className="text-xl text-club-navy">{selectedPlayer.name}</h3>
+                <h3 className="text-xl text-black">{selectedPlayer.name}</h3>
               </div>
 
-              <div className="mt-6 flex flex-col divide-y divide-slate-100">
+              <div className="mt-6 flex flex-col divide-y divide-black/10">
                 <div className="flex items-center gap-3 py-3 first:pt-0">
                   <Calendar className="h-4 w-4 shrink-0 text-club-red" />
                   <div>
-                    <p className="text-xs text-slate-400">Dzimšanas datums</p>
-                    <p className="text-sm text-club-navy">
+                    <p className="text-xs text-black/45">Dzimšanas datums</p>
+                    <p className="text-sm text-black">
                       {selectedPlayer.birthdate}
                     </p>
                   </div>
@@ -426,8 +386,8 @@ export function HomeTeamsPanel({
                 <div className="flex items-center gap-3 py-3">
                   <Users className="h-4 w-4 shrink-0 text-club-red" />
                   <div>
-                    <p className="text-xs text-slate-400">Komandas</p>
-                    <p className="text-sm text-club-navy">
+                    <p className="text-xs text-black/45">Komandas</p>
+                    <p className="text-sm text-black">
                       {selectedPlayer.teams.length > 0
                         ? selectedPlayer.teams.map((t) => t.name).join(", ")
                         : "—"}
@@ -437,17 +397,17 @@ export function HomeTeamsPanel({
                 <div className="flex items-center gap-3 py-3 last:pb-0">
                   <Goal className="h-4 w-4 shrink-0 text-club-red" />
                   <div>
-                    <p className="text-xs text-slate-400">Gūtie vārti</p>
+                    <p className="text-xs text-black/45">Gūtie vārti</p>
                     {selectedPlayer.teams.length > 0 ? (
                       <div className="mt-0.5 flex flex-col">
                         {selectedPlayer.teams.map((t) => (
-                          <p key={t.name} className="text-sm text-club-navy">
+                          <p key={t.name} className="text-sm text-black">
                             {t.name} - {t.goals}
                           </p>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-club-navy">—</p>
+                      <p className="text-sm text-black">—</p>
                     )}
                   </div>
                 </div>
@@ -458,23 +418,25 @@ export function HomeTeamsPanel({
       </Drawer>
 
       <Drawer
+        swipeDirection="right"
         open={Boolean(selectedCoach)}
         onOpenChange={(open) => {
           if (!open) setSelectedCoach(null);
         }}
       >
-        <DrawerContent className="border-none bg-transparent shadow-none">
+        <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,400px)] border-none bg-white shadow-xl data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
+          <div className="flex items-center justify-between bg-black px-4 py-3 text-white"><DrawerTitle className="text-2xl font-normal text-white">Informācija</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 items-center justify-center"><X className="size-6" /></DrawerClose></div>
           {selectedCoach && (
-            <div className="mx-auto w-full max-w-sm rounded-t-2xl border border-border bg-white p-6 shadow-xl">
+            <div className="min-h-0 flex-1 overflow-y-auto bg-white p-5 text-black">
               <div className="flex items-center gap-4">
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-club-gray-light">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-none bg-club-gray-light">
                   {selectedCoach.photoUrl ? (
                     <Image
                       src={selectedCoach.photoUrl}
                       alt={selectedCoach.name}
                       fill
                       sizes="80px"
-                      className="object-cover"
+                      className="object-contain object-bottom"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
@@ -483,23 +445,23 @@ export function HomeTeamsPanel({
                   )}
                 </div>
                 <div>
-                  <h3 className="text-xl text-club-navy">{selectedCoach.name}</h3>
-                  <p className="text-sm text-slate-400">{selectedCoach.position}</p>
+                  <h3 className="text-xl text-black">{selectedCoach.name}</h3>
+                  <p className="text-sm text-black/45">{selectedCoach.position}</p>
                 </div>
               </div>
 
-              <div className="mt-6 flex flex-col divide-y divide-slate-100">
+              <div className="mt-6 flex flex-col divide-y divide-black/10">
                 <div className="flex items-center gap-3 py-3 first:pt-0">
                   <Image
                     src={AUTHORITY_LOGO[selectedCoach.authority]}
                     alt={selectedCoach.authority}
                     width={20}
                     height={20}
-                    className="h-5 w-5 shrink-0 rounded-full object-contain"
+                    className="h-5 w-5 shrink-0 rounded-none object-contain"
                   />
                   <div>
-                    <p className="text-xs text-slate-400">Licence</p>
-                    <p className="text-sm text-club-navy">
+                    <p className="text-xs text-black/45">Licence</p>
+                    <p className="text-sm text-black">
                       {selectedCoach.license}
                     </p>
                   </div>
@@ -507,8 +469,8 @@ export function HomeTeamsPanel({
                 <div className="flex items-center gap-3 py-3 last:pb-0">
                   <Users className="h-4 w-4 shrink-0 text-club-red" />
                   <div>
-                    <p className="text-xs text-slate-400">Komandas</p>
-                    <p className="text-sm text-club-navy">
+                    <p className="text-xs text-black/45">Komandas</p>
+                    <p className="text-sm text-black">
                       {selectedCoach.teamNames.length > 0
                         ? selectedCoach.teamNames.join(", ")
                         : "—"}

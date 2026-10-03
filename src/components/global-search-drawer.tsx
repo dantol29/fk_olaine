@@ -148,33 +148,33 @@ export function GlobalSearchDrawer({ triggerClassName, open: controlledOpen, onO
             </div>
           </div>
 
-          <div aria-live="polite" aria-busy={isLoading && hasQuery} className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div aria-live="polite" aria-busy={isLoading && hasQuery} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-6 text-black pb-[max(1.5rem,env(safe-area-inset-bottom))]">
             {!hasQuery ? null : isLoading ? (
-              <p className="py-16 text-center text-sm text-slate-400">Meklē...</p>
+              <p className="py-16 text-center text-sm text-black/50">Meklē...</p>
             ) : !hasResults ? (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
-                  <SearchX className="h-6 w-6 text-slate-400" strokeWidth={1.5} />
+                <span className="flex size-14 items-center justify-center bg-[#e8e8e8]">
+                  <SearchX className="size-6 text-black/50" strokeWidth={1.5} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-club-navy">Nekas netika atrasts</p>
-                  <p className="mt-1 text-sm text-slate-400">
+                  <p className="text-base font-semibold text-black">Nekas netika atrasts</p>
+                  <p className="mt-2 text-sm text-black/55">
                     Pamēģini meklēt ar citu vārdu vai nosaukumu.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-8">
                 {results.teams.length > 0 && (
                   <section>
-                    <h3 className="mb-2 text-xs font-semibold text-slate-400">Komandas</h3>
-                    <div className="flex flex-col gap-1">
+                    <h3 className="mb-3 border-b-2 border-black pb-3 text-xl font-semibold uppercase text-black">Komandas</h3>
+                    <div className="flex flex-col divide-y divide-black/10">
                       {results.teams.map((team) => (
                         <Link
                           key={team.id}
                           href="/komandas"
                           onClick={close}
-                          className="rounded-lg px-2 py-2 text-sm font-semibold text-club-navy hover:bg-slate-50"
+                          className="flex min-h-12 items-center py-3 text-base font-semibold uppercase text-black hover:text-black/60 focus-visible:outline-black"
                         >
                           {team.name}
                         </Link>
@@ -185,36 +185,36 @@ export function GlobalSearchDrawer({ triggerClassName, open: controlledOpen, onO
 
                 {results.players.length > 0 && (
                   <section>
-                    <h3 className="mb-2 text-xs font-semibold text-slate-400">Spēlētāji</h3>
-                    <div className="flex flex-col divide-y divide-slate-100">
+                    <h3 className="mb-3 border-b-2 border-black pb-3 text-xl font-semibold uppercase text-black">Spēlētāji</h3>
+                    <div className="flex flex-col divide-y divide-black/10">
                       {results.players.map((player) => (
                         <Link
                           key={player.id}
                           href="/komandas"
                           onClick={close}
-                          className="flex items-center gap-4 rounded-xl px-2 py-3 transition hover:bg-slate-50"
+                          className="group flex items-center gap-4 py-4 text-black focus-visible:outline-black"
                         >
-                          <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
+                          <span className="relative size-20 shrink-0 overflow-hidden bg-[#f5f5f5]">
                             {player.photoUrl ? (
                               <Image
                                 src={player.photoUrl}
                                 alt={player.name}
                                 fill
-                                sizes="(min-width: 640px) 112px, 96px"
-                                className="object-cover"
+                                sizes="80px"
+                                className="object-contain object-bottom"
                               />
                             ) : (
                               <span className="flex h-full w-full items-center justify-center">
-                                <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+                                <UserRound className="size-9 text-black/20" strokeWidth={1.5} />
                               </span>
                             )}
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-lg font-semibold text-club-navy">
+                            <span className="block text-lg leading-snug font-semibold uppercase text-black group-hover:text-black/60">
                               {player.name}
                             </span>
                             {player.teamName && (
-                              <span className="block truncate text-sm text-slate-400">
+                              <span className="mt-1 block text-sm text-black/55">
                                 {player.teamName}
                               </span>
                             )}
@@ -227,42 +227,42 @@ export function GlobalSearchDrawer({ triggerClassName, open: controlledOpen, onO
 
                 {results.coaches.length > 0 && (
                   <section>
-                    <h3 className="mb-2 text-xs font-semibold text-slate-400">Treneri</h3>
-                    <div className="flex flex-col divide-y divide-slate-100">
+                    <h3 className="mb-3 border-b-2 border-black pb-3 text-xl font-semibold uppercase text-black">Treneri</h3>
+                    <div className="flex flex-col divide-y divide-black/10">
                       {results.coaches.map((coach) => (
                         <Link
                           key={coach.id}
                           href="/komandas#roster-staff"
                           onClick={close}
-                          className="flex items-center gap-4 rounded-xl px-2 py-3 transition hover:bg-slate-50"
+                          className="group flex items-center gap-4 py-4 text-black focus-visible:outline-black"
                         >
-                          <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full bg-club-gray-light sm:h-28 sm:w-28">
+                          <span className="relative size-20 shrink-0 overflow-hidden bg-[#f5f5f5]">
                             {coach.photoUrl ? (
                               <Image
                                 src={coach.photoUrl}
                                 alt={coach.name}
                                 fill
-                                sizes="(min-width: 640px) 112px, 96px"
-                                className="object-cover"
+                                sizes="80px"
+                                className="object-contain object-bottom"
                               />
                             ) : (
                               <span className="flex h-full w-full items-center justify-center">
-                                <UserRound className="h-9 w-9 text-club-muted" strokeWidth={1.5} />
+                                <UserRound className="size-9 text-black/20" strokeWidth={1.5} />
                               </span>
                             )}
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-lg font-semibold text-club-navy">
+                            <span className="block text-lg leading-snug font-semibold uppercase text-black group-hover:text-black/60">
                               {coach.name}
                             </span>
-                            <span className="block truncate text-sm text-slate-400">{coach.position}</span>
-                            <span className="mt-1 flex items-center gap-1.5 text-xs text-club-navy">
+                            <span className="mt-1 block text-sm text-black/55">{coach.position}</span>
+                            <span className="mt-2 flex items-center gap-1.5 text-xs text-black/55">
                               <Image
                                 src={AUTHORITY_LOGO[coach.authority]}
                                 alt={coach.authority}
                                 width={16}
                                 height={16}
-                                className="h-4 w-4 shrink-0 rounded-full object-contain"
+                                className="size-4 shrink-0 object-contain"
                               />
                               <span className="truncate">{coach.license}</span>
                             </span>
@@ -275,25 +275,25 @@ export function GlobalSearchDrawer({ triggerClassName, open: controlledOpen, onO
 
                 {results.articles.length > 0 && (
                   <section>
-                    <h3 className="mb-2 text-xs font-semibold text-slate-400">Jaunumi</h3>
-                    <div className="flex flex-col gap-1">
+                    <h3 className="mb-3 border-b-2 border-black pb-3 text-xl font-semibold uppercase text-black">Jaunumi</h3>
+                    <div className="flex flex-col divide-y divide-black/10">
                       {results.articles.map((article) => (
                         <Link
                           key={article.slug}
                           href={`/jaunumi/${article.slug}`}
                           onClick={close}
-                          className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-slate-50"
+                          className="group flex items-start gap-4 py-4 text-black focus-visible:outline-black"
                         >
-                          <span className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-club-gray-light">
+                          <span className="relative h-20 w-28 shrink-0 overflow-hidden bg-[#e8e8e8]">
                             <Image
                               src={article.image}
                               alt=""
                               fill
-                              sizes="64px"
+                              sizes="112px"
                               className="object-cover"
                             />
                           </span>
-                          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-club-navy">
+                          <span className="min-w-0 flex-1 text-base leading-snug font-semibold text-black group-hover:text-black/60">
                             {article.title}
                           </span>
                         </Link>

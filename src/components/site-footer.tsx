@@ -5,7 +5,7 @@ import { FacebookIcon, InstagramIcon, YouTubeIcon } from "@/components/social-ic
 import { getPartners } from "@/lib/partners-server";
 import { getPublishedClubPages } from "@/lib/club-pages-server";
 
-const navLinkClass = "flex min-h-11 items-center text-sm hover:text-white/70 focus-visible:outline-white";
+const navLinkClass = "flex min-h-8 items-center text-sm hover:text-white/70 focus-visible:outline-white sm:min-h-11";
 
 export async function SiteFooter() {
   const [clubPages, partners] = await Promise.all([getPublishedClubPages(), getPartners()]);
@@ -26,10 +26,10 @@ export async function SiteFooter() {
         <div aria-hidden="true" className="h-20 bg-[#e8e8e8] sm:h-24" />
         <section id="partners" aria-labelledby="partners-heading" className="scroll-mt-24 bg-white px-6 pt-6 pb-12 text-black sm:px-12 sm:pb-14">
           <h2 id="partners-heading" className="text-center text-lg font-semibold uppercase sm:text-xl">Kluba partneri</h2>
-          <div className="mx-auto mt-10 flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:mt-14 sm:gap-x-14">
+          <div className="mx-auto mt-10 grid max-w-5xl grid-cols-2 items-center justify-center gap-x-6 gap-y-8 sm:mt-14 sm:flex sm:flex-wrap sm:gap-x-14">
             {partners.map((partner) => {
               const image = (
-                <Image src={partner.logoUrl} alt={partner.name} width={partner.logoWidth} height={partner.logoHeight} className="max-h-14 w-auto max-w-[160px] object-contain grayscale opacity-60 transition-[filter,opacity] duration-200 group-hover:grayscale-0 group-hover:opacity-100 group-focus-visible:grayscale-0 group-focus-visible:opacity-100 motion-reduce:transition-none" />
+                <Image src={partner.logoUrl} alt={partner.name} width={partner.logoWidth} height={partner.logoHeight} className="max-h-14 w-auto max-w-full object-contain grayscale opacity-60 transition-[filter,opacity] duration-200 group-hover:grayscale-0 group-hover:opacity-100 group-focus-visible:grayscale-0 group-focus-visible:opacity-100 motion-reduce:transition-none sm:max-w-[160px]" />
               );
               return partner.websiteUrl ? (
                 <a key={partner.id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" className="group flex min-h-16 items-center justify-center focus-visible:outline-black">{image}</a>
@@ -60,7 +60,7 @@ export async function SiteFooter() {
             </a>
           </div>
 
-          <nav aria-label="Kājenes navigācija" className="flex flex-wrap justify-center gap-x-6 gap-y-2 lg:justify-end lg:gap-x-9">
+          <nav aria-label="Kājenes navigācija" className="flex flex-col items-center justify-center gap-x-6 gap-y-0 sm:flex-row sm:flex-wrap sm:gap-y-2 lg:justify-end lg:gap-x-9">
             {navItems.map((item) => <Link key={item.href} href={item.href} className={navLinkClass}>{item.title}</Link>)}
           </nav>
         </div>

@@ -17,10 +17,10 @@ export default async function AdminCoachesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold text-club-navy">Treneri</h1>
+        <h1 className="text-2xl font-semibold text-black">Treneri</h1>
         <Link
           href="/admin/coaches/new"
-          className="rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
+          className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
         </Link>
@@ -28,7 +28,7 @@ export default async function AdminCoachesPage() {
       <AdminSearch placeholder="Meklēt trenerus…" />
 
       {rows.length === 0 ? (
-        <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
+        <p className="rounded-none bg-white p-8 text-center text-sm text-black/45 shadow-none">
           Vēl nav neviena trenera.
         </p>
       ) : (
@@ -37,9 +37,9 @@ export default async function AdminCoachesPage() {
             <div
               key={coach.id}
               data-admin-search-item={`${coach.name} ${coach.position} ${coach.coachTeams.map((ct) => ct.team?.name).join(" ")}`}
-              className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+              className="overflow-hidden rounded-none border border-black/15 bg-white shadow-none"
             >
-              <div className="relative aspect-square bg-club-gray-light">
+              <div className="relative aspect-square bg-[#f5f5f5]">
                 {coach.photoUrl ? (
                   <Image
                     src={coach.photoUrl}
@@ -55,17 +55,17 @@ export default async function AdminCoachesPage() {
                 )}
               </div>
               <div className="p-3">
-                <p className="truncate text-sm font-semibold text-club-navy">{coach.name}</p>
-                <p className="text-xs text-slate-400">{coach.position}</p>
+                <p className="truncate text-sm font-semibold text-black">{coach.name}</p>
+                <p className="text-xs text-black/45">{coach.position}</p>
                 <p className="mt-1 truncate text-xs font-semibold text-club-red">
                   {coach.coachTeams.map((ct) => ct.team?.name).join(", ") || "—"}
                 </p>
-                <div className="mt-3 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
+                <div className="mt-3 flex items-center justify-end gap-2 border-t border-black/10 pt-2">
                   <Link
                     href={`/admin/coaches/${coach.id}`}
                     aria-label={`Rediģēt treneri "${coach.name}"`}
                     title="Rediģēt"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
+                    className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
                   </Link>

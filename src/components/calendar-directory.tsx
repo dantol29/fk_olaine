@@ -3,6 +3,8 @@
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin, X } from "lucide-react";
 import { useState } from "react";
 
+import { leagueForGame } from "@/lib/game-league";
+import type { LeagueStandings } from "@/lib/league-standings-server";
 import type { CalendarEvent } from "@/lib/calendar";
 import { cn } from "@/lib/utils";
 import { MatchListCard } from "@/components/upcoming-matches";
@@ -27,7 +29,7 @@ function dateLabel(date: string) {
   return new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${date}T12:00:00Z`));
 }
 
-export function CalendarDirectory({ events, today, minMonth, maxMonth }: { events: CalendarEvent[]; today: string; minMonth: string; maxMonth: string }) {
+export function CalendarDirectory({ events, leagues = [], today, minMonth, maxMonth }: { events: CalendarEvent[]; leagues?: LeagueStandings[]; today: string; minMonth: string; maxMonth: string }) {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [team, setTeam] = useState("Visas komandas");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
@@ -51,13 +53,13 @@ export function CalendarDirectory({ events, today, minMonth, maxMonth }: { event
   return <>
     <section className="calendar-page-hero bg-black px-6 pt-6 text-white sm:px-10 sm:pt-8 lg:px-14">
       <div className="mx-auto max-w-[1920px]">
-        <h1 className="mb-4 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Kalendārs</h1>
-        <nav aria-label="Komandas" className="flex gap-6 overflow-x-auto sm:gap-8">{teams.map((name) => <button key={name} type="button" aria-pressed={name === team} onClick={() => { setTeam(name); setSelectedDate(null); }} className={cn("shrink-0 border-b-4 pt-3 pb-1 text-base uppercase sm:text-lg", name === team ? "border-white font-semibold" : "border-transparent")}>{name}</button>)}</nav>
+        <h1 className="mb-2 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Kalendārs</h1>
+        <nav aria-label="Komandas" className="flex items-end gap-6 overflow-x-auto sm:gap-8 lg:min-h-12">{teams.map((name) => <button key={name} type="button" aria-pressed={name === team} onClick={() => { setTeam(name); setSelectedDate(null); }} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", name === team && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{name}</button>)}</nav>
       </div>
     </section>
     <section className="px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14">
       <div className="mx-auto max-w-[1440px]">
-        <div aria-label="Notikumu veids" className="mx-auto mb-10 flex w-fit max-w-full border-b border-black/10">{FILTERS.map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} onClick={() => setFilter(item.key)} className={cn("border-b-4 px-3 pt-3 pb-1 text-xs font-semibold uppercase sm:px-7 sm:text-lg", filter === item.key ? "border-black" : "border-transparent text-black/40")}>{item.label}</button>)}</div>
+        <div aria-label="Notikumu veids" className="mx-auto mb-10 flex w-fit max-w-full overflow-x-auto border-b border-black/10">{FILTERS.map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} onClick={() => setFilter(item.key)} className={cn("shrink-0 border-b-4 px-4 pt-3 pb-1 text-sm font-semibold uppercase sm:px-8 sm:text-lg", filter === item.key ? "border-black" : "border-transparent text-black/40")}>{item.label}</button>)}</div>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold uppercase sm:text-3xl">{new Intl.DateTimeFormat("lv-LV", { month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${month}-15T12:00:00Z`))}</h2>
           <div className="flex items-center gap-3"><button type="button" onClick={() => setMonth(today.slice(0, 7))} className="min-h-11 border-2 border-black px-4 text-xs font-semibold uppercase hover:bg-black hover:text-white">Šodien</button><button type="button" aria-label="Iepriekšējais mēnesis" disabled={month <= minMonth} onClick={() => setMonth(monthOffset(month, -1))} className={controlClass}><ChevronLeft className="size-5" /></button><button type="button" aria-label="Nākamais mēnesis" disabled={month >= maxMonth} onClick={() => setMonth(monthOffset(month, 1))} className={controlClass}><ChevronRight className="size-5" /></button></div>
@@ -80,7 +82,7 @@ export function CalendarDirectory({ events, today, minMonth, maxMonth }: { event
       <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,520px)] border-none bg-white data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4 bg-black px-6 py-4 text-white"><DrawerTitle className="text-xl text-white">{selectedDate ? dateLabel(selectedDate) : "Kalendārs"}</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 shrink-0 items-center justify-center"><X className="size-6" /></DrawerClose></div>
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-6 text-black">
-          {selectedEvents.length ? selectedEvents.map((event) => <div key={event.uid}><p className="mb-2 text-xs font-semibold text-black/45 uppercase">{FILTERS.find((item) => item.key === event.eventType)?.label}</p>{event.gameFixture ? <MatchListCard game={event.gameFixture} completed={new Date(event.start).getTime() <= Date.now()} compact /> : event.trainingFixture ? <TrainingRow training={event.trainingFixture} compact /> : <article className="border border-black/10 p-5"><p className="text-sm text-black/50">{event.timeLabel ?? "Visa diena"}</p><h3 className="mt-2 text-lg font-semibold">{event.title}</h3>{event.location && <p className="mt-3 flex items-start gap-2 text-sm text-black/50"><MapPin className="size-4 shrink-0" aria-hidden="true" />{event.location}</p>}</article>}</div>) : <div className="py-12 text-center"><CalendarDays className="mx-auto mb-4 size-10 text-black/25" aria-hidden="true" /><p className="text-sm text-black/50">Šajā dienā nav ieplānotu notikumu.</p></div>}
+          {selectedEvents.length ? selectedEvents.map((event) => <div key={event.uid}><p className="mb-2 text-xs font-semibold text-black/45 uppercase">{FILTERS.find((item) => item.key === event.eventType)?.label}</p>{event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={new Date(event.start).getTime() <= Date.now()} drawer showInfo={false} /> : event.trainingFixture ? <TrainingRow training={event.trainingFixture} compact /> : <article className="border border-black/10 p-5"><p className="text-sm text-black/50">{event.timeLabel ?? "Visa diena"}</p><h3 className="mt-2 text-lg font-semibold">{event.title}</h3>{event.location && <p className="mt-3 flex items-start gap-2 text-sm text-black/50"><MapPin className="size-4 shrink-0" aria-hidden="true" />{event.location}</p>}</article>}</div>) : <div className="py-12 text-center"><CalendarDays className="mx-auto mb-4 size-10 text-black/25" aria-hidden="true" /><p className="text-sm text-black/50">Šajā dienā nav ieplānotu notikumu.</p></div>}
         </div>
       </DrawerContent>
     </Drawer>

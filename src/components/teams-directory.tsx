@@ -35,27 +35,29 @@ export function TeamsDirectory({ teams }: { teams: Teams }) {
   const [player, setPlayer] = useState<Player | null>(null);
   const [coach, setCoach] = useState<Coach | null>(null);
   const team = teams.find((item) => item.id === teamId) ?? teams[0];
-  const unassigned = team?.players.filter((item) => !POSITIONS.some((position) => position.key === item.position)) ?? [];
-  const groups = [
-    ...POSITIONS.map((position) => ({ ...position, players: team?.players.filter((item) => item.position === position.key) ?? [] })),
-    ...(unassigned.length ? [{ key: "players", label: "Spēlētāji", players: unassigned }] : []),
-  ];
+  const groups = POSITIONS.map((position) => ({
+    ...position,
+    players: team?.players.filter((item) => {
+      const assigned = POSITIONS.some((entry) => entry.key === item.position) ? item.position : "defender";
+      return assigned === position.key;
+    }) ?? [],
+  }));
   const person = player ?? coach;
 
   return <>
-    <section className="teams-page-hero bg-black px-6 pt-8 text-white sm:px-10 sm:pt-12 lg:px-14">
+    <section className="teams-page-hero bg-black px-6 pt-6 text-white sm:px-10 sm:pt-8 lg:px-14">
       <div className="mx-auto max-w-[1920px]">
-        <h1 className="mb-8 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Komandas</h1>
-        <nav aria-label="Komandas" className="flex gap-6 overflow-x-auto sm:gap-8">
-          {teams.map((item) => <button key={item.id} type="button" aria-pressed={item.id === team?.id} onClick={() => setTeamId(item.id)} className={cn("shrink-0 border-b-4 pt-3 pb-2 text-base uppercase sm:text-lg", item.id === team?.id ? "border-white font-semibold" : "border-transparent")}>{item.name}</button>)}
+        <h1 className="mb-2 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Komandas</h1>
+        <nav aria-label="Komandas" className="flex items-end gap-6 overflow-x-auto sm:gap-8 lg:min-h-12">
+          {teams.map((item) => <button key={item.id} type="button" aria-pressed={item.id === team?.id} onClick={() => setTeamId(item.id)} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", item.id === team?.id && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{item.name}</button>)}
         </nav>
       </div>
     </section>
     <section className="bg-white px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14">
       <div className="mx-auto max-w-[1440px]">
         {team ? <>
-          <nav aria-label="Spēlētāju pozīcijas" className="mb-10 flex flex-wrap justify-center gap-3 sm:mb-12 sm:gap-5">
-            {[...groups, { key: "staff", label: "Treneri", players: team.coaches }].map((group) => <button key={group.key} type="button" disabled={group.players.length === 0} onClick={() => document.getElementById(`roster-${group.key}`)?.scrollIntoView({ block: "start", behavior: "instant" })} className="min-h-12 border-2 border-black px-5 text-sm font-semibold uppercase hover:bg-black hover:text-white disabled:cursor-default disabled:opacity-35 disabled:hover:bg-white disabled:hover:text-black sm:min-h-14 sm:px-7 sm:text-base">{group.label}</button>)}
+          <nav aria-label="Spēlētāju pozīcijas" className="mb-10 flex flex-nowrap gap-3 overflow-x-auto [justify-content:safe_center] sm:mb-12 sm:gap-5">
+            {[...groups, { key: "staff", label: "Treneri", players: team.coaches }].map((group) => <button key={group.key} type="button" disabled={group.players.length === 0} onClick={() => document.getElementById(`roster-${group.key}`)?.scrollIntoView({ block: "start", behavior: "instant" })} className="min-h-10 shrink-0 whitespace-nowrap border-2 border-black px-4 text-xs font-semibold uppercase hover:bg-black hover:text-white disabled:cursor-default disabled:opacity-35 disabled:hover:bg-white disabled:hover:text-black sm:min-h-11 sm:px-5 sm:text-sm">{group.label}</button>)}
           </nav>
           {team.players.length === 0 && <p className="mb-12 border-t border-black/10 py-8 text-black/50">Šai komandai vēl nav pievienoti spēlētāji.</p>}
           {groups.filter((group) => group.players.length > 0).map((group) => <section key={`${team.id}-${group.key}`} id={`roster-${group.key}`} className="mb-20 scroll-mt-28 sm:mb-28">
@@ -75,11 +77,11 @@ export function TeamsDirectory({ teams }: { teams: Teams }) {
       </div>
     </section>
     <Drawer swipeDirection="right" open={Boolean(person)} onOpenChange={(open) => { if (!open) { setPlayer(null); setCoach(null); } }}>
-      <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,480px)] border-none bg-white data-[swipe-direction=right]:rounded-none" overlayClassName="bg-black/50">
-        <div className="flex items-center justify-between bg-black px-6 py-4 text-white"><DrawerTitle className="text-xl text-white">{person?.name}</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 items-center justify-center"><X className="size-6" /></DrawerClose></div>
-        {person && <div className="min-h-0 flex-1 overflow-y-auto p-6 text-black"><Portrait name={person.name} photoUrl={person.photoUrl} /><dl className="mt-6 space-y-5 text-sm">
-          {player && <><div><dt className="text-black/50">Dzimšanas datums</dt><dd className="mt-1">{player.birthdate}</dd></div><div><dt className="text-black/50">Pilsonība</dt><dd className="mt-1 flex items-center gap-2"><Image src={nationalityFlagImage(player.nationality)} alt="" width={80} height={48} className="h-5 w-7 rounded-sm object-cover" />{nationalityName(player.nationality)}</dd></div>{player.number != null && <div><dt className="text-black/50">Numurs</dt><dd className="mt-1">{player.number}</dd></div>}<div><dt className="text-black/50">Komandas un gūtie vārti</dt><dd className="mt-1">{player.teams.map((item) => <p key={item.name}>{item.name} — {item.goals}</p>)}</dd></div></>}
-          {coach && <><div><dt className="text-black/50">Pozīcija</dt><dd className="mt-1">{coach.position}</dd></div><div><dt className="text-black/50">Licence</dt><dd className="mt-1">{coach.authority} {coach.license}</dd></div><div><dt className="text-black/50">Komandas</dt><dd className="mt-1">{coach.teamNames.join(", ")}</dd></div></>}
+      <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,400px)] border-none bg-white text-black shadow-xl data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
+        <div className="flex shrink-0 items-center justify-between gap-4 bg-black px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 text-white"><DrawerTitle className="text-2xl font-normal text-white">{person?.name}</DrawerTitle><DrawerClose aria-label="Aizvērt" className="-mr-2 flex size-11 shrink-0 items-center justify-center hover:text-white/70 focus-visible:outline-white"><X className="size-6" /></DrawerClose></div>
+        {person && <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-black"><div className="mx-auto max-w-[240px] overflow-hidden rounded-2xl"><Portrait name={person.name} photoUrl={person.photoUrl} /></div><dl className="mt-5 space-y-3 text-base [&>div]:rounded-2xl [&>div]:bg-[#f5f5f5] [&>div]:px-4 [&>div]:py-3 [&_dt]:text-xs [&_dt]:uppercase [&_dt]:text-black/50 [&_dd]:mt-1">
+          {player && <><div><dt>Dzimšanas datums</dt><dd>{player.birthdate}</dd></div><div><dt>Pilsonība</dt><dd className="flex items-center gap-2"><Image src={nationalityFlagImage(player.nationality)} alt="" width={80} height={48} className="h-5 w-7 rounded-sm object-cover" />{nationalityName(player.nationality)}</dd></div>{player.number != null && <div><dt>Numurs</dt><dd>{player.number}</dd></div>}<div><dt>Komandas un gūtie vārti</dt><dd>{player.teams.map((item) => <p key={item.name}>{item.name} — {item.goals}</p>)}</dd></div></>}
+          {coach && <><div><dt>Pozīcija</dt><dd>{coach.position}</dd></div><div><dt>Licence</dt><dd>{coach.authority} {coach.license}</dd></div><div><dt>Komandas</dt><dd>{coach.teamNames.join(", ")}</dd></div></>}
         </dl></div>}
       </DrawerContent>
     </Drawer>

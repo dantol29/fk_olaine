@@ -52,19 +52,19 @@ export default async function AdminLeagueSourcesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold text-club-navy">Līgu avoti</h1>
+        <h1 className="text-2xl font-semibold text-black">Līgu avoti</h1>
         <Link
           href="/admin/league-sources/new"
-          className="rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
+          className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
         </Link>
       </div>
-      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-6 rounded-none border border-black/15 bg-white p-4 shadow-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-club-navy">Pēdējā automātiskā LFF sinhronizācija</p>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="text-sm font-semibold text-black">Pēdējā automātiskā LFF sinhronizācija</p>
+            <p className="mt-1 text-sm text-black/55">
               {cronStatus ? formatDate(cronStatus.finishedAt ?? cronStatus.startedAt) : "Cron vēl nav palaists"}
             </p>
           </div>
@@ -82,25 +82,25 @@ export default async function AdminLeagueSourcesPage() {
           </div>
         </div>
         {cronStatus && (
-          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 border-t border-black/10 pt-3 text-xs text-black/55">
             <span>Importētas spēles: {cronStatus.importedCount}</span>
             <span>Pēdējā pilnībā veiksmīgā reize: {formatDate(cronStatus.lastSuccessAt)}</span>
           </div>
         )}
         {cronStatus && cronStatus.needsReviewCount > 0 && (
-          <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-700">
+          <p className="mt-3 rounded-none bg-amber-50 p-3 text-xs text-amber-700">
             LFF tagad rāda citu laiku vai stadionu {cronStatus.needsReviewCount} jau importētai
             spēlei — pārskati un piemēro izmaiņas attiecīgā līgas avota &quot;Ielādēt
             spēles&quot; ekrānā (zemāk).
           </p>
         )}
         {cronStatus?.message && (
-          <p className="mt-3 whitespace-pre-wrap rounded-lg bg-red-50 p-3 text-xs text-red-700">
+          <p className="mt-3 whitespace-pre-wrap rounded-none bg-red-50 p-3 text-xs text-red-700">
             {cronStatus.message}
           </p>
         )}
         {cronStatus?.lastEmailError && (
-          <p className="mt-3 whitespace-pre-wrap rounded-lg bg-red-50 p-3 text-xs text-red-700">
+          <p className="mt-3 whitespace-pre-wrap rounded-none bg-red-50 p-3 text-xs text-red-700">
             <span className="font-bold">E-pasta paziņojums neizdevās:</span>{" "}
             {cronStatus.lastEmailError}
           </p>
@@ -108,9 +108,9 @@ export default async function AdminLeagueSourcesPage() {
       </div>
       <AdminSearch placeholder="Meklēt līgu avotus…" />
 
-      <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
+      <table className="w-full overflow-hidden rounded-none bg-white text-left text-sm shadow-none">
         <thead>
-          <tr className="border-b border-slate-200 text-slate-400">
+          <tr className="border-b border-black/15 text-black/45">
             <th className="p-4 font-semibold">Secība</th>
             <th className="p-4 font-semibold">Nosaukums</th>
             <th className="p-4 font-semibold">Komanda</th>
@@ -120,11 +120,11 @@ export default async function AdminLeagueSourcesPage() {
         </thead>
         <tbody>
           {rows.map((source) => (
-            <tr data-admin-search-item={`${source.label} ${source.teamName} ${source.url} ${source.standingsUrl ?? ""} ${source.topScorersUrl ?? ""}`} key={source.id} className="border-b border-slate-100 last:border-0">
-              <td className="p-4 text-slate-500">{source.displayOrder}</td>
-              <td className="p-4 font-semibold text-club-navy">{source.label}</td>
-              <td className="p-4 text-slate-500">{source.teamName}</td>
-              <td className="max-w-xs truncate p-4 text-slate-500">{source.url}</td>
+            <tr data-admin-search-item={`${source.label} ${source.teamName} ${source.url} ${source.standingsUrl ?? ""} ${source.topScorersUrl ?? ""}`} key={source.id} className="border-b border-black/10 last:border-0">
+              <td className="p-4 text-black/55">{source.displayOrder}</td>
+              <td className="p-4 font-semibold text-black">{source.label}</td>
+              <td className="p-4 text-black/55">{source.teamName}</td>
+              <td className="max-w-xs truncate p-4 text-black/55">{source.url}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
                   <Link
@@ -136,7 +136,7 @@ export default async function AdminLeagueSourcesPage() {
                   {source.standingsUrl && (
                     <Link
                       href={`/admin/league-sources/${source.id}/test-standings`}
-                      className="text-sm font-semibold text-club-navy hover:underline"
+                      className="text-sm font-semibold text-black hover:underline"
                     >
                       Testēt tabulu
                     </Link>
@@ -144,7 +144,7 @@ export default async function AdminLeagueSourcesPage() {
                   {source.topScorersUrl && (
                     <Link
                       href={`/admin/league-sources/${source.id}/sync-top-scorers`}
-                      className="text-sm font-semibold text-club-navy hover:underline"
+                      className="text-sm font-semibold text-black hover:underline"
                     >
                       Sinhronizēt vārtu guvējus
                     </Link>
@@ -153,7 +153,7 @@ export default async function AdminLeagueSourcesPage() {
                     href={`/admin/league-sources/${source.id}`}
                     aria-label={`Rediģēt līgas avotu "${source.label}"`}
                     title="Rediģēt"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
+                    className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
                   </Link>
@@ -167,7 +167,7 @@ export default async function AdminLeagueSourcesPage() {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={5} className="p-4 text-center text-slate-400">
+              <td colSpan={5} className="p-4 text-center text-black/45">
                 Vēl nav neviena līgas avota.
               </td>
             </tr>

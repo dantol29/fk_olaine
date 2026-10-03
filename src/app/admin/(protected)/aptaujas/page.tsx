@@ -16,21 +16,21 @@ export default async function AdminPollsPage() {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold text-club-navy">Aptaujas</h1>
+        <h1 className="text-2xl font-semibold text-black">Aptaujas</h1>
         <Link
           href="/admin/aptaujas/new"
-          className="rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
+          className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
         </Link>
       </div>
-      <p className="mb-6 text-sm text-slate-400">
+      <p className="mb-6 text-sm text-black/45">
         Sākumlapā rāda pirmās 3 aptaujas pēc izveides secības.
       </p>
       <AdminSearch placeholder="Meklēt aptaujas…" />
 
       {rows.length === 0 ? (
-        <p className="rounded-xl bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
+        <p className="rounded-none bg-white p-8 text-center text-sm text-black/45 shadow-none">
           Vēl nav pievienota neviena aptauja.
         </p>
       ) : (
@@ -41,12 +41,12 @@ export default async function AdminPollsPage() {
               <div
                 key={poll.id}
                 data-admin-search-item={poll.question}
-                className="rounded-xl bg-white p-5 shadow-sm"
+                className="rounded-none bg-white p-5 shadow-none"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="font-semibold text-club-navy">{poll.question}</p>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="font-semibold text-black">{poll.question}</p>
+                    <p className="mt-1 text-xs text-black/45">
                       {poll.options.length} varianti · {totalVotes} balsis
                     </p>
                   </div>
@@ -55,7 +55,7 @@ export default async function AdminPollsPage() {
                       href={`/admin/aptaujas/${poll.id}`}
                       aria-label={`Rediģēt aptauju "${poll.question}"`}
                       title="Rediģēt"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
+                      className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                     >
                       <Pencil className="h-4 w-4" />
                     </Link>
@@ -69,7 +69,7 @@ export default async function AdminPollsPage() {
                   {poll.options.map((option) => (
                     <span
                       key={option.id}
-                      className="rounded-full bg-slate-100 px-3 py-1 text-xs text-club-navy"
+                      className="rounded-full bg-[#e8e8e8] px-3 py-1 text-xs text-black"
                     >
                       {option.label} · {option.votes}
                     </span>

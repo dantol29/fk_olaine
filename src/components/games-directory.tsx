@@ -20,7 +20,7 @@ const VIEWS: { id: View; label: string }[] = [
 
 export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leagues: LeagueStandings[] }) {
   const [selectedTeam, setActiveTeam] = useState("");
-  const [view, setView] = useState<View>("table");
+  const [view, setView] = useState<View>("fixtures");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarDate, setCalendarDate] = useState<string | null>(null);
   const year = String(new Date().getFullYear());
@@ -40,12 +40,12 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
       <section className="games-page-hero bg-black px-6 pt-6 text-white sm:px-10 sm:pt-8 lg:px-14">
         <div className="mx-auto max-w-[1920px]">
           <h1 className="mb-2 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Spēles</h1>
-          <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
+          <div className="flex flex-col justify-between lg:flex-row lg:items-end lg:gap-3">
             <nav aria-label="Komandas" className="flex min-w-0 gap-6 overflow-x-auto sm:gap-8">
               {teamNames.map((name) => <button key={name} type="button" aria-pressed={activeTeam === name} onClick={() => { setActiveTeam(name); setLeagueLabel(""); }} className={cn("relative flex shrink-0 items-center pt-3 pb-2 text-base uppercase sm:text-lg", activeTeam === name && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{name}</button>)}
             </nav>
-            <div className="flex shrink-0 flex-wrap items-center gap-6 pb-1">
-              <DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 bg-white px-5 text-xs font-semibold text-black uppercase disabled:opacity-40"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger>
+            <div className="-mx-6 flex shrink-0 items-center justify-end bg-white px-6 py-2 sm:-mx-10 sm:px-10 lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-1">
+              <DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 bg-club-red px-5 text-xs font-semibold text-white uppercase lg:bg-white lg:text-black"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger>
             </div>
           </div>
         </div>
@@ -73,13 +73,14 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
                 </div>
                 {league && league.standings.length > 0 ? (
                   <div role="region" aria-label="Turnīra tabula" tabIndex={0} className="overflow-x-auto">
-                    <table className="w-full min-w-[700px] border-collapse text-sm sm:text-base">
+                    <table className="w-full table-fixed border-collapse text-sm sm:min-w-[700px] sm:table-auto sm:text-base">
                       <caption className="sr-only">{league.label} — aktuālā turnīra tabula</caption>
-                      <thead><tr className="border-y-2 border-black text-left uppercase"><th scope="colgroup" className="px-3 py-5" colSpan={2}>Komanda</th>{["S", "U", "N", "Z", "+/−", "Punkti"].map((name) => <th key={name} scope="col" className="px-4 py-5 text-center">{name}</th>)}</tr></thead>
+                      <colgroup><col className="w-6 sm:w-12" /><col /><col className="w-9 sm:w-auto" /><col className="hidden sm:table-column" /><col className="hidden sm:table-column" /><col className="hidden sm:table-column" /><col className="w-10 sm:w-auto" /><col className="w-12 sm:w-auto" /></colgroup>
+                      <thead><tr className="border-y-2 border-black text-left uppercase"><th scope="colgroup" className="px-1 py-5 sm:px-3" colSpan={2}>Komanda</th>{["S", "U", "N", "Z", "+/−", "Punkti"].map((name, index) => <th key={name} scope="col" className={cn("px-1 py-5 text-center sm:px-4", index > 0 && index < 4 && "hidden sm:table-cell")}>{name}</th>)}</tr></thead>
                       <tbody>{league.standings.map((row) => <tr key={`${row.pos}-${row.team}`} className={cn("border-b border-black/10", row.isOlaine && "bg-black/5 font-semibold")}>
-                        <td className="w-12 px-3 py-5 text-center">{row.pos}</td>
-                        <th scope="row" className="px-2 py-4 text-left font-normal"><span className="flex items-center gap-3">{row.logo && <Image src={row.logo} alt="" width={28} height={28} className="size-7 object-contain" />}<span className="uppercase">{row.team}</span></span></th>
-                        {[row.played, row.wins, row.draws, row.losses, row.goalDiff, row.points].map((value, index) => <td key={index} className="px-4 py-5 text-center tabular-nums">{value}</td>)}
+                        <td className="px-1 py-5 text-center text-xs sm:px-3 sm:text-base">{row.pos}</td>
+                        <th scope="row" className="px-1 py-4 text-left font-normal sm:px-2"><span className="flex items-center gap-2 sm:gap-3">{row.logo && <Image src={row.logo} alt="" width={28} height={28} className="size-5 shrink-0 object-contain sm:size-7" />}<span className="min-w-0 break-words uppercase">{row.team}</span></span></th>
+                        {[row.played, row.wins, row.draws, row.losses, row.goalDiff, row.points].map((value, index) => <td key={index} className={cn("px-1 py-5 text-center tabular-nums sm:px-4", index > 0 && index < 4 && "hidden sm:table-cell")}>{value}</td>)}
                       </tr>)}</tbody>
                     </table>
                   </div>
@@ -99,7 +100,7 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
         <div className="min-h-0 flex-1 overflow-y-auto">
           <GamesMonthCalendar games={teamGames} activeDateKey={calendarDate} onSelectDate={setCalendarDate} className="!ml-0 !w-full !rounded-none !bg-black" />
           <div className="p-6">
-            {calendarDate ? <div className="space-y-5">{teamGames.filter((game) => game.rawDate === calendarDate).map((game) => <MatchListCard key={game.id} game={game} league={teamLeagues.find((item) => item.label === game.league) ?? (teamLeagues.length === 1 ? teamLeagues[0] : undefined)} completed={matchKickoff(game) <= Date.now()} compact />)}</div> : <p className="text-sm text-black/60">Izvēlies atzīmēto datumu, lai skatītu spēles informāciju.</p>}
+            {calendarDate ? <div className="space-y-5">{teamGames.filter((game) => game.rawDate === calendarDate).map((game) => <MatchListCard key={game.id} game={game} league={teamLeagues.find((item) => item.label === game.league) ?? (teamLeagues.length === 1 ? teamLeagues[0] : undefined)} completed={matchKickoff(game) <= Date.now()} drawer showInfo={false} />)}</div> : <p className="text-sm text-black/60">Izvēlies atzīmēto datumu, lai skatītu spēles informāciju.</p>}
           </div>
         </div>
       </DrawerContent>

@@ -26,19 +26,19 @@ export default async function AdminEventsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold text-club-navy">Notikumi</h1>
+        <h1 className="text-2xl font-semibold text-black">Notikumi</h1>
         <Link
           href="/admin/events/new"
-          className="rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
+          className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
         </Link>
       </div>
       <AdminSearch placeholder="Meklēt notikumus…" />
 
-      <table className="w-full overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
+      <table className="w-full overflow-hidden rounded-none bg-white text-left text-sm shadow-none">
         <thead>
-          <tr className="border-b border-slate-200 text-slate-400">
+          <tr className="border-b border-black/15 text-black/45">
             <th className="p-4 font-semibold">Nosaukums</th>
             <th className="p-4 font-semibold">Datums</th>
             <th className="p-4 font-semibold">Laiks</th>
@@ -48,20 +48,20 @@ export default async function AdminEventsPage() {
         </thead>
         <tbody>
           {rows.map((event) => (
-            <tr data-admin-search-item={`${event.title} ${event.date} ${event.startTime} ${event.teamName ?? "Viss klubs"}`} key={event.id} className="border-b border-slate-100 last:border-0">
-              <td className="p-4 font-semibold text-club-navy">{event.title}</td>
-              <td className="p-4 text-club-navy">{event.date}</td>
-              <td className="p-4 text-slate-500">
+            <tr data-admin-search-item={`${event.title} ${event.date} ${event.startTime} ${event.teamName ?? "Viss klubs"}`} key={event.id} className="border-b border-black/10 last:border-0">
+              <td className="p-4 font-semibold text-black">{event.title}</td>
+              <td className="p-4 text-black">{event.date}</td>
+              <td className="p-4 text-black/55">
                 {event.startTime}–{event.endTime}
               </td>
-              <td className="p-4 text-slate-500">{event.teamName ?? "Viss klubs"}</td>
+              <td className="p-4 text-black/55">{event.teamName ?? "Viss klubs"}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
                   <Link
                     href={`/admin/events/${event.id}`}
                     aria-label={`Rediģēt notikumu "${event.title}"`}
                     title="Rediģēt"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-club-navy transition hover:bg-club-gray-light"
+                    className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
                   </Link>
@@ -75,7 +75,7 @@ export default async function AdminEventsPage() {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={5} className="p-4 text-center text-slate-400">
+              <td colSpan={5} className="p-4 text-center text-black/45">
                 Vēl nav neviena notikuma.
               </td>
             </tr>

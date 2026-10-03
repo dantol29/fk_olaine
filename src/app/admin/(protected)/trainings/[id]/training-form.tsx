@@ -30,17 +30,17 @@ export function TrainingForm(
 
   return (
     <form action={formAction} className="max-w-md">
-      <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-6 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauns treniņš" : "Rediģēt treniņu"}
       </h1>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Komanda
         <select
           name="teamId"
           required
           defaultValue={training?.teamId ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         >
           <option value="" disabled>
             Izvēlies komandu
@@ -54,10 +54,10 @@ export function TrainingForm(
       </label>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Treneri (nav obligāts)</legend>
+        <legend className="text-sm font-semibold text-black">Treneri (nav obligāts)</legend>
         <div className="mt-1.5 flex flex-col gap-1.5">
           {props.coachOptions.map((coach) => (
-            <label key={coach.id} className="flex items-center gap-2 text-sm text-club-navy">
+            <label key={coach.id} className="flex items-center gap-2 text-sm text-black">
               <input
                 type="checkbox"
                 name="coachIds"
@@ -70,58 +70,58 @@ export function TrainingForm(
         </div>
       </fieldset>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Datums
         <input
           type="date"
           name="date"
           required
           defaultValue={training?.date ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
       <div className="mt-4 flex gap-4">
-        <label className="flex-1 text-sm font-semibold text-club-navy">
+        <label className="flex-1 text-sm font-semibold text-black">
           Sākuma laiks
           <input
             type="time"
             name="startTime"
             required
             defaultValue={training?.startTime ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+            className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
           />
         </label>
-        <label className="flex-1 text-sm font-semibold text-club-navy">
+        <label className="flex-1 text-sm font-semibold text-black">
           Beigu laiks
           <input
             type="time"
             name="endTime"
             required
             defaultValue={training?.endTime ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+            className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
           />
         </label>
       </div>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Vieta
         <input
           type="text"
           name="location"
           required
           defaultValue={training?.location ?? "Olaines pilsētas stadions"}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Piezīmes (nav obligāts)
         <textarea
           name="notes"
           rows={3}
           defaultValue={training?.notes ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
@@ -130,7 +130,7 @@ export function TrainingForm(
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>

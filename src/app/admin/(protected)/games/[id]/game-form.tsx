@@ -31,17 +31,17 @@ export function GameForm(
 
   return (
     <form action={formAction} className="max-w-md">
-      <h1 className="mb-6 text-2xl font-extrabold text-club-navy">
+      <h1 className="mb-6 text-2xl font-semibold text-black">
         {props.mode === "create" ? "Jauna spēle" : "Rediģēt spēli"}
       </h1>
 
-      <label className="block text-sm font-semibold text-club-navy">
+      <label className="block text-sm font-semibold text-black">
         Komanda
         <select
           name="teamId"
           required
           defaultValue={game?.teamId ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         >
           <option value="" disabled>
             Izvēlies komandu
@@ -55,7 +55,7 @@ export function GameForm(
       </label>
 
       <div className="mt-4 flex gap-4">
-        <label className="flex-1 text-sm font-semibold text-club-navy">
+        <label className="flex-1 text-sm font-semibold text-black">
           Mājinieki
           <input
             type="text"
@@ -63,10 +63,10 @@ export function GameForm(
             required
             placeholder="FK Olaine"
             defaultValue={game?.homeTeam ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+            className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
           />
         </label>
-        <label className="flex-1 text-sm font-semibold text-club-navy">
+        <label className="flex-1 text-sm font-semibold text-black">
           Viesi
           <input
             type="text"
@@ -74,82 +74,82 @@ export function GameForm(
             required
             placeholder="FK Ventspils"
             defaultValue={game?.awayTeam ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+            className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
           />
         </label>
       </div>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-semibold text-club-navy">Rezultāts (nav obligāts)</legend>
+        <legend className="text-sm font-semibold text-black">Rezultāts (nav obligāts)</legend>
         <div className="mt-2 flex gap-4">
-          <label className="flex-1 text-sm text-club-navy">Mājinieki<input type="number" name="homeScore" min={0} step={1} defaultValue={game?.homeScore ?? ""} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2" /></label>
-          <label className="flex-1 text-sm text-club-navy">Viesi<input type="number" name="awayScore" min={0} step={1} defaultValue={game?.awayScore ?? ""} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2" /></label>
+          <label className="flex-1 text-sm text-black">Mājinieki<input type="number" name="homeScore" min={0} step={1} defaultValue={game?.homeScore ?? ""} className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2" /></label>
+          <label className="flex-1 text-sm text-black">Viesi<input type="number" name="awayScore" min={0} step={1} defaultValue={game?.awayScore ?? ""} className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2" /></label>
         </div>
       </fieldset>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Datums
         <input
           type="date"
           name="date"
           required
           defaultValue={game?.date ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
       <div className="mt-4 flex gap-4">
-        <label className="flex-1 text-sm font-semibold text-club-navy">
+        <label className="flex-1 text-sm font-semibold text-black">
           Sākuma laiks
           <input
             type="time"
             name="startTime"
             required
             defaultValue={game?.startTime ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+            className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
           />
         </label>
-        <label className="flex-1 text-sm font-semibold text-club-navy">
+        <label className="flex-1 text-sm font-semibold text-black">
           Beigu laiks
           <input
             type="time"
             name="endTime"
             required
             defaultValue={game?.endTime ?? ""}
-            className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+            className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
           />
         </label>
       </div>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Vieta
         <input
           type="text"
           name="location"
           required
           defaultValue={game?.location ?? "Olaines pilsētas stadions"}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Sacensības (nav obligāts)
         <input
           type="text"
           name="league"
           placeholder="Draudzības spēle"
           defaultValue={game?.league ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-club-navy">
+      <label className="mt-4 block text-sm font-semibold text-black">
         Piezīmes (nav obligāts)
         <textarea
           name="notes"
           rows={3}
           defaultValue={game?.notes ?? ""}
-          className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-club-navy outline-none focus:border-club-red"
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
 
@@ -158,7 +158,7 @@ export function GameForm(
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 rounded-lg bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
+        className="mt-6 rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-club-red-dark disabled:opacity-50"
       >
         {pending ? "Saglabā..." : "Saglabāt"}
       </button>
