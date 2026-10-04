@@ -85,7 +85,7 @@ export function HomePollCard({ poll, className, variant = "classic", previewOnly
       </fieldset>
       {error && <p role="alert" className="mt-4 text-sm text-club-red">{error}</p>}
       <div className="mt-6 flex flex-wrap items-center gap-5">
-        <button type="submit" disabled={selectedId === null || isPending || votedForId === undefined} className="flex min-h-11 min-w-32 items-center justify-center bg-club-red px-6 text-sm font-semibold text-white uppercase hover:bg-club-red-dark disabled:cursor-default disabled:opacity-40">{isPending ? "Saglabā..." : "Balsot"}</button>
+        <button type="submit" disabled={selectedId === null || isPending || votedForId === undefined} className="motion-action flex min-h-11 min-w-32 items-center justify-center bg-club-red px-6 text-sm font-semibold text-white uppercase hover:bg-club-red-dark disabled:cursor-default disabled:opacity-40">{isPending ? "Saglabā..." : "Balsot"}</button>
         <button type="button" onClick={() => setPreviewResults(true)} disabled={isPending} className={cn(styles.secondary, "min-h-11 text-sm text-black/60 underline-offset-4 hover:underline")}>Skatīt rezultātus</button>
       </div>
     </form>}

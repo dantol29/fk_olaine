@@ -11,7 +11,7 @@ export async function HomeUpcomingGames() {
   return <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
     <UpcomingMatches games={[next]} leagues={leagues} showFixtures={false} />
     <div className="mt-6 flex justify-center">
-      <Link href="/speles" className="flex min-h-11 items-center gap-3 border-2 border-black px-5 text-sm font-semibold text-black uppercase hover:bg-black hover:text-white focus-visible:outline-black">Visas spēles<ArrowRight className="size-4" aria-hidden="true" /></Link>
+      <Link href="/speles" className="motion-action flex min-h-11 items-center gap-3 border-2 border-black px-5 text-sm font-semibold text-black uppercase hover:bg-black hover:text-white focus-visible:outline-black">Visas spēles<ArrowRight className="action-arrow size-4" aria-hidden="true" /></Link>
     </div>
   </section>;
 }

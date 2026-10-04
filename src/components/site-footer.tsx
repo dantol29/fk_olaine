@@ -40,22 +40,16 @@ export async function SiteFooter() {
         </>
       )}
     <footer id="footer" className="scroll-mt-24 bg-black text-white">
-      <div className="mx-auto max-w-[1600px] px-6 pt-12 pb-6 sm:px-12 lg:px-20">
-        <Link href="/" aria-label="FK Olaine — sākums" className="mx-auto flex w-fit flex-col items-center focus-visible:outline-white">
-          <Image src="/fk-olaine-crest-v2.png" alt="" width={124} height={128} className="h-20 w-auto object-contain" />
-          <span className="mt-2 text-2xl leading-none font-semibold tracking-tight uppercase">FK Olaine</span>
-          <span className="mt-1 text-xs leading-none font-semibold uppercase">Kopš 2008</span>
-        </Link>
-
-        <div className="mt-8 flex flex-col items-center justify-between gap-x-8 gap-y-4 sm:mt-7 lg:flex-row lg:items-start">
+      <div className="mx-auto max-w-[1600px] px-6 py-6 sm:px-12 sm:py-8 lg:px-20">
+        <div className="flex flex-col items-center justify-between gap-x-8 gap-y-4 lg:flex-row lg:items-start">
           <div aria-label="Sociālie tīkli" className="flex shrink-0 items-center gap-1">
-            <a href="https://www.facebook.com/afaolaine.sievietes/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
+            <a href="https://www.facebook.com/afaolaine.sievietes/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="motion-icon flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
               <FacebookIcon className="size-7" />
             </a>
-            <a href="https://www.instagram.com/fkolaine_sievietes/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
+            <a href="https://www.instagram.com/fkolaine_sievietes/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="motion-icon flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
               <InstagramIcon className="size-7" />
             </a>
-            <a href="https://www.youtube.com/c/avanakeks/videos" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
+            <a href="https://www.youtube.com/c/avanakeks/videos" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="motion-icon flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
               <YouTubeIcon className="size-7" aria-hidden="true" />
             </a>
           </div>

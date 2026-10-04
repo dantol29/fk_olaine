@@ -90,7 +90,7 @@ export async function HomeTeamsSection({ panelClassName }: { panelClassName?: st
     <section className="mx-auto max-w-[1280px]">
       <HomeTeamsShowcase teams={[mainTeam]} className={panelClassName} />
       <div className="mt-6 flex justify-center">
-        <Link href="/komandas" className="flex min-h-11 items-center gap-3 border-2 border-black px-5 text-sm font-semibold text-black uppercase hover:bg-black hover:text-white focus-visible:outline-black">Visas komandas<ArrowRight className="size-4" aria-hidden="true" /></Link>
+        <Link href="/komandas" className="motion-action flex min-h-11 items-center gap-3 border-2 border-black px-5 text-sm font-semibold text-black uppercase hover:bg-black hover:text-white focus-visible:outline-black">Visas komandas<ArrowRight className="action-arrow size-4" aria-hidden="true" /></Link>
       </div>
     </section>
   );

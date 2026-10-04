@@ -304,11 +304,40 @@
 .club-compact-header { visibility: hidden; transform: translateY(-100%); transition: transform 200ms ease, visibility 200ms; }
 .club-compact-header[data-visible] { visibility: visible; transform: translateY(0); }
 .club-header-nav-link:hover,
-.club-header-nav-link:focus-visible {
+.club-header-nav-link:focus-visible,
+.club-header-nav-link[aria-current="page"] {
   text-decoration: underline;
   text-decoration-color: white;
   text-decoration-thickness: 2px;
   text-underline-offset: 6px;
+}
+.card-hover-image { transition: transform 250ms ease-out; }
+#footer a:not(.motion-icon) { transition: color 180ms ease-out; }
+.motion-action { transition: background-color 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out, opacity 180ms ease-out, transform 180ms ease-out; }
+.action-arrow, .action-diagonal { transition: transform 180ms ease-out; }
+.motion-icon { transition: color 180ms ease-out, transform 180ms ease-out; }
+.match-hover { transition: border-color 200ms ease-out, box-shadow 200ms ease-out; }
+.motion-action:active:not(:disabled) { transform: scale(.98); }
+@media (hover: hover) and (pointer: fine) {
+  .card-hover:hover .card-hover-image { transform: scale(1.035); }
+  .motion-action:hover .action-arrow { transform: translateX(3px); }
+  .motion-action:hover .action-diagonal { transform: translate(2px, -2px); }
+  .motion-icon:hover { transform: translateY(-2px); }
+  .match-hover:hover { border-color: rgb(0 0 0 / .3); box-shadow: 0 4px 16px rgb(0 0 0 / .04); }
+}
+.card-hover:focus-visible .card-hover-image { transform: scale(1.035); }
+.motion-action:focus-visible .action-arrow { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) {
+  .card-hover-image { transition: none; }
+  #footer a { transition: none; }
+  .motion-action, .motion-icon, .action-arrow, .action-diagonal, .match-hover { transition: none; }
+  .motion-action:active:not(:disabled),
+  .motion-action:hover .action-arrow,
+  .motion-action:hover .action-diagonal,
+  .motion-action:focus-visible .action-arrow,
+  .motion-icon:hover { transform: none; }
+  .card-hover:hover .card-hover-image,
+  .card-hover:focus-visible .card-hover-image { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .club-compact-header { transition: none; }
@@ -397,6 +426,7 @@
 .home-hero-news > .hero-news-slide {
   padding: 208px clamp(24px, 2.5vw, 64px) 32px;
 }
+.home-hero-news.hero-has-navigation > .hero-news-slide { padding-bottom: 80px; }
 .hero-photo-shade {
   background: linear-gradient(180deg, rgb(0 0 0 / .85) 0%, rgb(0 0 0 / .4) 160px, transparent 360px), linear-gradient(0deg, rgb(0 0 0 / .75), transparent 60%), linear-gradient(90deg, rgb(0 0 0 / .2), transparent 65%);
 }

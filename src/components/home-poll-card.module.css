@@ -1,4 +1,14 @@
 .poll { isolation: isolate; }
+.option { transition: border-color 180ms ease-out, background-color 180ms ease-out; }
+.option > span { transition: transform 180ms ease-out; }
+.fill { transition: width 350ms ease-out; }
+@media (hover: hover) and (pointer: fine) {
+  .option:hover > span { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .option, .option > span, .fill { transition: none; }
+  .option:hover > span { transform: none; }
+}
 .classic { background: #fff; }
 .dark { max-width: 980px; background: #000; color: #fff; border: 0; }
 .dark .header h2 { max-width: 700px; font-size: clamp(28px, 3vw, 40px); }

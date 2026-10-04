@@ -46,10 +46,22 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
         Iestatījumi
       </h1>
       <p className="mb-6 text-sm text-black/55">
-        Šī informācija tiek rādīta mājaslapas kājenē (Biedrība, Kontakti).
+        Maini kluba kontaktinformāciju, rekvizītus un saites joslā virs galvenes.
       </p>
 
       <div className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold uppercase">Galvenes joslas pogas</h2>
+        <p className="text-sm text-black/55">Pogas tiek rādītas šādā secībā. Mobilajā skatā redzama tikai pirmā poga līdzās FKOLAINE.COM.</p>
+        <div className="grid gap-4 border-b border-black/15 pb-5 sm:grid-cols-2">
+          <Field label="1. pogas nosaukums" name="headerTvName" defaultValue={settings.headerTvName} />
+          <Field label="1. pogas saite" name="headerTvUrl" defaultValue={settings.headerTvUrl} />
+          <Field label="2. pogas nosaukums" name="headerJoinName" defaultValue={settings.headerJoinName} />
+          <Field label="2. pogas saite" name="headerJoinUrl" defaultValue={settings.headerJoinUrl} />
+          <Field label="3. pogas nosaukums" name="headerFederationName" defaultValue={settings.headerFederationName} />
+          <Field label="3. pogas saite" name="headerFederationUrl" defaultValue={settings.headerFederationUrl} />
+          <p className="text-xs leading-relaxed text-black/55 sm:col-span-2">Saite #pievienojies atver pieteikšanās paneli. Vari norādīt arī citu mājaslapas adresi vai saiti uz šīs vietnes lapu, piemēram, /kontakti.</p>
+        </div>
+        <h2 className="mt-2 text-lg font-semibold uppercase">Kluba informācija</h2>
         <Field
           label="Biedrības nosaukums"
           name="legalName"

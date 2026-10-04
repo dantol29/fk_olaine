@@ -18,6 +18,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { YouTubeIcon } from "@/components/social-icons";
+import type { HeaderLinkSettings } from "@/lib/site-settings";
 
 type NavItem = {
   title: string;
@@ -36,9 +37,11 @@ const BASE_NAV_ITEMS: NavItem[] = [
 
 export function SiteHeaderClient({
   clubPages,
+  headerLinks,
   overlay = false,
 }: {
   clubPages: { title: string; href: string }[];
+  headerLinks: HeaderLinkSettings;
   overlay?: boolean;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -47,7 +50,7 @@ export function SiteHeaderClient({
   const [returnToMenu, setReturnToMenu] = useState(false);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLButtonElement>(null);
-  const joinStripeRef = useRef<HTMLButtonElement>(null);
+  const joinStripeRef = useRef<HTMLAnchorElement>(null);
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const compactMenuRef = useRef<HTMLButtonElement>(null);
@@ -85,7 +88,7 @@ export function SiteHeaderClient({
   const desktopNavItems = navItems.filter((item) => item.title !== "Sākums");
 
   function isActive(item: NavItem) {
-    return item.href === pathname;
+    return item.href === pathname || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
   }
 
   const navLinkClass = "club-header-nav-link relative flex h-11 items-center rounded-md px-2.5 text-sm font-semibold text-white focus-visible:ring-white/70";
@@ -97,9 +100,9 @@ export function SiteHeaderClient({
         <nav aria-label="Ātrās saites" className="flex h-full min-w-0 items-center">
           <Link href="/" className="flex h-full shrink-0 items-center justify-center bg-club-red px-6 text-xs font-semibold text-white uppercase sm:px-8 sm:text-sm">FKOLAINE.COM</Link>
           <div className="flex h-8 items-center divide-x divide-black/15">
-            <Link href="/speles" className="flex h-full items-center px-3 text-xs font-semibold uppercase hover:text-club-red sm:px-6 lg:px-8 lg:text-sm">Spēles</Link>
-            <a href="https://www.youtube.com/c/avanakeks/videos" target="_blank" rel="noopener noreferrer" className="hidden h-full items-center px-6 text-xs font-semibold uppercase hover:text-club-red sm:flex lg:px-8 lg:text-sm">FKOLAINE TV</a>
-            <button ref={joinStripeRef} type="button" onClick={() => { setReturnToMenu(false); setJoinOpen(true); }} className="hidden h-full items-center px-6 text-xs font-semibold uppercase hover:text-club-red sm:flex lg:px-8 lg:text-sm">Pievienojies</button>
+            <a href={headerLinks.headerTvUrl} target={/^https?:\/\//i.test(headerLinks.headerTvUrl) ? "_blank" : undefined} rel="noopener noreferrer" className="flex h-full items-center px-3 text-xs font-semibold uppercase hover:text-club-red sm:px-6 lg:px-8 lg:text-sm">{headerLinks.headerTvName}</a>
+            <a ref={joinStripeRef} href={headerLinks.headerJoinUrl} target={/^https?:\/\//i.test(headerLinks.headerJoinUrl) ? "_blank" : undefined} rel="noopener noreferrer" onClick={(event) => { if (headerLinks.headerJoinUrl === "#pievienojies") { event.preventDefault(); setReturnToMenu(false); setJoinOpen(true); } }} className="hidden h-full items-center px-6 text-xs font-semibold uppercase hover:text-club-red sm:flex lg:px-8 lg:text-sm">{headerLinks.headerJoinName}</a>
+            <a href={headerLinks.headerFederationUrl} target={/^https?:\/\//i.test(headerLinks.headerFederationUrl) ? "_blank" : undefined} rel="noopener noreferrer" className="hidden h-full items-center px-6 text-xs font-semibold uppercase hover:text-club-red sm:flex lg:px-8 lg:text-sm">{headerLinks.headerFederationName}</a>
           </div>
         </nav>
         <LoginDrawer />

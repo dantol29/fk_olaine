@@ -14,9 +14,19 @@ export type SiteSettings = {
   stadiumAddress: string;
   phone: string;
   email: string;
+  headerTvName: string;
+  headerTvUrl: string;
+  headerJoinName: string;
+  headerJoinUrl: string;
+  headerFederationName: string;
+  headerFederationUrl: string;
 };
 
-/** Current live footer content, used to seed the singleton row the first
+export type HeaderLinkSettings = Pick<SiteSettings,
+  "headerTvName" | "headerTvUrl" | "headerJoinName" | "headerJoinUrl" | "headerFederationName" | "headerFederationUrl"
+>;
+
+/** Default club details and header links, used to seed the row the first
  *  time this is read (and as a safety net if the DB read fails). */
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   legalName: 'Biedrība "Futbola klubs Olaine"',
@@ -28,12 +38,17 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   stadiumAddress: "Zeiferta 4, Olaine",
   phone: "+371 29332883",
   email: "info@fkolaine.com",
+  headerTvName: "FKOLAINE TV",
+  headerTvUrl: "https://www.youtube.com/c/avanakeks/videos",
+  headerJoinName: "Pievienojies",
+  headerJoinUrl: "#pievienojies",
+  headerFederationName: "Federācija",
+  headerFederationUrl: "https://lff.lv/",
 };
 
 const SETTINGS_ID = 1;
 
-/** The club's editable legal/bank/contact details shown in the site
- *  footer. Singleton — always row id 1, created on first read if missing. */
+/** Editable club details and header links. Row id 1, created if missing. */
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
     const [row] = await db

@@ -105,7 +105,7 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
 export function MatchListCard({ game, league, completed = false, compact = false, drawer = false, showInfo = true }: { game: GameListItem; league?: LeagueStandings; completed?: boolean; compact?: boolean; drawer?: boolean; showInfo?: boolean }) {
               const home = isOlaine(game.home.name);
               const opponent = home ? game.away : game.home;
-              return <article className="border border-black/10 bg-white">
+              return <article className="match-hover border border-black/10 bg-white">
                 {!compact && <div className={cn("p-4", !drawer && "sm:hidden")}>
                   <div className="mb-4 flex items-center justify-between gap-3 text-xs"><p><span className="font-semibold">{game.time}</span><span className="ml-2 text-black/45">{Number(game.day)}. {game.month.toLowerCase()}</span></p><span className="font-semibold">{home ? "Mājās" : "Izbraukumā"}</span></div>
                   <div className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-5">

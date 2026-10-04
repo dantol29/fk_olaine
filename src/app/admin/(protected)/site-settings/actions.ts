@@ -18,6 +18,23 @@ function parseSettingsInput(formData: FormData) {
   const stadiumAddress = String(formData.get("stadiumAddress") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const headerLinks = {
+    headerTvName: String(formData.get("headerTvName") ?? "").trim(),
+    headerTvUrl: String(formData.get("headerTvUrl") ?? "").trim(),
+    headerJoinName: String(formData.get("headerJoinName") ?? "").trim(),
+    headerJoinUrl: String(formData.get("headerJoinUrl") ?? "").trim(),
+    headerFederationName: String(formData.get("headerFederationName") ?? "").trim(),
+    headerFederationUrl: String(formData.get("headerFederationUrl") ?? "").trim(),
+  };
+
+  for (const [name, url] of [
+    [headerLinks.headerTvName, headerLinks.headerTvUrl],
+    [headerLinks.headerJoinName, headerLinks.headerJoinUrl],
+    [headerLinks.headerFederationName, headerLinks.headerFederationUrl],
+  ]) {
+    if (!name || name.length > 80) return { error: "Pogas nosaukumam jābūt no 1 līdz 80 rakstzīmēm." } as const;
+    if (!isValidHeaderLink(url)) return { error: `Pogai “${name}” norādi derīgu saiti (https://…, /kontakti vai #pievienojies).` } as const;
+  }
 
   if (!legalName) return { error: "Biedrības nosaukums ir obligāts." } as const;
   if (!legalAddress) return { error: "Juridiskā adrese ir obligāta." } as const;
@@ -39,7 +56,20 @@ function parseSettingsInput(formData: FormData) {
     stadiumAddress,
     phone,
     email,
+    ...headerLinks,
   } as const;
+}
+
+function isValidHeaderLink(value: string) {
+  if (!value || /[\s\\\u0000-\u001f\u007f]/.test(value)) return false;
+  if (value.startsWith("/") && !value.startsWith("//")) return true;
+  if (value.startsWith("#") && value.length > 1) return true;
+  try {
+    const url = new URL(value);
+    return ["http:", "https:", "mailto:", "tel:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
 }
 
 export async function updateSiteSettings(
@@ -59,8 +89,9 @@ export async function updateSiteSettings(
       set: { ...parsed, updatedAt: Date.now() },
     });
 
-  // The footer renders on every public page via the root layout.
+  // Refresh shared header links and club details across public pages.
   revalidatePath("/", "layout");
+  revalidatePath("/admin/site-settings");
 
   return { success: true } as const;
 }

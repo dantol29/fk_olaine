@@ -294,9 +294,7 @@ export const partners = sqliteTable("partners", {
   createdAt: integer("created_at").notNull(),
 });
 
-/** Singleton — always exactly one row (id 1). Lets the club admin update
- *  its own legal/bank/contact details shown in the site footer without
- *  needing a code change. */
+/** Singleton — row id 1. Editable club details and header stripe links. */
 export const siteSettings = sqliteTable("site_settings", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   legalName: text("legal_name").notNull(),
@@ -308,6 +306,12 @@ export const siteSettings = sqliteTable("site_settings", {
   stadiumAddress: text("stadium_address").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
+  headerTvName: text("header_tv_name").notNull().default("FKOLAINE TV"),
+  headerTvUrl: text("header_tv_url").notNull().default("https://www.youtube.com/c/avanakeks/videos"),
+  headerJoinName: text("header_join_name").notNull().default("Pievienojies"),
+  headerJoinUrl: text("header_join_url").notNull().default("#pievienojies"),
+  headerFederationName: text("header_federation_name").notNull().default("Federācija"),
+  headerFederationUrl: text("header_federation_url").notNull().default("https://lff.lv/"),
   updatedAt: integer("updated_at").notNull(),
 });
 

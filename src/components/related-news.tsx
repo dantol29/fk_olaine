@@ -14,8 +14,8 @@ export async function RelatedNews({ slug }: { slug: string }) {
         <h2 id="related-news-heading" className="mb-8 text-4xl leading-tight font-semibold uppercase sm:mb-10 sm:text-5xl lg:text-6xl">Saistītie jaunumi</h2>
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
           {featured ? (
-          <Link href={`/jaunumi/${featured.slug}`} className="relative flex aspect-[4/3] min-h-80 flex-col justify-end overflow-hidden p-6 focus-visible:outline-white sm:p-8 lg:aspect-auto lg:min-h-[560px]">
-            <Image src={featured.image} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          <Link href={`/jaunumi/${featured.slug}`} className="card-hover relative flex aspect-[4/3] min-h-80 flex-col justify-end overflow-hidden p-6 focus-visible:outline-white sm:p-8 lg:aspect-auto lg:min-h-[560px]">
+            <Image src={featured.image} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="card-hover-image object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
             <div className="relative">
               <p className="mb-4 text-sm text-white/80">{featured.date}</p>
@@ -32,9 +32,9 @@ export async function RelatedNews({ slug }: { slug: string }) {
           )}
             <div className="flex flex-col gap-5">
               {otherArticles.map((article, index) => article ? (
-                <Link key={article.slug} href={`/jaunumi/${article.slug}`} className="grid flex-1 grid-cols-[32%_1fr] items-center gap-4 focus-visible:outline-white sm:gap-6">
+                <Link key={article.slug} href={`/jaunumi/${article.slug}`} className="card-hover grid flex-1 grid-cols-[32%_1fr] items-center gap-4 focus-visible:outline-white sm:gap-6">
                   <div className="relative aspect-[5/3] overflow-hidden">
-                    <Image src={article.image} alt="" fill sizes="(min-width: 1024px) 16vw, 32vw" className="object-cover" />
+                    <Image src={article.image} alt="" fill sizes="(min-width: 1024px) 16vw, 32vw" className="card-hover-image object-cover" />
                   </div>
                   <div className="min-w-0">
                     <p className="mb-2 text-xs text-white/60 sm:mb-4 sm:text-sm">{article.date}</p>

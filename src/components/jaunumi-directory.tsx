@@ -85,9 +85,9 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
           {pageArticles.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {pageArticles.map((article) => (
-                <Link key={article.slug} href={`/jaunumi/${article.slug}`} className="flex min-w-0 flex-col overflow-hidden border border-black/10 bg-white text-[#171717] focus-visible:outline-black">
+                <Link key={article.slug} href={`/jaunumi/${article.slug}`} className="card-hover flex min-w-0 flex-col overflow-hidden border border-black/10 bg-white text-[#171717] focus-visible:outline-black">
                   <div className="relative aspect-video w-full shrink-0 overflow-hidden">
-                    <Image src={article.image} alt="" fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+                    <Image src={article.image} alt="" fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="card-hover-image object-cover" />
                   </div>
                   <div className="flex min-h-[160px] flex-1 flex-col p-4 sm:p-5">
                     <p className="mb-2 flex items-center gap-2 text-sm font-semibold">

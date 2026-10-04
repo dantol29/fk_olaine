@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,38 @@ export function NewsCarousel({
   className?: string;
 }) {
   const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState<boolean | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [inView, setInView] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const autoPlayEnabled = playing ?? !reducedMotion;
+  const activeIndex = articles.length ? index % articles.length : 0;
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReducedMotion(preference.matches);
+    const updateVisibility = () => setVisible(!document.hidden);
+    updatePreference();
+    updateVisibility();
+    preference.addEventListener("change", updatePreference);
+    document.addEventListener("visibilitychange", updateVisibility);
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.15 });
+    if (carouselRef.current) observer.observe(carouselRef.current);
+    return () => {
+      preference.removeEventListener("change", updatePreference);
+      document.removeEventListener("visibilitychange", updateVisibility);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!featured || articles.length < 2 || !autoPlayEnabled || hovered || focused || !visible || !inView) return;
+    const timer = window.setTimeout(() => setIndex((current) => (current + 1) % articles.length), 7000);
+    return () => window.clearTimeout(timer);
+  }, [featured, articles.length, autoPlayEnabled, hovered, focused, visible, inView, index]);
 
   if (articles.length === 0) {
     if (!featured) return null;
@@ -39,7 +71,7 @@ export function NewsCarousel({
     );
   }
 
-  const article = articles[index];
+  const article = articles[activeIndex];
   const Heading = featured ? "h2" : "h3";
 
   const go = (direction: "prev" | "next") => {
@@ -51,9 +83,18 @@ export function NewsCarousel({
 
   return (
     <div
+      ref={carouselRef}
+      role="region"
+      aria-roledescription="karuselis"
+      aria-label="Jaunumu karuselis"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
       className={cn(
         "relative flex h-full min-h-[360px] flex-col overflow-hidden",
         featured ? "home-hero-news rounded-none" : "rounded-[1.5rem] shadow-sm",
+        featured && articles.length > 1 && "hero-has-navigation",
         className,
       )}
     >
@@ -72,8 +113,8 @@ export function NewsCarousel({
             preload={i === 0}
             sizes={featured ? "100vw" : "(min-width: 1024px) 55vw, 100vw"}
             className={cn(
-              "object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
-              i === index ? "opacity-100" : "opacity-0",
+              "object-cover transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+              i === activeIndex ? "opacity-100" : "opacity-0",
             )}
           />
         ))}
@@ -94,25 +135,38 @@ export function NewsCarousel({
           </p>
           {featured && (
             <div className="mt-4 flex flex-wrap items-center gap-2.5">
-              <Link href={`/jaunumi/${article.slug}`} className="hero-news-read inline-flex h-11 items-center border border-white px-4 text-xs font-semibold text-white uppercase hover:bg-white/10">
+              <Link href={`/jaunumi/${article.slug}`} className="motion-action hero-news-read inline-flex h-11 items-center border border-white px-4 text-xs font-semibold text-white uppercase hover:bg-white/10">
                 Lasīt vairāk
               </Link>
-              {articles.length > 1 && (
-                <div className="flex items-center gap-2.5">
-                  <button type="button" onClick={() => go("prev")} aria-label="Iepriekšējais raksts" className="flex size-11 items-center justify-center border border-white text-white hover:bg-white/10">
-                    <ArrowLeft className="size-5" aria-hidden="true" />
-                  </button>
-                  <button type="button" onClick={() => go("next")} aria-label="Nākamais raksts" className="flex size-11 items-center justify-center border border-white text-white hover:bg-white/10">
-                    <ArrowRight className="size-5" aria-hidden="true" />
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
 
 
       </div>
+
+      {featured && articles.length > 1 && (
+        <>
+          <button type="button" onClick={() => go("prev")} aria-label="Iepriekšējais jaunums" className="absolute top-1/2 left-0 z-20 flex h-14 w-11 -translate-y-1/2 items-center justify-center bg-black/30 text-white transition-colors duration-200 hover:bg-black/60 focus-visible:outline-white motion-reduce:transition-none sm:h-16 sm:w-14">
+            <ArrowLeft className="size-6" aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => go("next")} aria-label="Nākamais jaunums" className="absolute top-1/2 right-0 z-20 flex h-14 w-11 -translate-y-1/2 items-center justify-center bg-black/30 text-white transition-colors duration-200 hover:bg-black/60 focus-visible:outline-white motion-reduce:transition-none sm:h-16 sm:w-14">
+            <ArrowRight className="size-6" aria-hidden="true" />
+          </button>
+          <div className="absolute inset-x-0 bottom-3 z-20 flex items-center justify-center gap-1 sm:bottom-4">
+            <div className="flex items-center" aria-label="Izvēlēties jaunumu">
+              {articles.map((item, i) => (
+                <button key={item.slug} type="button" onClick={() => setIndex(i)} aria-label={`Jaunums ${i + 1}: ${item.title}`} aria-current={i === activeIndex ? "true" : undefined} className="flex size-11 items-center justify-center focus-visible:outline-white">
+                  <span aria-hidden="true" className={cn("size-2.5 rounded-full border border-white", i === activeIndex ? "bg-white" : "bg-transparent")} />
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => setPlaying(!autoPlayEnabled)} aria-label={autoPlayEnabled ? "Apturēt automātisko maiņu" : "Sākt automātisko maiņu"} className="flex size-11 items-center justify-center text-white/80 hover:text-white focus-visible:outline-white">
+              {autoPlayEnabled ? <Pause className="size-4" aria-hidden="true" /> : <Play className="size-4" aria-hidden="true" />}
+            </button>
+          </div>
+        </>
+      )}
 
       {!featured && articles.length > 1 && (
         <div className={cn("absolute bottom-8 left-8 z-20 flex items-center gap-3 sm:left-10", featured && "hero-news-controls bottom-6 left-6 gap-3 sm:bottom-8 sm:left-10 xl:left-12")}>
