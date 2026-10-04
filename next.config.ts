@@ -8,10 +8,11 @@ const nextConfig: NextConfig = {
       // before our validation even runs.
       bodySizeLimit: "6mb",
     },
-    // The cPanel host's build gets OOM-killed with the default worker count
-    // (each parallel worker is its own Node process). Setting this above
-    // the app's total page count forces static generation onto a single
-    // worker instead, trading build speed for a much smaller memory peak.
+    // cPanel has a small memory allowance even though it exposes many CPUs.
+    // Limit page-data collection workers as well as static generation;
+    // minPagesPerWorker alone does not limit page-data collection.
+    cpus: 1,
+    staticGenerationMaxConcurrency: 1,
     staticGenerationMinPagesPerWorker: 50,
   },
   images: {
