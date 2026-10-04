@@ -27,12 +27,12 @@ export function PlayerInfoModal({ player, onClose }: { player: Player | null; on
             <div className="min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6">
               <div className="grid items-start gap-6 sm:grid-cols-[240px_minmax(0,1fr)]">
                 <div className="relative mx-auto aspect-square w-full max-w-[240px] overflow-hidden bg-[#f5f5f5]">
-                  {player.photoUrl ? <Image src={player.photoUrl} alt="" fill sizes="240px" className="object-cover object-top" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-20 text-black/15" strokeWidth={1} /></div>}
+                  {player.photoUrl ? <Image src={player.photoUrl} alt="" fill sizes="240px" className="object-contain object-bottom" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-20 text-black/15" strokeWidth={1} /></div>}
                 </div>
                 <dl className="grid gap-3 text-base [&>div]:bg-[#f5f5f5] [&>div]:px-4 [&>div]:py-3 [&_dt]:text-xs [&_dt]:uppercase [&_dt]:text-black/50 [&_dd]:mt-1">
                   <div><dt>Pozīcija</dt><dd>{POSITIONS[player.position ?? "defender"] ?? "Aizsargs"}</dd></div>
                   <div><dt>Dzimšanas datums</dt><dd>{player.birthdate}</dd></div>
-                  <div><dt>Pilsonība</dt><dd className="flex items-center gap-2"><Image src={nationalityFlagImage(player.nationality)} alt="" width={80} height={48} className="h-5 w-7 rounded-sm object-cover" />{nationalityName(player.nationality)}</dd></div>
+                  <div><dt>Pilsonība</dt><dd className="flex items-center gap-2"><Image src={nationalityFlagImage(player.nationality)} alt="" width={80} height={48} className="h-5 w-7 object-cover" />{nationalityName(player.nationality)}</dd></div>
                   {player.number != null && <div><dt>Numurs</dt><dd>{player.number}</dd></div>}
                   <div><dt>Komandas un gūtie vārti</dt><dd className="space-y-1">{player.teams.map((team) => <p key={team.name}>{team.name} — {team.goals}</p>)}</dd></div>
                 </dl>

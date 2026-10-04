@@ -25,7 +25,17 @@ function Countdown({ game }: { game: GameListItem }) {
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
   }, [game]);
-  if (remaining === 0) return <p className="text-lg font-semibold">Spēle sākusies</p>;
+  if (remaining === 0) return (
+    <div role="status" className="flex min-h-[60px] items-center justify-center sm:min-h-[68px]">
+      <div className="inline-flex items-center gap-3 border border-white/25 bg-black/30 px-5 py-3 sm:px-7 sm:py-4">
+        <span aria-hidden="true" className="relative flex size-2.5 shrink-0">
+          <span className="absolute inset-0 animate-ping rounded-full bg-club-red/60 motion-reduce:animate-none" />
+          <span className="relative size-2.5 rounded-full bg-club-red" />
+        </span>
+        <p className="text-sm font-semibold tracking-[0.08em] uppercase sm:text-base">Spēle sākusies</p>
+      </div>
+    </div>
+  );
   const values = remaining === null ? [null, null, null, null] : [Math.floor(remaining / 86400), Math.floor(remaining / 3600) % 24, Math.floor(remaining / 60) % 60, remaining % 60];
   return (
     <div aria-label="Laiks līdz spēles sākumam" className="flex justify-center gap-5 sm:gap-8">

@@ -22,12 +22,12 @@ const POSITIONS = [
 
 function Name({ name }: { name: string }) {
   const [first, ...rest] = name.trim().split(/\s+/);
-  return <span className="block uppercase"><span className="block text-base leading-tight text-club-red sm:text-lg">{rest.length ? first : ""}</span><span className="block text-xl leading-tight font-semibold sm:text-2xl">{rest.length ? rest.join(" ") : first}</span></span>;
+  return <span className="block min-w-0 flex-1 uppercase"><span className="block min-h-[1.25em] text-base leading-tight text-club-red sm:text-lg">{rest.length ? first : ""}</span><span className="block min-h-[2.5em] text-xl leading-tight font-semibold sm:text-2xl">{rest.length ? rest.join(" ") : first}</span></span>;
 }
 
 function Portrait({ name, photoUrl, cover = false }: { name: string; photoUrl: string | null; cover?: boolean }) {
   return <div className="relative aspect-square w-full overflow-hidden bg-white">
-    {photoUrl ? <Image src={photoUrl} alt={name} fill sizes="(min-width: 1024px) 33vw, 50vw" className={cn("card-hover-image", cover ? "object-cover object-top" : "object-contain object-bottom")} /> : <div className="flex h-full items-center justify-center bg-[#f5f5f5]"><UserRound className="size-24 text-black/15" strokeWidth={1} /></div>}
+    {photoUrl ? <Image src={photoUrl} alt={name} fill sizes="(min-width: 1024px) 33vw, 50vw" className={cover ? "object-contain object-bottom" : "card-hover-image object-contain object-bottom"} /> : <div className="flex h-full items-center justify-center bg-[#f5f5f5]"><UserRound className="size-24 text-black/15" strokeWidth={1} /></div>}
   </div>;
 }
 
@@ -64,9 +64,9 @@ export function TeamsDirectory({ teams }: { teams: Teams }) {
           {groups.filter((group) => group.players.length > 0).map((group) => <section key={`${team.id}-${group.key}`} id={`roster-${group.key}`} className="mb-20 scroll-mt-28 sm:mb-28">
             <h2 className="mb-8 text-3xl font-semibold uppercase sm:text-4xl">{group.label}</h2>
             {group.players.length ? <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-8">
-              {group.players.map((item) => <button key={item.id} type="button" onClick={() => setPlayer(item)} className="card-hover min-w-0 text-left focus-visible:outline-black">
-                <div className="relative"><Portrait name={item.name} photoUrl={item.photoUrl} cover />{item.number != null && <span className="absolute top-3 left-3 text-2xl font-semibold sm:text-3xl lg:text-4xl">{item.number}</span>}</div>
-                <div className="flex items-end justify-between gap-3 pt-3"><Name name={item.name} /><Image src={nationalityFlagImage(item.nationality)} alt={nationalityName(item.nationality)} title={nationalityName(item.nationality)} width={80} height={48} className="h-6 w-8 shrink-0 rounded-sm object-cover sm:h-7 sm:w-9" /></div>
+              {group.players.map((item) => <button key={item.id} type="button" onClick={() => setPlayer(item)} className="card-hover flex min-w-0 flex-col text-left focus-visible:outline-black">
+                <div className="relative w-full shrink-0"><Portrait name={item.name} photoUrl={item.photoUrl} cover /><div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-3"><span className="text-2xl leading-none font-semibold tabular-nums sm:text-3xl lg:text-4xl">{item.number ?? ""}</span><Image src={nationalityFlagImage(item.nationality)} alt={nationalityName(item.nationality)} title={nationalityName(item.nationality)} width={80} height={48} className="h-6 w-8 shrink-0 object-cover sm:h-7 sm:w-9" /></div></div>
+                <div className="w-full pt-3 text-center"><Name name={item.name} /></div>
               </button>)}
             </div> : <p className="border-t border-black/10 py-6 text-sm text-black/50">Šajā pozīcijā vēl nav pievienoti spēlētāji.</p>}
           </section>)}

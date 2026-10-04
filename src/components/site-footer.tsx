@@ -58,6 +58,10 @@ export async function SiteFooter() {
             {navItems.map((item) => <Link key={item.href} href={item.href} className={navLinkClass}>{item.title}</Link>)}
           </nav>
         </div>
+        <p className="mt-5 text-center text-xs text-white/45 lg:text-right">
+          Izstrāde:{" "}
+          <a href="https://42days.eu/lv" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline focus-visible:outline-white">42days</a>
+        </p>
       </div>
     </footer>
     </>

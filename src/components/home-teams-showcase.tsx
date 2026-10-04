@@ -9,12 +9,14 @@ import { nationalityFlagImage, nationalityName } from "@/lib/nationality";
 
 type Teams = Awaited<ReturnType<typeof getTeamsRoster>>;
 type Player = Teams[number]["players"][number];
-const POSITIONS: Record<string, string> = { goalkeeper: "Vārtsargs", defender: "Aizsargs", midfielder: "Pussargs", forward: "Uzbrucējs" };
 
 function PlayerPortrait({ player }: { player: Player }) {
-  return <div className="relative aspect-square overflow-hidden bg-[#f5f5f5]">
-    {player.photoUrl ? <Image src={player.photoUrl} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="card-hover-image object-cover object-top" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-20 text-black/15" strokeWidth={1} /></div>}
-    {player.number != null && <span className="absolute top-4 left-4 text-3xl leading-none font-semibold tabular-nums sm:text-4xl">{player.number}</span>}
+  return <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-[#f5f5f5]">
+    {player.photoUrl ? <Image src={player.photoUrl} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-contain object-bottom" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-20 text-black/15" strokeWidth={1} /></div>}
+    <div className="absolute top-4 right-4 left-4 flex items-center justify-between gap-3">
+      <span className="text-3xl leading-none font-semibold tabular-nums sm:text-4xl">{player.number ?? ""}</span>
+      <Image src={nationalityFlagImage(player.nationality)} alt={nationalityName(player.nationality)} title={nationalityName(player.nationality)} width={80} height={48} className="h-5 w-7 shrink-0 object-cover sm:h-6 sm:w-8" />
+    </div>
   </div>;
 }
 
@@ -48,13 +50,11 @@ export function HomeTeamsShowcase({ teams, className }: { teams: Teams; classNam
     {players.length ? <div className="relative mt-5"><div ref={galleryRef} role="region" aria-label={`${team.name} spēlētāji`} tabIndex={0} className="no-scrollbar grid snap-x snap-mandatory auto-cols-[72%] grid-flow-col gap-6 overflow-x-auto pb-4 sm:auto-cols-[calc((100%_-_48px)/3)] lg:auto-cols-[calc((100%_-_72px)/4)]">
       {players.map((item) => {
         const [first, ...rest] = item.name.trim().split(/\s+/);
-        return <button key={item.id} type="button" onClick={() => setPlayer(item)} className="card-hover min-w-0 snap-start text-left focus-visible:outline-black">
+        return <button key={item.id} type="button" onClick={() => setPlayer(item)} className="card-hover flex min-w-0 snap-start flex-col text-left focus-visible:outline-black">
           <PlayerPortrait player={item} />
-          <div className="mt-4 flex items-end justify-between gap-3">
-            <div className="min-w-0 uppercase"><span className="block text-sm leading-tight text-club-red sm:text-base">{rest.length ? first : ""}</span><span className="block text-lg leading-tight font-semibold sm:text-2xl">{rest.length ? rest.join(" ") : first}</span></div>
-            <Image src={nationalityFlagImage(item.nationality)} alt={nationalityName(item.nationality)} width={80} height={48} className="h-5 w-7 shrink-0 rounded-sm object-cover sm:h-6 sm:w-8" />
+          <div className="mt-4 w-full text-center">
+            <div className="min-w-0 uppercase"><span className="block min-h-[1.25em] text-sm leading-tight text-club-red sm:text-base">{rest.length ? first : ""}</span><span className="block min-h-[2.5em] text-lg leading-tight font-semibold sm:text-2xl">{rest.length ? rest.join(" ") : first}</span></div>
           </div>
-          <p className="mt-2 text-xs text-black/45 sm:text-sm">{POSITIONS[item.position ?? "defender"] ?? "Aizsargs"}</p>
         </button>;
       })}
     </div>

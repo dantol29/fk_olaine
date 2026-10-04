@@ -48,65 +48,28 @@ export async function TopScorersList({
   if (scorers.length === 0) return null;
 
   return (
-    <div
-      className={cn(
-        "h-full bg-black p-6 text-white sm:p-8",
-        className,
-      )}
-    >
-      <h3 className="text-2xl font-semibold uppercase sm:text-3xl">
-        Bombardieri
-      </h3>
-
-      <div className="mt-6 flex flex-col divide-y divide-white/20">
+    <section aria-labelledby="top-scorers-heading" className={cn("h-full bg-white text-black", className)}>
+      <div className="flex items-end justify-between gap-4 border-b-2 border-black pb-5">
+        <h3 id="top-scorers-heading" className="text-2xl font-semibold uppercase sm:text-3xl">Bombardieri</h3>
+        <span className="pb-1 text-xs text-black/45 uppercase">Vārti</span>
+      </div>
+      <ol className="divide-y divide-black/10">
         {scorers.map((scorer, index) => (
-          <div
-            key={scorer.id}
-            className="flex items-center gap-3 py-5 sm:gap-4"
-          >
-            <span className="w-5 shrink-0 text-sm tabular-nums text-white/50">{String(index + 1).padStart(2, "0")}</span>
-            <div className="relative size-14 shrink-0 overflow-hidden bg-white/10 sm:size-16">
-              {scorer.photoUrl ? (
-                <Image
-                  src={scorer.photoUrl}
-                  alt={scorer.name}
-                  fill
-                  sizes="(min-width: 640px) 64px, 56px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <UserRound
-                    className="size-8 text-white/40"
-                    strokeWidth={1.5}
-                  />
-                </div>
-              )}
+          <li key={scorer.id} className="flex items-center gap-3 py-6 sm:gap-5">
+            <span aria-label={`${index + 1}. vieta`} className={cn("w-7 shrink-0 text-2xl leading-none font-semibold tabular-nums", index === 0 ? "text-club-red" : "text-black/25")}>{String(index + 1).padStart(2, "0")}</span>
+            <div className="relative h-24 w-16 shrink-0 overflow-hidden bg-[#f5f5f5] sm:h-28 sm:w-20">
+              {scorer.photoUrl ? <Image src={scorer.photoUrl} alt="" fill sizes="80px" className="object-contain object-bottom" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-8 text-black/20" strokeWidth={1} /></div>}
             </div>
-
             <div className="min-w-0 flex-1">
-              <p className="text-base font-semibold leading-snug sm:text-lg">
-                {scorer.name}
-              </p>
-              <div className="mt-0.5 flex flex-col">
-                {scorer.teamBreakdown.map((entry) => (
-                  <p
-                    key={entry.teamName}
-                    className="text-xs text-white/50 sm:text-sm"
-                  >
-                    {entry.teamName} - {entry.goals}
-                  </p>
-                ))}
+              <p className="text-base leading-tight font-semibold sm:text-xl">{scorer.name}</p>
+              <div className="mt-2 space-y-1">
+                {scorer.teamBreakdown.map((entry) => <p key={entry.teamName} className="text-xs text-black/45">{entry.teamName}<span className="mx-1.5 text-black/20">/</span><span className="tabular-nums">{entry.goals}</span></p>)}
               </div>
             </div>
-
-            <div className="ml-auto w-12 shrink-0 text-right">
-              <span className="block text-3xl font-semibold leading-none tabular-nums text-club-red sm:text-4xl">{scorer.totalGoals}</span>
-              <span className="mt-1 block text-xs text-white/50">Vārti</span>
-            </div>
-          </div>
+            <span className={cn("ml-auto shrink-0 text-4xl leading-none font-semibold tabular-nums sm:text-5xl", index === 0 ? "text-club-red" : "text-black")}>{scorer.totalGoals}<span className="sr-only"> vārti</span></span>
+          </li>
         ))}
-      </div>
-    </div>
+      </ol>
+    </section>
   );
 }

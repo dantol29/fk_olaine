@@ -29,15 +29,15 @@ export default function Home() {
             <HomePollsSection />
           </div>
         </section>
-        <section className="border-t border-black/10 bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+        <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto max-w-[1600px]">
             <HomeTeamsSection />
 
           </div>
         </section>
-        <section className="border-t border-black/10 bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+        <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto max-w-[1280px]">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
               <TopScorersList />
               <UpcomingBirthdays />
             </div>
