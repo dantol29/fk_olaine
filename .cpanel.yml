@@ -7,5 +7,5 @@ deployment:
     - if [ -d "$DEPLOYPATH/uploads" ] && [ ! -L "$DEPLOYPATH/uploads" ]; then rsync -a "$DEPLOYPATH/uploads/" /home3/afaolain/fk_olaine-data/uploads/ && rm -rf "$DEPLOYPATH/uploads"; fi
     - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.env' --exclude='node_modules' --exclude='.next' --exclude='uploads' ./ $DEPLOYPATH
     - ln -sfn /home3/afaolain/fk_olaine-data/uploads $DEPLOYPATH/uploads
-    - source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd $DEPLOYPATH && rm -rf node_modules && npm install && npm run db:migrate && npm run build -- --webpack
+    - source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd $DEPLOYPATH && npm config set @dantol29:registry https://npm.pkg.github.com --location=project && rm -rf node_modules && npm install && npm run db:migrate && npm run build -- --webpack
     - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt
