@@ -43,3 +43,15 @@ Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`, `SITE
 For an existing database, run `node src/db/add-header-links.mjs` against the production database when deploying the editable header stripe buttons. It adds the six name/link columns with the current button defaults and preserves existing settings. The buttons can then be edited under **Iestatījumi → Galvenes joslas pogas**.
 
 - **Outgoing email** (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`) — used for notification emails (e.g. the LFF sync alerting an admin that a game needs review). In cPanel: Email Accounts → pick/create a mailbox (e.g. `info@yourdomain.com`) → "Connect Devices" next to it shows the exact host/port to use (typically `mail.yourdomain.com`, port `465` for SSL or `587` for STARTTLS). `SMTP_USER`/`SMTP_PASSWORD` are that mailbox's full address and password. Leave unset to disable email sending entirely — `src/lib/mailer.ts` just logs a warning and skips it rather than failing whatever triggered the notification.
+
+### Game-to-league relationships
+
+Games reference `league_sources.id` through nullable `games.league_source_id`. Both LFF import flows set it directly; manually entered games have a league-source selector. Renaming a source keeps its games linked. Deleting it clears the link without deleting games.
+
+Before starting a deployment with this change, run from the app directory with the production database configured:
+
+```bash
+node src/db/add-game-league-source.mjs
+```
+
+The cPanel deployment runs this automatically before building. The migration adds the foreign key and index, and backfills only unique matches of team ID and league label. Unmatched or ambiguous games stay unassigned and can be linked in the admin game form. League logos and fixture links resolve by source ID; unassigned games use the club-logo fallback.

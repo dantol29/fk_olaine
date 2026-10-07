@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CalendarDays, X } from "lucide-react";
 import { useState } from "react";
 
+import { leagueForGame } from "@/lib/game-league";
 import { cn } from "@/lib/utils";
 import type { GameListItem } from "@/lib/games-server";
 import type { LeagueStandings } from "@/lib/league-standings-server";
@@ -27,12 +28,12 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
   const [leagueLabel, setLeagueLabel] = useState("");
   const [failedLogo, setFailedLogo] = useState<string | null>(null);
   const teamNames = [...new Set([...games.map((game) => game.teamName), ...leagues.flatMap((league) => league.teamName ? [league.teamName] : [])])];
-  const activeTeam = teamNames.includes(selectedTeam) ? selectedTeam : teamNames[0] ?? "";
-  const teamGames = games.filter((game) => game.teamName === activeTeam && game.year === year);
+  const activeTeam = teamNames.includes(selectedTeam) ? selectedTeam : "";
+  const teamGames = games.filter((game) => (!activeTeam || game.teamName === activeTeam) && game.year === year);
   const upcoming = teamGames.filter((game) => !game.isPast && matchKickoff(game) > Date.now());
   const displayedGames = view === "results" ? teamGames.filter((game) => matchKickoff(game) <= Date.now()).reverse() : upcoming;
-  const teamLeagues = leagues.filter((league) => league.teamName === activeTeam);
-  const league = teamLeagues.find((item) => item.label === leagueLabel) ?? teamLeagues[0];
+  const teamLeagues = leagues.filter((league) => !activeTeam || league.teamName === activeTeam);
+  const league = teamLeagues.find((item) => String(item.id) === leagueLabel) ?? teamLeagues[0];
   const leagueLogo = league?.logoUrl && league.logoUrl !== failedLogo ? league.logoUrl : null;
 
   return (
@@ -41,9 +42,17 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
         <div className="mx-auto max-w-[1920px]">
           <h1 className="mb-2 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Spēles</h1>
           <div className="flex flex-col justify-between lg:flex-row lg:items-end lg:gap-3">
-            <nav aria-label="Komandas" className="flex min-w-0 gap-6 overflow-x-auto sm:gap-8">
-              {teamNames.map((name) => <button key={name} type="button" aria-pressed={activeTeam === name} onClick={() => { setActiveTeam(name); setLeagueLabel(""); }} className={cn("relative flex shrink-0 items-center pt-3 pb-2 text-base uppercase sm:text-lg", activeTeam === name && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{name}</button>)}
-            </nav>
+            <label className="my-3 flex min-w-0 flex-col gap-2 lg:my-2">
+              <span className="text-xs text-white/60 uppercase">Komandas</span>
+              <select
+                value={activeTeam}
+                onChange={(event) => { setActiveTeam(event.target.value); setLeagueLabel(""); setCalendarDate(null); }}
+                className="min-h-11 w-full max-w-sm border border-white/30 bg-black px-4 py-2 text-base text-white focus-visible:outline-white"
+              >
+                <option value="">Visas komandas</option>
+                {teamNames.map((name) => <option key={name} value={name}>{name}</option>)}
+              </select>
+            </label>
             <div className="-mx-6 flex shrink-0 items-center justify-end bg-white px-6 py-2 sm:-mx-10 sm:px-10 lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-1">
               <DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 bg-club-red px-5 text-xs font-semibold text-white uppercase lg:bg-white lg:text-black"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger>
             </div>
@@ -68,7 +77,7 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
             {view === "table" ? (
               <>
                 <div className="mb-8 flex flex-col items-center gap-4">
-                  {teamLeagues.length > 1 && <select aria-label="Līga" value={league?.label ?? ""} onChange={(event) => setLeagueLabel(event.target.value)} className="max-w-full border-b border-black/20 bg-transparent px-3 py-2 text-center text-base font-semibold">{teamLeagues.map((item) => <option key={item.label} value={item.label}>{item.label}</option>)}</select>}
+                  {teamLeagues.length > 1 && <select aria-label="Līga" value={league?.id ?? ""} onChange={(event) => setLeagueLabel(event.target.value)} className="max-w-full border-b border-black/20 bg-transparent px-3 py-2 text-center text-base font-semibold">{teamLeagues.map((item) => <option key={item.id ?? item.label} value={item.id}>{item.label}{!activeTeam && item.teamName ? ` — ${item.teamName}` : ""}</option>)}</select>}
                   <Image src={leagueLogo ?? "/fk-olaine-crest-v2.png"} alt={leagueLogo ? league?.label ?? "Līgas logo" : "FK Olaine"} width={120} height={120} className="size-30 object-contain" onError={() => { if (leagueLogo) setFailedLogo(leagueLogo); }} />
                 </div>
                 {league && league.standings.length > 0 ? (
@@ -94,13 +103,13 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
       </section>
       <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,520px)] border-none bg-white shadow-xl data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
         <div className="flex items-center justify-between bg-black px-6 py-4 text-white">
-          <div><DrawerTitle className="text-2xl text-white">Spēļu kalendārs</DrawerTitle><p className="mt-1 text-sm text-white/60">{activeTeam}</p></div>
+          <div><DrawerTitle className="text-2xl text-white">Spēļu kalendārs</DrawerTitle><p className="mt-1 text-sm text-white/60">{activeTeam || "Visas komandas"}</p></div>
           <DrawerClose aria-label="Aizvērt kalendāru" className="flex size-11 items-center justify-center"><X className="size-6" /></DrawerClose>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           <GamesMonthCalendar games={teamGames} activeDateKey={calendarDate} onSelectDate={setCalendarDate} className="!ml-0 !w-full !rounded-none !bg-black" />
           <div className="p-6">
-            {calendarDate ? <div className="space-y-5">{teamGames.filter((game) => game.rawDate === calendarDate).map((game) => <MatchListCard key={game.id} game={game} league={teamLeagues.find((item) => item.label === game.league) ?? (teamLeagues.length === 1 ? teamLeagues[0] : undefined)} completed={matchKickoff(game) <= Date.now()} drawer showInfo={false} />)}</div> : <p className="text-sm text-black/60">Izvēlies atzīmēto datumu, lai skatītu spēles informāciju.</p>}
+            {calendarDate ? <div className="space-y-5">{teamGames.filter((game) => game.rawDate === calendarDate).map((game) => <MatchListCard key={game.id} game={game} league={leagueForGame(game, teamLeagues)} completed={matchKickoff(game) <= Date.now()} drawer showInfo={false} />)}</div> : <p className="text-sm text-black/60">Izvēlies atzīmēto datumu, lai skatītu spēles informāciju.</p>}
           </div>
         </div>
       </DrawerContent>

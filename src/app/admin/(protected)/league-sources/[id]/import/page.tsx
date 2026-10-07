@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -82,7 +82,7 @@ export default async function AdminLeagueSourceImportPage({
       location: games.location,
     })
     .from(games)
-    .where(and(eq(games.teamId, source.teamId), eq(games.source, "lff")));
+    .where(and(eq(games.teamId, source.teamId), eq(games.source, "lff"), or(eq(games.leagueSourceId, source.id), isNull(games.leagueSourceId))));
 
   const existingByKey = new Map(
     existingGames.map((g) => [`${g.date}|${g.homeTeam}|${g.awayTeam}`, g]),
@@ -111,7 +111,7 @@ export default async function AdminLeagueSourceImportPage({
       awayScore: row.fixture.awayScore,
     }));
 
-  const boundConfirm = confirmImport.bind(null, source.teamId, source.label);
+  const boundConfirm = confirmImport.bind(null, source.id);
   const boundApplyLffChanges = applyLffChanges.bind(null, sourceId);
 
   return (

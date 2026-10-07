@@ -105,6 +105,7 @@ export const getUpcomingGamesFromDb = cache(async function getUpcomingGamesFromD
 });
 
 export type GameListItem = UpcomingGame & {
+  leagueSourceId?: number | null;
   endTime?: string;
   fixturesUrl?: string | null;
   homeScore?: number | null;
@@ -125,6 +126,7 @@ export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promi
       .select({
         id: gamesTable.id,
         teamId: gamesTable.teamId,
+        leagueSourceId: gamesTable.leagueSourceId,
         homeTeam: gamesTable.homeTeam,
         awayTeam: gamesTable.awayTeam,
         homeScore: gamesTable.homeScore,
@@ -142,13 +144,13 @@ export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promi
 
     const [logos, sources] = await Promise.all([
       resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam])),
-      rows.length > 0 ? db.select({ teamId: leagueSources.teamId, label: leagueSources.label, url: leagueSources.url }).from(leagueSources).where(inArray(leagueSources.teamId, [...new Set(rows.map((row) => row.teamId))])) : Promise.resolve([]),
+      rows.length > 0 ? db.select({ id: leagueSources.id, teamId: leagueSources.teamId, label: leagueSources.label, url: leagueSources.url }).from(leagueSources).where(inArray(leagueSources.teamId, [...new Set(rows.map((row) => row.teamId))])) : Promise.resolve([]),
     ]);
 
     return rows.map((row) => {
       const [year, month, day] = row.date.split("-").map(Number);
       const teamSources = sources.filter((source) => source.teamId === row.teamId);
-      const source = teamSources.find((source) => source.label === row.league) ?? (teamSources.length === 1 ? teamSources[0] : undefined);
+      const source = teamSources.find((source) => source.id === row.leagueSourceId);
       return {
         id: row.id,
         day: String(day).padStart(2, "0"),
@@ -157,10 +159,11 @@ export const getAllGamesFromDb = cache(async function getAllGamesFromDb(): Promi
         weekday: weekdayAbbrFor(row.date),
         time: row.startTime,
         endTime: row.endTime,
+        leagueSourceId: row.leagueSourceId,
         fixturesUrl: source?.url ?? null,
         homeScore: row.homeScore,
         awayScore: row.awayScore,
-        league: row.league ?? "Draudzības spēle",
+        league: source?.label ?? row.league ?? "Draudzības spēle",
         home: teamDisplay(row.homeTeam, logos.get(row.homeTeam) ?? null),
         away: teamDisplay(row.awayTeam, logos.get(row.awayTeam) ?? null),
         venue: row.location,

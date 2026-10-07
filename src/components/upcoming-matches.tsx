@@ -57,7 +57,7 @@ function VideoLink() {
 export function UpcomingMatches({ games, leagues, completed = false, showFixtures = true }: { games: GameListItem[]; leagues: LeagueStandings[]; completed?: boolean; showFixtures?: boolean }) {
   const next = games[0];
   const hasScore = (game: GameListItem) => game.homeScore != null && game.awayScore != null;
-  const leagueFor = (game: GameListItem) => leagueForGame(game, leagues) ?? (leagues.length === 1 ? leagues[0] : undefined);
+  const leagueFor = (game: GameListItem) => leagueForGame(game, leagues);
   const groups = new Map<string, GameListItem[]>();
   for (const game of games) {
     const key = game.rawDate.slice(0, 7);

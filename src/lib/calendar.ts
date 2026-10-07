@@ -1,7 +1,7 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { coaches, events, games, teams, trainingCoaches, trainings } from "@/db/schema";
+import { coaches, events, games, leagueSources, teams, trainingCoaches, trainings } from "@/db/schema";
 import { resolveClubLogos } from "@/lib/club-logos";
 import type { GameListItem } from "@/lib/games-server";
 import type { TrainingCoach, TrainingListItem } from "@/lib/trainings-server";
@@ -257,12 +257,16 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
       endTime: games.endTime,
       location: games.location,
       league: games.league,
+      leagueSourceId: games.leagueSourceId,
+      leagueLabel: leagueSources.label,
+      fixturesUrl: leagueSources.url,
       homeScore: games.homeScore,
       awayScore: games.awayScore,
       teamName: teams.name,
     })
     .from(games)
     .innerJoin(teams, eq(games.teamId, teams.id))
+    .leftJoin(leagueSources, eq(games.leagueSourceId, leagueSources.id))
     .where(and(gte(games.date, afterKey), lte(games.date, beforeKey)));
 
   const logos = await resolveClubLogos(rows.flatMap((row) => [row.homeTeam, row.awayTeam]));
@@ -296,7 +300,9 @@ async function getAdminGameEvents(after: Date, before: Date): Promise<CalendarEv
         endTime: row.endTime,
         homeScore: row.homeScore,
         awayScore: row.awayScore,
-        league: row.league ?? "Draudzības spēle",
+        leagueSourceId: row.leagueSourceId,
+        fixturesUrl: row.fixturesUrl,
+        league: row.leagueLabel ?? row.league ?? "Draudzības spēle",
         home: row.homeTeam === "" ? { name: row.homeTeam } : { name: row.homeTeam, logo: logos.get(row.homeTeam) ?? undefined },
         away: row.awayTeam === "" ? { name: row.awayTeam } : { name: row.awayTeam, logo: logos.get(row.awayTeam) ?? undefined },
         venue: row.location,

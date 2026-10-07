@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
-import { games } from "@/db/schema";
+import { games, leagueSources } from "@/db/schema";
 import { requireAdminSession } from "@/lib/auth";
 
 type SelectedFixture = {
@@ -41,8 +41,11 @@ function addMinutes(time: string, minutes: number): string {
   return `${String(wrappedHour).padStart(2, "0")}:${String(remMinute).padStart(2, "0")}`;
 }
 
-export async function confirmImport(teamId: number, league: string, formData: FormData) {
+export async function confirmImport(sourceId: number, formData: FormData) {
   await requireAdminSession();
+
+  const [source] = await db.select().from(leagueSources).where(eq(leagueSources.id, sourceId));
+  if (!source) throw new Error("Līgas avots nav atrasts.");
 
   const selections = formData
     .getAll("selected")
@@ -51,7 +54,8 @@ export async function confirmImport(teamId: number, league: string, formData: Fo
   if (selections.length > 0) {
     await db.insert(games).values(
       selections.map((fixture) => ({
-        teamId,
+        teamId: source.teamId,
+        leagueSourceId: source.id,
         homeTeam: fixture.homeTeam,
         awayTeam: fixture.awayTeam,
         ...knownScores(fixture),
@@ -60,7 +64,7 @@ export async function confirmImport(teamId: number, league: string, formData: Fo
         endTime: addMinutes(fixture.startTime, 90),
         location: fixture.location,
         source: "lff" as const,
-        league,
+        league: source.label,
         createdAt: Date.now(),
       })),
     );

@@ -11,7 +11,7 @@ async function main() {
   for (const source of sources) {
     try {
       const fixtures = await scrapeFixtures(source.url);
-      const updated = await updateFixtureScores(source.teamId, source.label, fixtures);
+      const updated = await updateFixtureScores(source.teamId, source.id, fixtures);
       total += updated;
       console.log(`${source.label}: ${updated} game scores updated`);
     } catch (error) {

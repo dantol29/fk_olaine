@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { eq, isNotNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { leagueSources, teams } from "@/db/schema";
@@ -38,10 +38,10 @@ const FALLBACK_STANDINGS: StandingRow[] = [
   },
 ];
 
-export type LeagueStandings = { label: string; standings: StandingRow[]; url: string; teamName?: string; logoUrl?: string | null };
+export type LeagueStandings = { id?: number; label: string; standings: StandingRow[]; url: string; teamName?: string; logoUrl?: string | null };
 
 export const getLeagueLogosForDisplay = cache(async function getLeagueLogosForDisplay(): Promise<LeagueStandings[]> {
-  const sources = await db.select({ label: leagueSources.label, teamName: teams.name, logoUrl: leagueSources.logoUrl, url: leagueSources.url })
+  const sources = await db.select({ id: leagueSources.id, label: leagueSources.label, teamName: teams.name, logoUrl: leagueSources.logoUrl, url: leagueSources.url })
     .from(leagueSources).innerJoin(teams, eq(leagueSources.teamId, teams.id))
     .orderBy(leagueSources.displayOrder, leagueSources.label);
   return sources.map((source) => ({ ...source, url: source.url ?? "", standings: [] }));
@@ -70,10 +70,9 @@ export const getLeagueStandingsForDisplay = cache(async function getLeagueStandi
 
   try {
     const sources = await db
-      .select({ label: leagueSources.label, standingsUrl: leagueSources.standingsUrl, teamName: teams.name, logoUrl: leagueSources.logoUrl })
+      .select({ id: leagueSources.id, label: leagueSources.label, standingsUrl: leagueSources.standingsUrl, teamName: teams.name, logoUrl: leagueSources.logoUrl })
       .from(leagueSources)
       .innerJoin(teams, eq(leagueSources.teamId, teams.id))
-      .where(isNotNull(leagueSources.standingsUrl))
       .orderBy(leagueSources.displayOrder, leagueSources.label);
 
     if (sources.length === 0) {
@@ -82,12 +81,13 @@ export const getLeagueStandingsForDisplay = cache(async function getLeagueStandi
 
     const results = await Promise.all(
       sources.map(async (source) => {
-        const url = source.standingsUrl as string;
+        const url = source.standingsUrl ?? "";
+        if (!url) return { id: source.id, label: source.label, standings: [], url, teamName: source.teamName, logoUrl: source.logoUrl };
         try {
           const standings = await getStandings(url);
-          return { label: source.label, standings, url, teamName: source.teamName, logoUrl: source.logoUrl };
+          return { id: source.id, label: source.label, standings, url, teamName: source.teamName, logoUrl: source.logoUrl };
         } catch {
-          return { label: source.label, standings: [], url, teamName: source.teamName, logoUrl: source.logoUrl };
+          return { id: source.id, label: source.label, standings: [], url, teamName: source.teamName, logoUrl: source.logoUrl };
         }
       }),
     );

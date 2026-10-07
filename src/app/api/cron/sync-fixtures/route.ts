@@ -9,6 +9,7 @@ import { syncPlayerPositionsForSource } from "@/lib/player-positions";
 import { sendNotificationEmail } from "@/lib/mailer";
 import { getSiteSettings } from "@/lib/site-settings";
 import { getSiteUrl } from "@/lib/site-url";
+import { errorMessage } from "@/lib/error-message";
 
 export const dynamic = "force-dynamic";
 
@@ -154,7 +155,7 @@ async function runSync(request: NextRequest) {
       { headers: NO_STORE_HEADERS },
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = errorMessage(error);
     await db.update(cronJobStatuses).set({
       status: "error",
       finishedAt: Date.now(),

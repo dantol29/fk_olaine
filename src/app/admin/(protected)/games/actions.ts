@@ -5,10 +5,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db/client";
-import { games } from "@/db/schema";
+import { games, leagueSources } from "@/db/schema";
 import { requireAdminSession } from "@/lib/auth";
 
-function parseGameInput(formData: FormData) {
+async function parseGameInput(formData: FormData) {
   const teamId = Number(formData.get("teamId"));
   const homeTeam = String(formData.get("homeTeam") ?? "").trim();
   const awayTeam = String(formData.get("awayTeam") ?? "").trim();
@@ -17,6 +17,14 @@ function parseGameInput(formData: FormData) {
   const endTime = String(formData.get("endTime") ?? "").trim();
   const location = String(formData.get("location") ?? "").trim();
   const league = String(formData.get("league") ?? "").trim();
+  const leagueSourceValue = String(formData.get("leagueSourceId") ?? "").trim();
+  const leagueSourceId = leagueSourceValue ? Number(leagueSourceValue) : null;
+  let selectedLeague: typeof leagueSources.$inferSelect | undefined;
+  if (leagueSourceId !== null) {
+    if (!Number.isSafeInteger(leagueSourceId) || leagueSourceId <= 0) return { error: "Nederīgs līgas avots." } as const;
+    [selectedLeague] = await db.select().from(leagueSources).where(eq(leagueSources.id, leagueSourceId));
+    if (!selectedLeague || selectedLeague.teamId !== teamId) return { error: "Līgas avotam jāatbilst izvēlētajai komandai." } as const;
+  }
   const notes = String(formData.get("notes") ?? "").trim();
   const homeInput = String(formData.get("homeScore") ?? "").trim();
   const awayInput = String(formData.get("awayScore") ?? "").trim();
@@ -41,7 +49,8 @@ function parseGameInput(formData: FormData) {
     startTime,
     endTime,
     location,
-    league: league || null,
+    leagueSourceId,
+    league: selectedLeague?.label ?? (league || null),
     notes: notes || null,
     homeScore: homeInput ? Number(homeInput) : null,
     awayScore: awayInput ? Number(awayInput) : null,
@@ -51,7 +60,7 @@ function parseGameInput(formData: FormData) {
 export async function createGame(_prevState: { error?: string } | undefined, formData: FormData) {
   await requireAdminSession();
 
-  const parsed = parseGameInput(formData);
+  const parsed = await parseGameInput(formData);
   if ("error" in parsed) return parsed;
 
   await db.insert(games).values({ ...parsed, source: "manual", createdAt: Date.now() });
@@ -69,7 +78,7 @@ export async function updateGame(
 ) {
   await requireAdminSession();
 
-  const parsed = parseGameInput(formData);
+  const parsed = await parseGameInput(formData);
   if ("error" in parsed) return parsed;
 
   await db.update(games).set(parsed).where(eq(games.id, id));

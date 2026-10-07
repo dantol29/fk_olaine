@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { createGame, updateGame } from "../actions";
 
@@ -16,18 +16,22 @@ type Game = {
   endTime: string;
   location: string;
   league: string | null;
+  leagueSourceId: number | null;
   notes: string | null;
 };
+type LeagueOption = { id: number; teamId: number; label: string };
 type TeamOption = { id: number; name: string };
 
 export function GameForm(
   props:
-    | { mode: "create"; teamOptions: TeamOption[] }
-    | { mode: "edit"; game: Game; teamOptions: TeamOption[] },
+    | { mode: "create"; teamOptions: TeamOption[]; leagueOptions: LeagueOption[] }
+    | { mode: "edit"; game: Game; teamOptions: TeamOption[]; leagueOptions: LeagueOption[] },
 ) {
   const action = props.mode === "create" ? createGame : updateGame.bind(null, props.game.id);
   const [state, formAction, pending] = useActionState(action, undefined);
   const game = props.mode === "edit" ? props.game : null;
+
+  const [teamId, setTeamId] = useState(game?.teamId ?? 0);
 
   return (
     <form action={formAction} className="max-w-md">
@@ -40,7 +44,8 @@ export function GameForm(
         <select
           name="teamId"
           required
-          defaultValue={game?.teamId ?? ""}
+          value={teamId || ""}
+          onChange={(event) => setTeamId(Number(event.target.value))}
           className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         >
           <option value="" disabled>
@@ -130,6 +135,14 @@ export function GameForm(
           defaultValue={game?.location ?? "Olaines pilsētas stadions"}
           className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-black">
+        Līgas avots (nav obligāts)
+        <select key={teamId} name="leagueSourceId" defaultValue={game && teamId === game.teamId ? game.leagueSourceId ?? "" : ""} className="mt-1.5 w-full border border-black/15 px-3 py-2 text-sm">
+          <option value="">Bez līgas avota</option>
+          {props.leagueOptions.filter((source) => source.teamId === teamId).map((source) => <option key={source.id} value={source.id}>{source.label}</option>)}
+        </select>
       </label>
 
       <label className="mt-4 block text-sm font-semibold text-black">

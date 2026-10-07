@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const teams = sqliteTable("teams", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -126,6 +126,7 @@ export const events = sqliteTable("events", {
 });
 
 export const games = sqliteTable("games", {
+  leagueSourceId: integer("league_source_id").references(() => leagueSources.id, { onDelete: "set null" }),
   id: integer("id").primaryKey({ autoIncrement: true }),
   teamId: integer("team_id")
     .notNull()
@@ -142,7 +143,7 @@ export const games = sqliteTable("games", {
   source: text("source", { enum: ["manual", "lff"] }).notNull().default("manual"),
   league: text("league"),
   createdAt: integer("created_at").notNull(),
-});
+}, (table) => [index("games_league_source_id").on(table.leagueSourceId)]);
 
 export const leagueSources = sqliteTable("league_sources", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -227,8 +228,14 @@ export const trainingCoachesRelations = relations(trainingCoaches, ({ one }) => 
   coach: one(coaches, { fields: [trainingCoaches.coachId], references: [coaches.id] }),
 }));
 
-export const leagueSourcesRelations = relations(leagueSources, ({ one }) => ({
+export const gamesRelations = relations(games, ({ one }) => ({
+  team: one(teams, { fields: [games.teamId], references: [teams.id] }),
+  leagueSource: one(leagueSources, { fields: [games.leagueSourceId], references: [leagueSources.id] }),
+}));
+
+export const leagueSourcesRelations = relations(leagueSources, ({ one, many }) => ({
   team: one(teams, { fields: [leagueSources.teamId], references: [teams.id] }),
+  games: many(games),
 }));
 
 export const clubLogos = sqliteTable("club_logos", {

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { games } from "@/db/schema";
@@ -38,6 +38,7 @@ export type ReviewNeededGame = {
  *  it's reported back in `reviewNeeded` — same diff the "Ielādēt spēles"
  *  screen already surfaces, applied there via its own explicit button. */
 export async function syncLeagueSource(source: {
+  id: number;
   teamId: number;
   label: string;
   url: string;
@@ -77,7 +78,7 @@ export async function syncLeagueSource(source: {
       location: games.location,
     })
     .from(games)
-    .where(and(eq(games.teamId, source.teamId), eq(games.source, "lff")));
+    .where(and(eq(games.teamId, source.teamId), eq(games.source, "lff"), or(eq(games.leagueSourceId, source.id), isNull(games.leagueSourceId))));
   const existingByKey = new Map(
     existingGames.map((g) => [`${g.date}|${g.homeTeam}|${g.awayTeam}`, g]),
   );
@@ -92,6 +93,7 @@ export async function syncLeagueSource(source: {
         const startTime = fixture.time as string; // guaranteed by the candidates filter above
         return {
           teamId: source.teamId,
+          leagueSourceId: source.id,
           homeTeam: fixture.home,
           awayTeam: fixture.away,
           homeScore: fixture.homeScore,
@@ -108,7 +110,7 @@ export async function syncLeagueSource(source: {
     );
   }
 
-  const updatedScores = await updateFixtureScores(source.teamId, source.label, fixtures);
+  const updatedScores = await updateFixtureScores(source.teamId, source.id, fixtures);
   const reviewNeeded: ReviewNeededGame[] = [];
   for (const fixture of candidates) {
     const existing = existingByKey.get(`${fixture.date}|${fixture.home}|${fixture.away}`);
