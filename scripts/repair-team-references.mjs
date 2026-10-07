@@ -25,6 +25,22 @@ try {
       throw new Error(`Expected team #${newId} to be ${expectedName}. Repair cancelled.`);
     }
   }
+  const u14 = teams.rows.find((team) => Number(team.id) === 4);
+  if (u14 && u14.name !== "U14") {
+    throw new Error("Team #4 exists with a different name. Repair cancelled.");
+  }
+  if (!u14) {
+    if (teams.rows.some((team) => team.name === "U14")) {
+      throw new Error("U14 already exists with a different ID. Repair cancelled.");
+    }
+    console.log("Restore team #4: U14 (preserves its existing games)");
+    if (apply) {
+      await transaction.execute({
+        sql: "INSERT INTO teams (id, name, created_at) VALUES (?, ?, ?)",
+        args: [4, "U14", Date.now()],
+      });
+    }
+  }
   const tables = await transaction.execute(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
   );
