@@ -55,3 +55,28 @@ node src/db/add-game-league-source.mjs
 ```
 
 The cPanel deployment runs this automatically before building. The migration adds the foreign key and index, and backfills only unique matches of team ID and league label. Unmatched or ambiguous games stay unassigned and can be linked in the admin game form. League logos and fixture links resolve by source ID; unassigned games use the club-logo fallback.
+
+## Shared database package
+
+The source of truth is the private repository https://github.com/dantol29/olaine-database
+(local checkout: ../olaine_database). Both websites install the same exact release from
+GitHub Packages using the npm alias `@olaine/database` → `@dantol29/database`.
+Do not edit the installed package or maintain a separate schema in either website.
+
+### Installing and deploying
+
+Configure `NODE_AUTH_TOKEN` with a GitHub classic token granting `read:packages`
+on your development machine and in the cPanel deployment shell. The committed
+`.npmrc` contains only an environment-variable placeholder; never commit a token.
+For cPanel, the token must be available to the shell running `npm install`,
+not just the running Node application. Both deployments run `npm run db:migrate`
+before building. Both apps need the same database URL to share actual data.
+
+### Releasing a database change
+
+Edit the standalone repository, add any required idempotent migration, bump its
+package version, commit, and push a matching `vVERSION` tag. GitHub Actions
+publishes the private release using its own `GITHUB_TOKEN`.
+From FK Olaine, run `npm run db:update-shared -- VERSION` to install that exact
+release in both websites, then commit both manifests and lockfiles.
+Website database schema/client files are only compatibility imports.

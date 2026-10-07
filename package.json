@@ -9,11 +9,14 @@
     "lint": "eslint",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx src/db/seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:migrate": "node node_modules/@olaine/database/migrate.mjs",
+    "db:update-shared": "node scripts/use-database-release.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@libsql/client": "^0.18.0",
+    "@olaine/database": "npm:@dantol29/database@0.1.0",
     "@tailwindcss/postcss": "^4",
     "@tiptap/extension-underline": "^3.31.3",
     "@tiptap/extensions": "^3.31.3",

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@olaine/database"],
   experimental: {
     serverActions: {
       // Matches the 5MB cap enforced in src/lib/uploads.ts for photo
