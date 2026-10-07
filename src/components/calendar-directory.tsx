@@ -29,13 +29,13 @@ function dateLabel(date: string) {
   return new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${date}T12:00:00Z`));
 }
 
-export function CalendarDirectory({ events, leagues = [], today, minMonth, maxMonth }: { events: CalendarEvent[]; leagues?: LeagueStandings[]; today: string; minMonth: string; maxMonth: string }) {
+export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth }: { events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [team, setTeam] = useState("Visas komandas");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const teams = ["Visas komandas", ...new Set(events.flatMap((event) => event.team ? [event.team] : []))];
+  const teams = ["Visas komandas", ...teamOptions.map((team) => team.name)];
   const visible = events.filter((event) => (team === "Visas komandas" || event.team === team || event.team === null) && (filter === "all" || filter === event.eventType));
   const byDate = new Map<string, CalendarEvent[]>();
   for (const event of visible) byDate.set(event.dateKey, [...(byDate.get(event.dateKey) ?? []), event]);

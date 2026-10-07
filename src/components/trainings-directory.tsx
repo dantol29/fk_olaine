@@ -32,8 +32,8 @@ export function TrainingRow({ training, compact = false }: { training: TrainingL
   </article>;
 }
 
-export function TrainingsDirectory({ trainings, birthdays }: { trainings: TrainingListItem[]; birthdays?: ReactNode }) {
-  const teamNames = [...new Set(trainings.map((training) => training.teamName))];
+export function TrainingsDirectory({ trainings, birthdays, teams }: { trainings: TrainingListItem[]; birthdays?: ReactNode; teams: { id: number; name: string }[] }) {
+  const teamNames = teams.map((team) => team.name);
   const [activeTeam, setActiveTeam] = useState(teamNames[0] ?? "");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarDate, setCalendarDate] = useState<string | null>(null);
