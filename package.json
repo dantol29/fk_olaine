@@ -13,6 +13,7 @@
     "db:migrate": "node node_modules/@olaine/database/migrate.mjs",
     "db:check-references": "node scripts/check-database-references.mjs",
     "db:repair-team-references": "node scripts/repair-team-references.mjs",
+    "db:deduplicate-league-sources": "node scripts/deduplicate-league-sources.mjs",
     "db:update-shared": "node scripts/use-database-release.mjs"
   },
   "dependencies": {
