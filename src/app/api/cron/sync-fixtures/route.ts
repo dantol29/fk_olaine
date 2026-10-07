@@ -96,7 +96,20 @@ async function runSync(request: NextRequest) {
     const sources = await db.select().from(leagueSources);
     const results = await Promise.all(
       sources.map(async (source) => {
-        const fixtures = await syncLeagueSource(source);
+        let fixtures;
+        try {
+          fixtures = await syncLeagueSource(source);
+        } catch (error) {
+          return {
+            id: source.id,
+            label: source.label,
+            imported: 0,
+            updatedScores: 0,
+            reviewNeeded: [] as ReviewNeededGame[],
+            positionSync: { updated: 0 },
+            error: `League source #${source.id}, team #${source.teamId}: ${errorMessage(error)}`,
+          };
+        }
         let positionSync;
         try {
           positionSync = await syncPlayerPositionsForSource(source);

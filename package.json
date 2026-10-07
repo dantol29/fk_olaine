@@ -11,6 +11,7 @@
     "db:seed": "tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "db:migrate": "node node_modules/@olaine/database/migrate.mjs",
+    "db:check-references": "node scripts/check-database-references.mjs",
     "db:update-shared": "node scripts/use-database-release.mjs"
   },
   "dependencies": {
