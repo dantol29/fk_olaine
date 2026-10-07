@@ -19,7 +19,7 @@ const VIEWS: { id: View; label: string }[] = [
   { id: "table", label: "Tabula" },
 ];
 
-export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leagues: LeagueStandings[] }) {
+export function GamesDirectory({ games, leagues, teams }: { games: GameListItem[]; leagues: LeagueStandings[]; teams: { id: number; name: string }[] }) {
   const [selectedTeam, setActiveTeam] = useState("");
   const [view, setView] = useState<View>("fixtures");
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -27,8 +27,8 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
   const year = String(new Date().getFullYear());
   const [leagueLabel, setLeagueLabel] = useState("");
   const [failedLogo, setFailedLogo] = useState<string | null>(null);
-  const teamNames = [...new Set([...games.map((game) => game.teamName), ...leagues.flatMap((league) => league.teamName ? [league.teamName] : [])])];
-  const activeTeam = teamNames.includes(selectedTeam) ? selectedTeam : "";
+  const teamNames = teams.map((team) => team.name);
+  const activeTeam = teamNames.includes(selectedTeam) ? selectedTeam : teamNames[0] ?? "";
   const teamGames = games.filter((game) => (!activeTeam || game.teamName === activeTeam) && game.year === year);
   const upcoming = teamGames.filter((game) => !game.isPast && matchKickoff(game) > Date.now());
   const displayedGames = view === "results" ? teamGames.filter((game) => matchKickoff(game) <= Date.now()).reverse() : upcoming;
@@ -42,17 +42,11 @@ export function GamesDirectory({ games, leagues }: { games: GameListItem[]; leag
         <div className="mx-auto max-w-[1920px]">
           <h1 className="mb-2 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Spēles</h1>
           <div className="flex flex-col justify-between lg:flex-row lg:items-end lg:gap-3">
-            <label className="my-3 flex min-w-0 flex-col gap-2 lg:my-2">
-              <span className="text-xs text-white/60 uppercase">Komandas</span>
-              <select
-                value={activeTeam}
-                onChange={(event) => { setActiveTeam(event.target.value); setLeagueLabel(""); setCalendarDate(null); }}
-                className="min-h-11 w-full max-w-sm border border-white/30 bg-black px-4 py-2 text-base text-white focus-visible:outline-white"
-              >
-                <option value="">Visas komandas</option>
-                {teamNames.map((name) => <option key={name} value={name}>{name}</option>)}
-              </select>
-            </label>
+            <nav aria-label="Komandas" className="flex min-w-0 items-end gap-6 overflow-x-auto sm:gap-8 lg:min-h-12">
+              {teamNames.map((name) => ({ name, value: name })).map((item) => (
+                <button key={item.value} type="button" aria-pressed={activeTeam === item.value} onClick={() => { setActiveTeam(item.value); setLeagueLabel(""); setCalendarDate(null); }} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", activeTeam === item.value && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{item.name}</button>
+              ))}
+            </nav>
             <div className="-mx-6 flex shrink-0 items-center justify-end bg-white px-6 py-2 sm:-mx-10 sm:px-10 lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-1">
               <DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 bg-club-red px-5 text-xs font-semibold text-white uppercase lg:bg-white lg:text-black"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger>
             </div>

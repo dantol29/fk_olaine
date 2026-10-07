@@ -13,7 +13,7 @@ export async function getTeamsRoster() {
         playerTeams: { with: { player: true } },
         coachTeams: { with: { coach: true } },
       },
-      orderBy: (teams, { asc }) => [asc(teams.name)],
+      orderBy: (teams, { asc, desc }) => [desc(teams.isMain), asc(teams.name)],
     }),
     getAllGamesFromDb(),
     getAllTrainingsFromDb(),
