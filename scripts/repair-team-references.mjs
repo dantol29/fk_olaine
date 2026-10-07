@@ -51,7 +51,10 @@ try {
   if (apply) {
     const violations = await transaction.execute("PRAGMA foreign_key_check");
     if (violations.rows.length) {
-      throw new Error(`Unresolved foreign keys; repair rolled back: ${JSON.stringify(violations.rows)}`);
+      const orphanedGames = await transaction.execute(
+        "SELECT g.id, g.team_id, g.home_team, g.away_team, g.league FROM games g LEFT JOIN teams t ON t.id = g.team_id WHERE t.id IS NULL ORDER BY g.team_id, g.id",
+      );
+      throw new Error(`Unresolved foreign keys; repair rolled back: ${JSON.stringify(violations.rows)}\nGames with missing teams: ${JSON.stringify(orphanedGames.rows)}`);
     }
     await transaction.commit();
     console.log("Repair committed. All foreign key references are valid.");

@@ -26,7 +26,7 @@ try {
   );
   console.log("League sources with missing teams:", JSON.stringify(orphanedSources.rows));
   const orphanedGameTeams = await client.execute(
-    "SELECT DISTINCT g.team_id, g.home_team, g.away_team FROM games g LEFT JOIN teams t ON t.id = g.team_id WHERE t.id IS NULL ORDER BY g.team_id LIMIT 12",
+    "SELECT id, team_id, home_team, away_team, league FROM (SELECT g.id, g.team_id, g.home_team, g.away_team, g.league, ROW_NUMBER() OVER (PARTITION BY g.team_id ORDER BY g.id) AS sample_number FROM games g LEFT JOIN teams t ON t.id = g.team_id WHERE t.id IS NULL) WHERE sample_number <= 3 ORDER BY team_id, id",
   );
   console.log("Sample games with missing teams:", JSON.stringify(orphanedGameTeams.rows));
   process.exitCode = violations.rows.length || orphanedSources.rows.length ? 1 : 0;
