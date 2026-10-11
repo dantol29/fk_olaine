@@ -1,5 +1,7 @@
 "use client";
 
+import { StadiumAvailability } from "@/components/admin/stadium-availability";
+
 import { useActionState } from "react";
 
 import { createEvent, updateEvent } from "../actions";
@@ -112,6 +114,8 @@ export function EventForm(
           className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
+
+      <StadiumAvailability exclude={event ? `event-${event.id}` : undefined} />
 
       {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}
 

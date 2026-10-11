@@ -1,5 +1,7 @@
 "use client";
 
+import { StadiumAvailability } from "@/components/admin/stadium-availability";
+
 import { useActionState, useState } from "react";
 
 import { createGame, updateGame } from "../actions";
@@ -165,6 +167,8 @@ export function GameForm(
           className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
       </label>
+
+      <StadiumAvailability exclude={game ? `game-${game.id}` : undefined} />
 
       {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}
 

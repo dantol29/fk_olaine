@@ -1,11 +1,14 @@
 "use client";
 
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin, X } from "lucide-react";
+import Link from "next/link";
+import type { SharedCalendarStatus } from "@/lib/shared-calendar";
 import { useState } from "react";
 
 import { leagueForGame } from "@/lib/game-league";
 import type { LeagueStandings } from "@/lib/league-standings-server";
 import type { CalendarEvent } from "@/lib/calendar";
+import { normalizeVenue } from "@/lib/stadium-venue";
 import { cn } from "@/lib/utils";
 import { MatchListCard } from "@/components/upcoming-matches";
 import { TrainingRow } from "@/components/trainings-directory";
@@ -29,14 +32,17 @@ function dateLabel(date: string) {
   return new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${date}T12:00:00Z`));
 }
 
-export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth }: { events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
+export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth, sharedStatus, admin = false }: { sharedStatus?: SharedCalendarStatus; admin?: boolean; events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [team, setTeam] = useState("Visas komandas");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const teams = ["Visas komandas", ...teamOptions.map((team) => team.name)];
-  const visible = events.filter((event) => (team === "Visas komandas" || event.team === team || event.team === null) && (filter === "all" || filter === event.eventType));
+  const [club, setClub] = useState("all");
+  const [venue, setVenue] = useState("all");
+  const teams = ["Visas komandas", ...new Set([...teamOptions.map((team) => team.name), ...events.flatMap((event) => event.team ? [event.team] : [])])];
+  const venues = [...new Map(events.flatMap((event) => event.location ? [[normalizeVenue(event.location), event.location] as const] : [])).values()].sort((a, b) => a.localeCompare(b, "lv"));
+  const visible = events.filter((event) => (club === "all" || event.club === club) && (venue === "all" || normalizeVenue(event.location ?? "") === normalizeVenue(venue)) && (team === "Visas komandas" || event.team === team || event.team === null) && (filter === "all" || filter === event.eventType));
   const byDate = new Map<string, CalendarEvent[]>();
   for (const event of visible) byDate.set(event.dateKey, [...(byDate.get(event.dateKey) ?? []), event]);
   const [year, number] = month.split("-").map(Number);
@@ -51,14 +57,20 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
   const controlClass = "flex size-11 items-center justify-center border-2 border-black hover:bg-black hover:text-white disabled:cursor-default disabled:opacity-25 disabled:hover:bg-white disabled:hover:text-black";
 
   return <>
-    <section className="calendar-page-hero bg-black px-6 pt-6 text-white sm:px-10 sm:pt-8 lg:px-14">
+    <section className={cn("bg-black px-6 pt-6 text-white sm:px-10 sm:pt-8 lg:px-14", !admin && "calendar-page-hero")}>
       <div className="mx-auto max-w-[1920px]">
+        {admin && <div className="mb-4 flex flex-wrap gap-3 text-sm"><Link href="/admin/games/new" className="border border-white/30 px-3 py-2">+ Spēle</Link><Link href="/admin/trainings/new" className="border border-white/30 px-3 py-2">+ Treniņš</Link><Link href="/admin/events/new" className="border border-white/30 px-3 py-2">+ Notikums</Link><a href="/admin/calendar" className="border border-white/30 px-3 py-2">Atjaunot</a></div>}
         <h1 className="mb-2 text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Kalendārs</h1>
         <nav aria-label="Komandas" className="flex items-end gap-6 overflow-x-auto sm:gap-8 lg:min-h-12">{teams.map((name) => <button key={name} type="button" aria-pressed={name === team} onClick={() => { setTeam(name); setSelectedDate(null); }} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", name === team && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{name}</button>)}</nav>
       </div>
     </section>
     <section className="px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14">
       <div className="mx-auto max-w-[1440px]">
+        {sharedStatus && sharedStatus !== "ok" && <p role="status" className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">{sharedStatus === "unconfigured" ? "AFA Olaine kalendārs vēl nav pieslēgts." : "AFA Olaine kalendārs pašlaik nav pieejams."} Tiek rādīti tikai FK Olaine notikumi; stadiona pieejamību nevar pilnībā apstiprināt.</p>}
+        <div className="mb-6 flex flex-wrap gap-4">
+          <label className="flex flex-col gap-2 text-xs font-semibold uppercase">Klubs<select value={club} onChange={(event) => setClub(event.target.value)} className="min-h-11 border border-black/20 bg-white px-3 text-sm font-normal normal-case"><option value="all">Abi klubi</option><option>FK Olaine</option><option>AFA Olaine</option></select></label>
+          <label className="flex min-w-0 flex-col gap-2 text-xs font-semibold uppercase">Vieta<select value={venue} onChange={(event) => setVenue(event.target.value)} className="min-h-11 max-w-full border border-black/20 bg-white px-3 text-sm font-normal normal-case"><option value="all">Visas vietas</option>{venues.map((name) => <option key={name}>{name}</option>)}</select></label>
+        </div>
         <div aria-label="Notikumu veids" className="mx-auto mb-10 flex w-fit max-w-full overflow-x-auto border-b border-black/10">{FILTERS.map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} onClick={() => setFilter(item.key)} className={cn("shrink-0 border-b-4 px-4 pt-3 pb-1 text-sm font-semibold uppercase sm:px-8 sm:text-lg", filter === item.key ? "border-black" : "border-transparent text-black/40")}>{item.label}</button>)}</div>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold uppercase sm:text-3xl">{new Intl.DateTimeFormat("lv-LV", { month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${month}-15T12:00:00Z`))}</h2>
@@ -70,7 +82,7 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
             const dayEvents = byDate.get(cell.key) ?? [];
             return <button key={cell.key} type="button" disabled={cell.muted} aria-label={`${dateLabel(cell.key)}, ${dayEvents.length} notikumi`} aria-pressed={selectedDate === cell.key} onClick={() => { setSelectedDate(cell.key); setOpen(true); }} className={cn("flex min-h-20 min-w-0 flex-col items-center border-r border-b border-black/10 p-2 text-left sm:min-h-36 sm:items-start sm:p-3 lg:min-h-44", cell.muted ? "bg-[#fafafa] text-black/20" : "hover:bg-[#f5f5f5]")}>
               <span className={cn("flex size-8 shrink-0 items-center justify-center text-sm font-semibold", selectedDate === cell.key ? "bg-club-red text-white" : cell.key === today && "bg-black text-white")}>{cell.day}</span>
-              {!cell.muted && <><span className="mt-2 flex gap-1 sm:hidden">{[...new Set(dayEvents.map((event) => event.eventType))].map((type) => <span key={type} className={cn("size-1.5 rounded-full", accent[type])} />)}</span><span className="mt-2 hidden w-full space-y-2 sm:block">{dayEvents.slice(0, 2).map((event) => <span key={event.uid} className="block border-l-2 border-black/15 pl-2"><span className="flex items-center gap-1.5 text-xs font-semibold"><span className={cn("size-1.5 shrink-0 rounded-full", accent[event.eventType])} />{event.timeLabel ?? "Visa diena"}</span><span className="mt-1 block line-clamp-2 text-xs leading-snug text-black/65">{event.title}</span></span>)}{dayEvents.length > 2 && <span className="block text-xs font-semibold">+{dayEvents.length - 2} vēl</span>}</span></>}
+              {!cell.muted && <><span className="mt-2 flex gap-1 sm:hidden">{[...new Set(dayEvents.map((event) => event.eventType))].map((type) => <span key={type} className={cn("size-1.5 rounded-full", accent[type])} />)}</span><span className="mt-2 hidden w-full space-y-2 sm:block">{dayEvents.slice(0, 2).map((event) => <span key={event.uid} className="block border-l-2 border-black/15 pl-2"><span className="flex items-center gap-1.5 text-xs font-semibold"><span className={cn("size-1.5 shrink-0 rounded-full", accent[event.eventType])} />{event.timeLabel ?? "Visa diena"}</span><span className="mt-1 block line-clamp-2 text-xs leading-snug text-black/65">{event.title}</span><span className="mt-1 block text-[10px] font-semibold text-black/45">{event.club ?? "FK Olaine"}</span></span>)}{dayEvents.length > 2 && <span className="block text-xs font-semibold">+{dayEvents.length - 2} vēl</span>}</span></>}
             </button>;
           })}
         </div>
@@ -82,7 +94,7 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
       <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,520px)] border-none bg-white data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4 bg-black px-6 py-4 text-white"><DrawerTitle className="text-xl text-white">{selectedDate ? dateLabel(selectedDate) : "Kalendārs"}</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 shrink-0 items-center justify-center"><X className="size-6" /></DrawerClose></div>
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-6 text-black">
-          {selectedEvents.length ? selectedEvents.map((event) => <div key={event.uid}><p className="mb-2 text-xs font-semibold text-black/45 uppercase">{FILTERS.find((item) => item.key === event.eventType)?.label}</p>{event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={new Date(event.start).getTime() <= Date.now()} drawer showInfo={false} /> : event.trainingFixture ? <TrainingRow training={event.trainingFixture} compact /> : <article className="border border-black/10 p-5"><p className="text-sm text-black/50">{event.timeLabel ?? "Visa diena"}</p><h3 className="mt-2 text-lg font-semibold">{event.title}</h3>{event.location && <p className="mt-3 flex items-start gap-2 text-sm text-black/50"><MapPin className="size-4 shrink-0" aria-hidden="true" />{event.location}</p>}</article>}</div>) : <div className="py-12 text-center"><CalendarDays className="mx-auto mb-4 size-10 text-black/25" aria-hidden="true" /><p className="text-sm text-black/50">Šajā dienā nav ieplānotu notikumu.</p></div>}
+          {selectedEvents.length ? selectedEvents.map((event) => <div key={event.uid}><p className="mb-2 text-xs font-semibold text-black/45 uppercase">{event.club ?? "FK Olaine"} · {FILTERS.find((item) => item.key === event.eventType)?.label}{event.readOnly && " · Tikai lasīšanai"}</p>{event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={new Date(event.start).getTime() <= Date.now()} drawer showInfo={false} /> : event.trainingFixture ? <TrainingRow training={event.trainingFixture} compact /> : <article className="border border-black/10 p-5"><p className="text-sm text-black/50">{event.allDay ? "Visa diena" : `${event.timeLabel}–${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit" }).format(new Date(event.end))}`}</p><h3 className="mt-2 text-lg font-semibold">{event.title}</h3>{event.location && <p className="mt-3 flex items-start gap-2 text-sm text-black/50"><MapPin className="size-4 shrink-0" aria-hidden="true" />{event.location}</p>}</article>}{admin && !event.readOnly && <Link href={`/admin/${event.eventType === "game" ? "games" : event.eventType === "training" ? "trainings" : "events"}/${event.uid.split("-").at(-1)}`} className="mt-3 inline-flex min-h-11 items-center border border-black/20 px-4 text-sm font-semibold">Rediģēt</Link>}</div>) : <div className="py-12 text-center"><CalendarDays className="mx-auto mb-4 size-10 text-black/25" aria-hidden="true" /><p className="text-sm text-black/50">Šajā dienā nav ieplānotu notikumu.</p></div>}
         </div>
       </DrawerContent>
     </Drawer>

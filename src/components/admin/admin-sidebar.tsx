@@ -32,6 +32,7 @@ const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin/teams", label: "Komandas", icon: Users },
   { href: "/admin/players", label: "Spēlētāji", icon: UserRound },
   { href: "/admin/coaches", label: "Treneri", icon: Award },
+  { href: "/admin/calendar", label: "Kalendārs", icon: CalendarDays },
   { href: "/admin/trainings", label: "Treniņi", icon: Dumbbell },
   { href: "/admin/events", label: "Notikumi", icon: CalendarDays },
   { href: "/admin/games", label: "Spēles", icon: Volleyball },

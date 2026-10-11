@@ -8,6 +8,8 @@ import type { TrainingCoach, TrainingListItem } from "@/lib/trainings-server";
 
 export type CalendarEvent = {
   uid: string;
+  club?: "FK Olaine" | "AFA Olaine";
+  readOnly?: boolean;
   title: string;
   location: string | null;
   allDay: boolean;
@@ -109,7 +111,7 @@ function dateKeyToParts(dateKey: string): [number, number, number] {
 
 /** Converts a Riga wall-clock time (as printed on lff.lv) into the real
  *  UTC instant it refers to, correctly accounting for DST. */
-function rigaWallClockToUtc(
+export function rigaWallClockToUtc(
   year: number,
   month: number,
   day: number,

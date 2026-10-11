@@ -12,7 +12,7 @@ export async function UpcomingBirthdays({ className }: { className?: string } = 
 
   return (
     <section aria-labelledby="upcoming-birthdays-heading" className={cn("h-full bg-white text-black", className)}>
-      <div className="flex items-end justify-between gap-4 border-b-2 border-black pb-5">
+      <div className="flex items-end justify-between gap-4 pb-5">
         <h3 id="upcoming-birthdays-heading" className="text-2xl font-semibold uppercase sm:text-3xl">Dzimšanas dienas</h3>
       </div>
       <ul className="divide-y divide-black/10">

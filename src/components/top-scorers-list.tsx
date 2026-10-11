@@ -49,7 +49,7 @@ export async function TopScorersList({
 
   return (
     <section aria-labelledby="top-scorers-heading" className={cn("h-full bg-white text-black", className)}>
-      <div className="flex items-end justify-between gap-4 border-b-2 border-black pb-5">
+      <div className="flex items-end justify-between gap-4 pb-5">
         <h3 id="top-scorers-heading" className="text-2xl font-semibold uppercase sm:text-3xl">Bombardieri</h3>
         <span className="pb-1 text-xs text-black/45 uppercase">Vārti</span>
       </div>
