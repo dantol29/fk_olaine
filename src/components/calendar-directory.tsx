@@ -2,13 +2,13 @@
 
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import type { SharedCalendarStatus } from "@/lib/shared-calendar";
 import { useState } from "react";
 
 import { leagueForGame } from "@/lib/game-league";
 import type { LeagueStandings } from "@/lib/league-standings-server";
 import type { CalendarEvent } from "@/lib/calendar";
-import { normalizeVenue } from "@/lib/stadium-venue";
 import { cn } from "@/lib/utils";
 import { MatchListCard } from "@/components/upcoming-matches";
 import { TrainingRow } from "@/components/trainings-directory";
@@ -32,17 +32,17 @@ function dateLabel(date: string) {
   return new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${date}T12:00:00Z`));
 }
 
-export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth, sharedStatus, admin = false }: { sharedStatus?: SharedCalendarStatus; admin?: boolean; events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
+export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth, sharedStatus, sharedError, sharedUpdatedAt, admin = false }: { sharedUpdatedAt?: string; sharedError?: string; sharedStatus?: SharedCalendarStatus; admin?: boolean; events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [team, setTeam] = useState("Visas komandas");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [club, setClub] = useState("all");
-  const [venue, setVenue] = useState("all");
+  const [showAfa, setShowAfa] = useState(true);
+  const [errorOpen, setErrorOpen] = useState(false);
+  const afaFailed = Boolean(sharedStatus && sharedStatus !== "ok");
   const teams = ["Visas komandas", ...new Set([...teamOptions.map((team) => team.name), ...events.flatMap((event) => event.team ? [event.team] : [])])];
-  const venues = [...new Map(events.flatMap((event) => event.location ? [[normalizeVenue(event.location), event.location] as const] : [])).values()].sort((a, b) => a.localeCompare(b, "lv"));
-  const visible = events.filter((event) => (club === "all" || event.club === club) && (venue === "all" || normalizeVenue(event.location ?? "") === normalizeVenue(venue)) && (team === "Visas komandas" || event.team === team || event.team === null) && (filter === "all" || filter === event.eventType));
+  const visible = events.filter((event) => (showAfa || event.club !== "AFA Olaine") && (team === "Visas komandas" || event.team === team || event.team === null) && (filter === "all" || filter === event.eventType));
   const byDate = new Map<string, CalendarEvent[]>();
   for (const event of visible) byDate.set(event.dateKey, [...(byDate.get(event.dateKey) ?? []), event]);
   const [year, number] = month.split("-").map(Number);
@@ -66,15 +66,11 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
     </section>
     <section className="px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14">
       <div className="mx-auto max-w-[1440px]">
-        {sharedStatus && sharedStatus !== "ok" && <p role="status" className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">{sharedStatus === "unconfigured" ? "AFA Olaine kalendārs vēl nav pieslēgts." : "AFA Olaine kalendārs pašlaik nav pieejams."} Tiek rādīti tikai FK Olaine notikumi; stadiona pieejamību nevar pilnībā apstiprināt.</p>}
-        <div className="mb-6 flex flex-wrap gap-4">
-          <label className="flex flex-col gap-2 text-xs font-semibold uppercase">Klubs<select value={club} onChange={(event) => setClub(event.target.value)} className="min-h-11 border border-black/20 bg-white px-3 text-sm font-normal normal-case"><option value="all">Abi klubi</option><option>FK Olaine</option><option>AFA Olaine</option></select></label>
-          <label className="flex min-w-0 flex-col gap-2 text-xs font-semibold uppercase">Vieta<select value={venue} onChange={(event) => setVenue(event.target.value)} className="min-h-11 max-w-full border border-black/20 bg-white px-3 text-sm font-normal normal-case"><option value="all">Visas vietas</option>{venues.map((name) => <option key={name}>{name}</option>)}</select></label>
-        </div>
+        {sharedStatus === "stale" && <p role="status" className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">AFA Olaine dati ir novecojuši. Tiek rādīts pēdējais veiksmīgi ielādētais kalendārs{sharedUpdatedAt ? ` (${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", dateStyle: "short", timeStyle: "short" }).format(new Date(sharedUpdatedAt))})` : ""}. Aktuālo stadiona pieejamību nevar apstiprināt.</p>}
         <div aria-label="Notikumu veids" className="mx-auto mb-10 flex w-fit max-w-full overflow-x-auto border-b border-black/10">{FILTERS.map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} onClick={() => setFilter(item.key)} className={cn("shrink-0 border-b-4 px-4 pt-3 pb-1 text-sm font-semibold uppercase sm:px-8 sm:text-lg", filter === item.key ? "border-black" : "border-transparent text-black/40")}>{item.label}</button>)}</div>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold uppercase sm:text-3xl">{new Intl.DateTimeFormat("lv-LV", { month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${month}-15T12:00:00Z`))}</h2>
-          <div className="flex items-center gap-3"><button type="button" onClick={() => setMonth(today.slice(0, 7))} className="min-h-11 border-2 border-black px-4 text-xs font-semibold uppercase hover:bg-black hover:text-white">Šodien</button><button type="button" aria-label="Iepriekšējais mēnesis" disabled={month <= minMonth} onClick={() => setMonth(monthOffset(month, -1))} className={controlClass}><ChevronLeft className="size-5" /></button><button type="button" aria-label="Nākamais mēnesis" disabled={month >= maxMonth} onClick={() => setMonth(monthOffset(month, 1))} className={controlClass}><ChevronRight className="size-5" /></button></div>
+          <div className="flex items-center gap-3"><button type="button" aria-pressed={afaFailed ? undefined : showAfa} aria-haspopup={afaFailed ? "dialog" : undefined} aria-label={afaFailed ? "AFA Olaine kalendāra kļūda — rādīt informāciju" : "Rādīt AFA Olaine notikumus"} title={afaFailed ? "AFA Olaine kalendāra kļūda" : showAfa ? "Paslēpt AFA Olaine notikumus" : "Rādīt AFA Olaine notikumus"} onClick={() => afaFailed ? setErrorOpen(true) : setShowAfa((value) => !value)} className={cn("grid size-11 shrink-0 place-items-center border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black", afaFailed ? "border-red-600 bg-red-600 hover:bg-red-700" : showAfa ? "border-black bg-black" : "border-black/20 bg-white hover:border-black/50")}><Image src="/afa-olaine-logo.png" alt="" width={32} height={32} className={cn("size-8 object-contain transition-opacity", !afaFailed && !showAfa && "opacity-35 grayscale")} /></button><button type="button" onClick={() => setMonth(today.slice(0, 7))} className="min-h-11 border-2 border-black px-4 text-xs font-semibold uppercase hover:bg-black hover:text-white">Šodien</button><button type="button" aria-label="Iepriekšējais mēnesis" disabled={month <= minMonth} onClick={() => setMonth(monthOffset(month, -1))} className={controlClass}><ChevronLeft className="size-5" /></button><button type="button" aria-label="Nākamais mēnesis" disabled={month >= maxMonth} onClick={() => setMonth(monthOffset(month, 1))} className={controlClass}><ChevronRight className="size-5" /></button></div>
         </div>
         <div className="grid grid-cols-7 border-x border-t border-black/10 bg-black text-white">{WEEKDAYS.map((day) => <span key={day} className="py-3 text-center text-xs font-semibold uppercase sm:text-sm">{day}</span>)}</div>
         <div className="grid grid-cols-7 border-t border-l border-black/10">
@@ -90,6 +86,12 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
         {!monthEvents.length && <p className="mt-8 border border-black/10 px-6 py-8 text-center text-sm text-black/50">Šajā mēnesī nav notikumu ar izvēlētajiem filtriem.</p>}
       </div>
     </section>
+    <Drawer swipeDirection="right" open={errorOpen} onOpenChange={setErrorOpen}>
+      <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,520px)] border-none bg-white data-[swipe-direction=right]:rounded-none" overlayClassName="bg-black/50">
+        <div className="flex items-center justify-between gap-4 bg-red-600 px-6 py-4 text-white"><DrawerTitle className="text-xl text-white">AFA Olaine kalendāra kļūda</DrawerTitle><DrawerClose aria-label="Aizvērt" className="grid size-11 shrink-0 place-items-center"><X className="size-6" /></DrawerClose></div>
+        <div className="space-y-4 overflow-y-auto p-6 text-black"><p>{sharedError ?? "AFA Olaine kalendāru pašlaik nevar ielādēt."}</p><p className="text-sm text-black/60">{sharedStatus === "stale" ? "FK Olaine notikumi ir aktuāli; AFA Olaine notikumi ir no pēdējās veiksmīgās ielādes un var būt novecojuši." : "Tiek rādīti tikai FK Olaine notikumi."} Stadiona pieejamību nevar pilnībā apstiprināt.</p><button type="button" onClick={() => window.location.reload()} className="min-h-11 border-2 border-black px-4 text-sm font-semibold">Mēģināt vēlreiz</button></div>
+      </DrawerContent>
+    </Drawer>
     <Drawer swipeDirection="right" open={open} onOpenChange={setOpen}>
       <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,520px)] border-none bg-white data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4 bg-black px-6 py-4 text-white"><DrawerTitle className="text-xl text-white">{selectedDate ? dateLabel(selectedDate) : "Kalendārs"}</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 shrink-0 items-center justify-center"><X className="size-6" /></DrawerClose></div>

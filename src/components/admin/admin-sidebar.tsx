@@ -107,7 +107,7 @@ export function AdminSidebar() {
         <Link href="/admin" className="flex items-center gap-3"><Image src="/fk-olaine-crest-v2.png" alt="" width={48} height={50} className="h-10 w-auto" /><span className="text-lg font-semibold">FK OLAINE</span></Link>
         <button type="button" onClick={() => setOpen(true)} aria-label="Atvērt izvēlni" className="flex size-11 items-center justify-center focus-visible:outline-white"><Menu className="size-7" /></button>
       </div>
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto bg-black p-5 text-white lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col justify-between overflow-y-auto bg-black p-5 text-white lg:flex">
         <SidebarContent />
       </aside>
       <Drawer swipeDirection="right" open={open} onOpenChange={setOpen}>
