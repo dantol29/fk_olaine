@@ -11,7 +11,7 @@ function LoginForm() {
 
   return <form action={formAction} className="bg-black px-4 pt-1 pb-4 text-white">
     <label htmlFor="login-password" className="sr-only">Parole</label>
-    <div className="flex h-12 items-center gap-3 rounded-full bg-[#1e1c1c] px-4">
+    <div className="flex h-12 items-center gap-3 rounded-full bg-club-navy-light px-4">
       <LockKeyhole className="size-6 shrink-0" strokeWidth={1.5} aria-hidden="true" />
       <input id="login-password" type="password" name="password" placeholder="Parole" required autoComplete="current-password" autoFocus aria-invalid={Boolean(state?.error)} aria-describedby={state?.error ? "login-error" : undefined} className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/50" />
     </div>

@@ -15,14 +15,14 @@ export function FeaturedNews({ articles }: { articles: Article[] }) {
         <div className="grid gap-5 sm:grid-cols-2 sm:auto-rows-[230px] lg:grid-cols-4 lg:auto-rows-[clamp(230px,18vw,360px)]">
           {slots.map((article, index) => {
             const tileClass = cn(
-              "relative min-w-0 overflow-hidden sm:flex sm:flex-col sm:justify-end sm:bg-[#171717] sm:p-7",
-              index === 0 ? "flex aspect-[11/10] min-h-[300px] flex-col justify-end bg-[#171717] p-5 sm:row-span-2 sm:aspect-auto sm:min-h-0 lg:col-span-2" : "grid grid-cols-[28%_minmax(0,1fr)] items-start gap-4 sm:gap-0",
+              "relative min-w-0 overflow-hidden sm:flex sm:flex-col sm:justify-end sm:bg-club-navy sm:p-7",
+              index === 0 ? "flex aspect-[11/10] min-h-[300px] flex-col justify-end bg-club-navy p-5 sm:row-span-2 sm:aspect-auto sm:min-h-0 lg:col-span-2" : "grid grid-cols-[28%_minmax(0,1fr)] items-start gap-4 sm:gap-0",
               index === 1 && "lg:col-span-2",
             );
             const imageClass = index === 0 ? "absolute inset-0 overflow-hidden" : "relative aspect-[6/5] w-full overflow-hidden sm:absolute sm:inset-0 sm:aspect-auto";
             if (!article) return (
               <div key={`placeholder-${index}`} className={tileClass}>
-                <div aria-hidden="true" className={cn(imageClass, "flex items-center justify-center bg-[#171717]")}>
+                <div aria-hidden="true" className={cn(imageClass, "flex items-center justify-center bg-club-navy")}>
                   <Image src="/fk-olaine-crest-v2.png" alt="" width={124} height={128} className="h-24 w-auto grayscale opacity-20" />
                 </div>
                 <p className="relative text-base font-semibold text-white/40 sm:text-xl">Raksts vēl nav pieejams</p>

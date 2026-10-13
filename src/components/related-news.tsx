@@ -23,7 +23,7 @@ export async function RelatedNews({ slug }: { slug: string }) {
             </div>
           </Link>
           ) : (
-            <div className="relative flex aspect-[4/3] min-h-80 flex-col justify-end bg-[#171717] p-6 sm:p-8 lg:aspect-auto lg:min-h-[560px]">
+            <div className="relative flex aspect-[4/3] min-h-80 flex-col justify-end bg-club-navy p-6 sm:p-8 lg:aspect-auto lg:min-h-[560px]">
               <div aria-hidden="true" className="absolute inset-0 flex items-center justify-center">
                 <Image src="/fk-olaine-crest-v2.png" alt="" width={124} height={128} className="h-32 w-auto grayscale opacity-20" />
               </div>
@@ -43,7 +43,7 @@ export async function RelatedNews({ slug }: { slug: string }) {
                 </Link>
               ) : (
                 <div key={`placeholder-${index}`} className="grid flex-1 grid-cols-[32%_1fr] items-center gap-4 sm:gap-6">
-                  <div aria-hidden="true" className="flex aspect-[5/3] items-center justify-center bg-[#171717]">
+                  <div aria-hidden="true" className="flex aspect-[5/3] items-center justify-center bg-club-navy">
                     <Image src="/fk-olaine-crest-v2.png" alt="" width={62} height={64} className="h-12 w-auto grayscale opacity-20 sm:h-16" />
                   </div>
                   <p className="text-base leading-snug font-semibold text-white/40 sm:text-xl xl:text-2xl">Raksts vēl nav pieejams</p>

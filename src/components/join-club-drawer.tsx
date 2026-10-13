@@ -43,7 +43,7 @@ export function JoinClubDrawer({
             <div className="mt-5 space-y-3">
             <a
               href="mailto:info@fkolaine.com"
-              className="motion-action group flex min-h-12 items-center gap-3 rounded-full bg-[#1e1c1c] px-4 py-3 hover:bg-[#292727] focus-visible:outline-white"
+              className="motion-action group flex min-h-12 items-center gap-3 rounded-full bg-club-navy-light px-4 py-3 hover:bg-club-navy-light/80 focus-visible:outline-white"
             >
               <Mail className="size-5 shrink-0" aria-hidden="true" />
               <span className="min-w-0 flex-1 break-words text-base">info@fkolaine.com</span>
@@ -51,7 +51,7 @@ export function JoinClubDrawer({
             </a>
             <a
               href="tel:+37129332883"
-              className="motion-action group flex min-h-12 items-center gap-3 rounded-full bg-[#1e1c1c] px-4 py-3 hover:bg-[#292727] focus-visible:outline-white"
+              className="motion-action group flex min-h-12 items-center gap-3 rounded-full bg-club-navy-light px-4 py-3 hover:bg-club-navy-light/80 focus-visible:outline-white"
             >
               <Phone className="size-5 shrink-0" aria-hidden="true" />
               <span className="min-w-0 flex-1 text-base">+371 29332883</span>

@@ -110,7 +110,7 @@ export function GlobalSearchDrawer({ triggerClassName, open: controlledOpen, onO
                 <X className="size-6" />
               </button>
             </div>
-            <div className="flex h-12 items-center gap-3 rounded-full bg-[#1e1c1c] px-4">
+            <div className="flex h-12 items-center gap-3 rounded-full bg-club-navy-light px-4">
               <Search className="size-6 shrink-0" strokeWidth={1.5} aria-hidden="true" />
               <input
                 autoFocus

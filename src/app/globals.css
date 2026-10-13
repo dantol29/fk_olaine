@@ -2,29 +2,29 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-.admin-shell { --color-club-navy: #000; --color-club-gray-light: #f5f5f5; }
+.admin-shell { --color-club-navy: var(--club-navy); --color-club-gray-light: #f5f5f5; }
 .admin-content h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 600; line-height: 1.15; text-transform: uppercase; }
 .admin-content h2 { font-weight: 600; }
-.admin-content table { border-collapse: collapse; border-top: 2px solid #000; }
-.admin-content thead { border-bottom: 2px solid #000; color: #000; }
-.admin-content thead tr { color: #000; }
+.admin-content table { border-collapse: collapse; border-top: 2px solid var(--club-navy); }
+.admin-content thead { border-bottom: 2px solid var(--club-navy); color: var(--club-navy); }
+.admin-content thead tr { color: var(--club-navy); }
 .admin-content th { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .025em; }
 .admin-content tbody tr:hover { background: #f5f5f5; }
 .admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
 .admin-content select { min-height: 44px; background-color: #fff; }
 .admin-content textarea { background-color: #fff; }
-.admin-content input[type="checkbox"], .admin-content input[type="radio"] { accent-color: #000; }
+.admin-content input[type="checkbox"], .admin-content input[type="radio"] { accent-color: var(--club-navy); }
 .admin-content :is(button, a)[class~="bg-club-red"] { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; text-transform: uppercase; font-size: .75rem; letter-spacing: .025em; }
-.admin-content .rich-text-editor :is(h2, h3) { color: #000; }
-.admin-content :is(button, a, input, select, textarea):focus-visible { outline: 2px solid #000; outline-offset: 3px; }
-.home-content { --color-club-navy: #000; --color-club-gray-light: #f5f5f5; }
+.admin-content .rich-text-editor :is(h2, h3) { color: var(--club-navy); }
+.admin-content :is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--club-navy); outline-offset: 3px; }
+.home-content { --color-club-navy: var(--club-navy); --color-club-gray-light: #f5f5f5; }
 .home-calendar-section [class*="rounded-"] { border-radius: 0; }
 .home-calendar-section [class*="shadow-"] { box-shadow: none; }
-.home-calendar-section [class*="text-slate-"] { color: rgb(0 0 0 / .55); }
-.home-calendar-section [class*="border-slate-"] { border-color: rgb(0 0 0 / .15); }
-.home-calendar-section [class*="bg-club-navy"] { background-color: #000; }
-.home-content .text-slate-400 { color: rgb(0 0 0 / .45); }
-.home-content .divide-slate-100 > :not(:last-child) { border-color: rgb(0 0 0 / .1); }
+.home-calendar-section [class*="text-slate-"] { color: rgb(20 46 73 / .55); }
+.home-calendar-section [class*="border-slate-"] { border-color: rgb(20 46 73 / .15); }
+.home-calendar-section [class*="bg-club-navy"] { background-color: var(--club-navy); }
+.home-content .text-slate-400 { color: rgb(20 46 73 / .45); }
+.home-content .divide-slate-100 > :not(:last-child) { border-color: rgb(20 46 73 / .1); }
 .home-content :is(button, a):focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .home-content a[class*="rounded-full"],
 .home-content button[class*="rounded-full"] { border-radius: 0; }
@@ -50,14 +50,14 @@
 .rich-page-content a { color: var(--color-club-red); text-decoration: underline; text-underline-offset: 3px; }
 .rich-text-editor p.is-editor-empty:first-child::before { float: left; height: 0; color: #94a3b8; content: attr(data-placeholder); pointer-events: none; }
 
-.club-page-content h2 { color: #000; font-size: 1.65em; font-weight: 600; line-height: 1.2; text-transform: uppercase; }
-.club-page-content h3 { color: #000; font-size: 1.25em; font-weight: 600; }
+.club-page-content h2 { color: var(--club-navy); font-size: 1.65em; font-weight: 600; line-height: 1.2; text-transform: uppercase; }
+.club-page-content h3 { color: var(--club-navy); font-size: 1.25em; font-weight: 600; }
 .club-page-content > :first-child { margin-top: 0; }
-.club-page-content blockquote { border-left-color: #000; color: #222; }
+.club-page-content blockquote { border-left-color: var(--club-navy); color: var(--club-navy); }
 .club-page-content img { max-width: 100%; height: auto; border-radius: 0; }
 .club-page-content table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
 .club-page-content th, .club-page-content td { border-bottom: 1px solid #e8e8e8; padding: 0.75em; text-align: left; }
-.club-page-content th { border-block: 2px solid #000; color: #000; font-weight: 600; }
+.club-page-content th { border-block: 2px solid var(--club-navy); color: var(--club-navy); font-weight: 600; }
 
 
 /* Safari can briefly paint crossfading image layers outside an overflow-hidden
@@ -72,6 +72,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-black: var(--club-navy);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-club-red: var(--club-red);
@@ -130,11 +131,11 @@
   --club-gray-light: #f5f7fa;
   --club-muted: #66778b;
   --background: #f7f9fb;
-  --foreground: oklch(0.145 0 0);
+  --foreground: var(--club-navy);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: var(--club-navy);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: var(--club-navy);
   --primary: var(--club-red);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: var(--club-navy);
@@ -142,7 +143,7 @@
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: var(--club-navy);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -151,32 +152,32 @@
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --chart-5: var(--club-navy-light);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-foreground: var(--club-navy);
+  --sidebar-primary: var(--club-navy);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent-foreground: var(--club-navy);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: var(--club-navy);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: var(--club-navy);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: var(--club-navy);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --primary-foreground: var(--club-navy);
+  --secondary: var(--club-navy-light);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: var(--club-navy-light);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: var(--club-navy-light);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -186,12 +187,12 @@
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
+  --chart-5: var(--club-navy-light);
+  --sidebar: var(--club-navy);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: var(--club-navy-light);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
@@ -297,7 +298,7 @@
 /* Compact two-row club header, following the supplied reference. */
 .club-masthead-light {
   position: relative;
-  background: black;
+  background: var(--club-navy);
   color: white;
   border-bottom: 0;
 }
@@ -323,7 +324,7 @@
   .motion-action:hover .action-arrow { transform: translateX(3px); }
   .motion-action:hover .action-diagonal { transform: translate(2px, -2px); }
   .motion-icon:hover { transform: translateY(-2px); }
-  .match-hover:hover { border-color: rgb(0 0 0 / .3); box-shadow: 0 4px 16px rgb(0 0 0 / .04); }
+  .match-hover:hover { border-color: rgb(20 46 73 / .3); box-shadow: 0 4px 16px rgb(20 46 73 / .04); }
 }
 .card-hover:focus-visible .card-hover-image { transform: scale(1.035); }
 .motion-action:focus-visible .action-arrow { transform: translateX(3px); }
@@ -391,7 +392,7 @@
 .club-masthead-light .club-header-menu:hover,
 .club-masthead-light .club-header-join:hover { background: rgb(255 255 255 / .1); }
 .club-masthead-light .club-masthead-inner :focus-visible { outline-color: white; }
-.club-masthead-light .club-header-account :focus-visible { outline-color: black; }
+.club-masthead-light .club-header-account :focus-visible { outline-color: var(--club-navy); }
 .club-masthead-light[data-over-hero] {
   position: absolute;
   inset: 0 0 auto;
@@ -434,13 +435,13 @@
 .home-hero-news.hero-has-navigation > .hero-news-slide { padding-bottom: 80px; }
 .hero-photo-shade {
   background:
-    linear-gradient(180deg, rgb(0 0 0 / .4), rgb(0 0 0 / .12) 160px, transparent 300px),
-    linear-gradient(0deg, rgb(0 0 0 / .95), rgb(0 0 0 / .8) 30%, rgb(0 0 0 / .3) 65%, transparent 85%),
-    linear-gradient(90deg, rgb(0 0 0 / .4), transparent 75%);
+    linear-gradient(180deg, rgb(20 46 73 / .25), rgb(20 46 73 / .08) 160px, transparent 300px),
+    linear-gradient(0deg, rgb(20 46 73 / .75), rgb(20 46 73 / .55) 25%, rgb(20 46 73 / .15) 55%, transparent 75%),
+    linear-gradient(90deg, rgb(20 46 73 / .2), transparent 65%);
 }
 .home-page-hero-frame .hero-news-content,
 .article-news-content {
-  text-shadow: 0 2px 12px rgb(0 0 0 / .5);
+  text-shadow: 0 1px 6px rgb(20 46 73 / .3);
 }
 .home-page-hero-frame .hero-news-content > p,
 .article-news-content > p {
@@ -466,7 +467,7 @@
 .hero-news-content .hero-news-meta { font-size: 14px; line-height: 1.5; }
 .hero-news-read { border-radius: 0; font-size: 14px; }
 .hero-standings > div {
-  background: rgb(6 16 24 / .94);
+  background: rgb(20 46 73 / .94);
   color: white;
   border: 1px solid rgb(255 255 255 / .14);
   border-radius: 6px;
@@ -479,7 +480,7 @@
 .hero-standings button:hover { background: rgb(255 255 255 / .16); }
 .hero-standings button[aria-pressed="true"] { background: var(--club-red); color: white; }
 .hero-standings :focus-visible { outline: 2px solid white; outline-offset: 3px; }
-.hero-league-table thead { background: #08121b; color: rgb(255 255 255 / .72); }
+.hero-league-table thead { background: var(--club-navy); color: rgb(255 255 255 / .72); }
 .hero-league-table th { padding-block: 12px; font-weight: 600; text-transform: uppercase; font-size: 10px; }
 .hero-league-table td { height: 60px; padding-block: 10px; border-top: 1px solid rgb(255 255 255 / .1); color: rgb(255 255 255 / .9); }
 .hero-league-table tr[data-club] { background: rgb(201 0 53 / .24); }
