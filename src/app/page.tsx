@@ -5,6 +5,7 @@ import { Hero } from "@/components/hero";
 import { HomePollsSection } from "@/components/home-polls-section";
 import { HomeTeamsSection } from "@/components/home-teams-section";
 import { HomeUpcomingGames } from "@/components/home-upcoming-games";
+import { HomeStandingsSection } from "@/components/home-standings-section";
 import { JoinTeamCta } from "@/components/join-team-cta";
 import { SiteFooter } from "@/components/site-footer";
 import { TopScorersList } from "@/components/top-scorers-list";
@@ -24,6 +25,7 @@ export default function Home() {
         <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />
         <HomeUpcomingGames />
+        <HomeStandingsSection />
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto max-w-[1600px]">
             <HomePollsSection />
