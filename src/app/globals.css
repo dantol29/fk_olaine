@@ -59,6 +59,20 @@
 .club-page-content th, .club-page-content td { border-bottom: 1px solid #e8e8e8; padding: 0.75em; text-align: left; }
 .club-page-content th { border-block: 2px solid var(--club-navy); color: var(--club-navy); font-weight: 600; }
 
+.rich-text-editor .tableWrapper,
+.rich-page-content .tableWrapper { max-width: 100%; overflow-x: auto; margin: 1.5em 0; }
+.rich-text-editor table,
+.rich-page-content table { display: table; width: 100%; border-collapse: collapse; font-size: 0.875em; }
+.rich-text-editor :is(th, td),
+.rich-page-content :is(th, td) { position: relative; min-width: 5rem; border: 1px solid rgb(11 22 38 / .2); padding: 0.65rem 0.85rem; text-align: left; vertical-align: top; }
+.rich-text-editor th,
+.rich-page-content th { background: var(--club-navy); color: #fff; font-weight: 600; }
+.rich-text-editor :is(th, td) > p,
+.rich-page-content :is(th, td) > p { margin: 0; }
+.rich-text-editor .selectedCell::after { position: absolute; inset: 0; z-index: 1; background: rgb(201 0 53 / .12); content: ""; pointer-events: none; }
+.rich-text-editor .tableWrapper:focus-visible,
+.rich-page-content .tableWrapper:focus-visible { outline: 2px solid var(--club-navy); outline-offset: 3px; }
+
 
 /* Safari can briefly paint crossfading image layers outside an overflow-hidden
  * border radius while the page scrolls. A masked compositor layer keeps the

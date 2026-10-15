@@ -21,6 +21,7 @@
     "@libsql/client": "^0.18.0",
     "@olaine/database": "npm:@dantol29/database@0.1.0",
     "@tailwindcss/postcss": "^4",
+    "@tiptap/extension-table": "3.31.3",
     "@tiptap/extension-underline": "^3.31.3",
     "@tiptap/extensions": "^3.31.3",
     "@tiptap/pm": "^3.31.3",

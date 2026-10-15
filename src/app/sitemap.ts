@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { articles, clubPages } from "@/db/schema";
 import { getSiteUrl } from "@/lib/site-url";
+import { parseClubPageMedia } from "@/lib/club-page-media";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
@@ -20,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [rows, pageRows] = await Promise.all([
     db.select({ slug: articles.slug, createdAt: articles.createdAt }).from(articles),
-    db.select({ slug: clubPages.slug, updatedAt: clubPages.updatedAt })
+    db.select({ slug: clubPages.slug, updatedAt: clubPages.updatedAt, images: clubPages.images })
       .from(clubPages)
       .where(eq(clubPages.isPublished, true)),
   ]);
@@ -36,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(row.updatedAt),
     changeFrequency: "monthly",
     priority: 0.5,
+    images: parseClubPageMedia(row.images).photos.map((photo) => new URL(photo.src, siteUrl).href),
   }));
 
   return [...staticRoutes, ...articleRoutes, ...clubPageRoutes];
