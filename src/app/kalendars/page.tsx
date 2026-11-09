@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { asc, desc } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import { db } from "@/db/client";
 import { teams as teamsTable } from "@/db/schema";
 
@@ -24,7 +24,7 @@ export default async function KalendarsPage() {
   const [schedule, leagues, teams] = await Promise.all([
     getCombinedScheduleForRange(new Date(Date.UTC(year - 1, 0, 1)), new Date(Date.UTC(year + 1, 11, 31, 12)), "public"),
     getLeagueLogosForDisplay(),
-    db.select({ id: teamsTable.id, name: teamsTable.name }).from(teamsTable).orderBy(desc(teamsTable.isMain), asc(teamsTable.name)),
+    db.select({ id: teamsTable.id, name: teamsTable.name }).from(teamsTable).orderBy(asc(teamsTable.sort), asc(teamsTable.name)),
   ]);
   return <><SiteHeader /><main className="bg-white"><CalendarDirectory events={schedule.events} sharedStatus={schedule.sharedStatus} sharedError={schedule.sharedError} sharedUpdatedAt={schedule.sharedUpdatedAt} leagues={leagues} teamOptions={teams} today={today} minMonth={`${year - 1}-01`} maxMonth={`${year + 1}-12`} /></main><SiteFooter /></>;
 }

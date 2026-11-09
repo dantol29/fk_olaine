@@ -4,13 +4,25 @@ import Link from "next/link";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
+import { toDateKey } from "@/lib/calendar";
 
 import { deleteTraining } from "./actions";
 
-export default async function AdminTrainingsPage() {
+export default async function AdminTrainingsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+  const archived = (await searchParams).view === "archive";
+  const now = new Date();
+  const today = toDateKey(now);
+  const time = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).format(now);
   const rows = await db.query.trainings.findMany({
-    with: { team: true, trainingCoaches: { with: { coach: true } } },
-    orderBy: (trainings, { asc }) => [asc(trainings.date), asc(trainings.startTime)],
+    where: (table, { and, or, lt, lte, gt, eq }) => archived
+      ? or(lt(table.date, today), and(eq(table.date, today), lte(table.endTime, time)))
+      : or(gt(table.date, today), and(eq(table.date, today), gt(table.endTime, time))),
+    with: { trainingTeams: { with: { team: true } }, trainingCoaches: { with: { coach: true } } },
+    orderBy: (table, { asc, desc }) => archived
+      ? [desc(table.date), desc(table.startTime)]
+      : [asc(table.date), asc(table.startTime)],
   });
 
   return (
@@ -24,6 +36,12 @@ export default async function AdminTrainingsPage() {
           + Pievienot
         </Link>
       </div>
+      <nav aria-label="Treniņu saraksts" className="mb-4 flex gap-4 text-sm">
+        <Link href="/admin/trainings" aria-current={!archived ? "page" : undefined}
+          className={!archived ? "font-semibold text-club-red underline" : "text-black/55 hover:text-black"}>Aktuālie treniņi</Link>
+        <Link href="/admin/trainings?view=archive" aria-current={archived ? "page" : undefined}
+          className={archived ? "font-semibold text-club-red underline" : "text-black/55 hover:text-black"}>Arhīvs</Link>
+      </nav>
       <AdminSearch placeholder="Meklēt treniņus…" />
 
       <table className="w-full overflow-hidden rounded-none bg-white text-left text-sm shadow-none">
@@ -31,7 +49,7 @@ export default async function AdminTrainingsPage() {
           <tr className="border-b border-black/15 text-black/45">
             <th className="p-4 font-semibold">Datums</th>
             <th className="p-4 font-semibold">Laiks</th>
-            <th className="p-4 font-semibold">Komanda</th>
+            <th className="p-4 font-semibold">Komandas</th>
             <th className="p-4 font-semibold">Treneri</th>
             <th className="p-4 font-semibold">Vieta</th>
             <th className="p-4" />
@@ -39,12 +57,12 @@ export default async function AdminTrainingsPage() {
         </thead>
         <tbody>
           {rows.map((training) => (
-            <tr data-admin-search-item={`${training.date} ${training.startTime} ${training.team?.name ?? ""} ${training.trainingCoaches.map((tc) => tc.coach?.name).join(" ")} ${training.location}`} key={training.id} className="border-b border-black/10 last:border-0">
+            <tr data-admin-search-item={`${training.date} ${training.startTime} ${training.trainingTeams.map((item) => item.team.name).join(" ")} ${training.trainingCoaches.map((tc) => tc.coach?.name).join(" ")} ${training.location}`} key={training.id} className="border-b border-black/10 last:border-0">
               <td className="p-4 text-black">{training.date}</td>
               <td className="p-4 text-black/55">
                 {training.startTime}–{training.endTime}
               </td>
-              <td className="p-4 font-semibold text-black">{training.team?.name ?? "—"}</td>
+              <td className="p-4 font-semibold text-black">{training.trainingTeams.map((item) => item.team.name).join(", ") || "—"}</td>
               <td className="p-4 text-black/55">
                 {training.trainingCoaches.map((tc) => tc.coach?.name).join(", ") || "—"}
               </td>
@@ -70,7 +88,7 @@ export default async function AdminTrainingsPage() {
           {rows.length === 0 && (
             <tr>
               <td colSpan={6} className="p-4 text-center text-black/45">
-                Vēl nav neviena treniņa.
+                {archived ? "Arhīvā nav treniņu." : "Nav aktuālu treniņu."}
               </td>
             </tr>
           )}

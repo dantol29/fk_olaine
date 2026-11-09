@@ -12,7 +12,7 @@ export default async function AdminArticleFormPage({
 }) {
   const { id } = await params;
   const [teamOptions, coachOptions] = await Promise.all([
-    db.select().from(teams).orderBy(teams.name),
+    db.select().from(teams).orderBy(teams.sort, teams.name),
     db
       .select({ id: coaches.id, name: coaches.name })
       .from(coaches)

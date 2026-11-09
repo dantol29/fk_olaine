@@ -9,7 +9,7 @@ import { teams } from "@/db/schema";
 import { deleteTeam } from "./actions";
 
 export default async function AdminTeamsPage() {
-  const rows = await db.select().from(teams).orderBy(teams.name);
+  const rows = await db.select().from(teams).orderBy(teams.sort, teams.name);
 
   return (
     <div>
@@ -28,6 +28,7 @@ export default async function AdminTeamsPage() {
         <thead>
           <tr className="border-b border-black/15 text-black/45">
             <th className="p-4 font-semibold">Nosaukums</th>
+            <th className="p-4 font-semibold">Secība</th>
             <th className="p-4" />
           </tr>
         </thead>
@@ -35,6 +36,7 @@ export default async function AdminTeamsPage() {
           {rows.map((team) => (
             <tr data-admin-search-item={team.name} key={team.id} className="border-b border-black/10 last:border-0">
               <td className="p-4 font-semibold text-black">{team.name}{team.isMain && <span className="ml-3 inline-block bg-black px-2 py-1 text-[10px] font-semibold text-white uppercase">Galvenā komanda</span>}</td>
+              <td className="p-4 tabular-nums text-black/55">{team.sort}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
                   <Link
@@ -55,7 +57,7 @@ export default async function AdminTeamsPage() {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={2} className="p-4 text-center text-black/45">
+              <td colSpan={3} className="p-4 text-center text-black/45">
                 Vēl nav neviena komanda.
               </td>
             </tr>

@@ -26,7 +26,7 @@ export function StadiumAvailability({ exclude }: { exclude?: string }) {
     if (!form) return;
     const update = () => {
       const data = new FormData(form);
-      const next = { date: String(data.get("date") ?? ""), start: String(data.get("startTime") ?? ""), end: String(data.get("endTime") ?? ""), location: String(data.get("location") ?? "") };
+      const next = { date: String(data.get("date") ?? ""), start: String(data.get("startTime") ?? ""), end: String(data.get("endTime") ?? ""), location: String(data.get("location") || data.get("customLocation") || "") };
       const key = `${next.date}::${next.location}`;
       if (requestKey.current !== key) { requestKey.current = key; setResult(null); setStatus("idle"); }
       setInput(next);

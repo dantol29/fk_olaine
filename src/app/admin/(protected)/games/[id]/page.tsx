@@ -14,7 +14,7 @@ export default async function AdminGameFormPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const teamOptions = await db.select().from(teams).orderBy(teams.name);
+  const teamOptions = await db.select().from(teams).orderBy(teams.sort, teams.name);
 
   const leagueOptions = await db.select().from(leagueSources).orderBy(leagueSources.label);
 
@@ -44,7 +44,7 @@ export default async function AdminGameFormPage({
         <h2 className="mb-4 text-lg font-bold text-black">
           Esošais grafiks (lai zinātu, kas jau ir aizņemts)
         </h2>
-        <WeekCalendar events={events} />
+        <WeekCalendar events={events} teamOrder={teamOptions.map((team) => team.name)} />
       </div>
     </div>
   );

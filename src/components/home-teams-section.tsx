@@ -13,7 +13,7 @@ export async function getTeamsRoster() {
         playerTeams: { with: { player: true } },
         coachTeams: { with: { coach: true } },
       },
-      orderBy: (teams, { asc, desc }) => [desc(teams.isMain), asc(teams.name)],
+      orderBy: (teams, { asc }) => [asc(teams.sort), asc(teams.name)],
     }),
     getAllGamesFromDb(),
     getAllTrainingsFromDb(),
@@ -76,7 +76,7 @@ export async function getTeamsRoster() {
         teamNames: teamNamesByCoachId.get(coach.id) ?? [],
       })),
     games: games.filter((game) => game.teamName === team.name),
-    trainings: trainings.filter((training) => training.teamName === team.name),
+    trainings: trainings.filter((training) => training.teamNames.includes(team.name)),
   }));
 }
 

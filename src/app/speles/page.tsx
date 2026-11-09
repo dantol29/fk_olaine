@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { asc, desc } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import { db } from "@/db/client";
 import { teams as teamsTable } from "@/db/schema";
 
@@ -24,7 +24,7 @@ export default async function SpelesPage() {
   const [games, leagues, teams] = await Promise.all([
     getAllGamesFromDb(),
     getLeagueStandingsForDisplay(),
-    db.select({ id: teamsTable.id, name: teamsTable.name }).from(teamsTable).orderBy(desc(teamsTable.isMain), asc(teamsTable.name)),
+    db.select({ id: teamsTable.id, name: teamsTable.name }).from(teamsTable).orderBy(asc(teamsTable.sort), asc(teamsTable.name)),
   ]);
 
   const upcomingForSchema = games.filter((game) => !game.isPast).slice(0, 20);

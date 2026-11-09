@@ -49,6 +49,7 @@ export async function searchSite(query: string): Promise<SearchResults> {
     }),
     db.query.teams.findMany({
       where: like(teams.name, pattern),
+      orderBy: (table, { asc }) => [asc(table.sort), asc(table.name)],
       limit: RESULT_LIMIT,
     }),
   ]);

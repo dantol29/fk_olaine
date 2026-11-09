@@ -4,7 +4,7 @@ import { useActionState } from "react";
 
 import { createTeam, updateTeam } from "../actions";
 
-type Team = { id: number; name: string; isMain: boolean };
+type Team = { id: number; name: string; isMain: boolean; sort: number };
 
 export function TeamForm(props: { mode: "create" } | { mode: "edit"; team: Team }) {
   const action = props.mode === "create" ? createTeam : updateTeam.bind(null, props.team.id);
@@ -25,6 +25,14 @@ export function TeamForm(props: { mode: "create" } | { mode: "edit"; team: Team 
           defaultValue={props.mode === "edit" ? props.team.name : ""}
           className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
         />
+      </label>
+
+      <label className="mt-4 block text-sm font-semibold text-black">
+        Secība
+        <input type="number" name="sort" required step={1} min={-2147483648} max={2147483647}
+          defaultValue={props.mode === "edit" ? props.team.sort : 0}
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black" />
+        <span className="mt-1 block text-sm font-normal text-black/55">Mazāks skaitlis parādās augstāk. Ja skaitļi sakrīt, komandas tiek sakārtotas pēc nosaukuma.</span>
       </label>
 
       <label className="mt-6 flex items-start gap-3 text-sm">

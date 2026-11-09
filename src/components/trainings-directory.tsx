@@ -37,7 +37,7 @@ export function TrainingsDirectory({ trainings, birthdays, teams }: { trainings:
   const [activeTeam, setActiveTeam] = useState(teamNames[0] ?? "");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarDate, setCalendarDate] = useState<string | null>(null);
-  const teamFiltered = trainings.filter((training) => training.teamName === activeTeam);
+  const teamFiltered = trainings.filter((training) => training.teamNames.includes(activeTeam));
   const visible = teamFiltered.filter((training) => !training.isPast).sort((a, b) => `${a.rawDate}${a.startTime}`.localeCompare(`${b.rawDate}${b.startTime}`));
   const selectedTrainings = teamFiltered.filter((training) => training.rawDate === calendarDate).sort((a, b) => a.startTime.localeCompare(b.startTime));
   const groups = new Map<string, TrainingListItem[]>();

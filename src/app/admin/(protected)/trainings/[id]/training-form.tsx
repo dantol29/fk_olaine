@@ -2,13 +2,13 @@
 
 import { StadiumAvailability } from "@/components/admin/stadium-availability";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { createTraining, updateTraining } from "../actions";
 
 type Training = {
   id: number;
-  teamId: number;
+  trainingTeams: { teamId: number }[];
   date: string;
   startTime: string;
   endTime: string;
@@ -21,13 +21,16 @@ type CoachOption = { id: number; name: string };
 
 export function TrainingForm(
   props:
-    | { mode: "create"; teamOptions: TeamOption[]; coachOptions: CoachOption[] }
-    | { mode: "edit"; training: Training; teamOptions: TeamOption[]; coachOptions: CoachOption[] },
+    | { mode: "create"; teamOptions: TeamOption[]; coachOptions: CoachOption[]; locationOptions: string[] }
+    | { mode: "edit"; training: Training; teamOptions: TeamOption[]; coachOptions: CoachOption[]; locationOptions: string[] },
 ) {
   const action =
     props.mode === "create" ? createTraining : updateTraining.bind(null, props.training.id);
   const [state, formAction, pending] = useActionState(action, undefined);
   const training = props.mode === "edit" ? props.training : null;
+  const selectedTeamIds = new Set(training?.trainingTeams.map((item) => item.teamId) ?? []);
+  const [location, setLocation] = useState(training?.location ?? "Olaines pilsētas stadions");
+  const [customLocation, setCustomLocation] = useState("");
   const selectedCoachIds = new Set(training?.trainingCoaches.map((tc) => tc.coachId) ?? []);
 
   return (
@@ -36,24 +39,18 @@ export function TrainingForm(
         {props.mode === "create" ? "Jauns treniņš" : "Rediģēt treniņu"}
       </h1>
 
-      <label className="block text-sm font-semibold text-black">
-        Komanda
-        <select
-          name="teamId"
-          required
-          defaultValue={training?.teamId ?? ""}
-          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
-        >
-          <option value="" disabled>
-            Izvēlies komandu
-          </option>
+      <fieldset>
+        <legend className="text-sm font-semibold text-black">Komandas</legend>
+        <p className="mt-1 text-sm text-black/55">Izvēlies vienu vai vairākas komandas.</p>
+        <div className="mt-2 flex flex-col gap-1.5">
           {props.teamOptions.map((team) => (
-            <option key={team.id} value={team.id}>
+            <label key={team.id} className="flex items-center gap-2 text-sm text-black">
+              <input type="checkbox" name="teamIds" value={team.id} defaultChecked={selectedTeamIds.has(team.id)} />
               {team.name}
-            </option>
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </fieldset>
 
       <fieldset className="mt-4">
         <legend className="text-sm font-semibold text-black">Treneri (nav obligāts)</legend>
@@ -108,14 +105,18 @@ export function TrainingForm(
 
       <label className="mt-4 block text-sm font-semibold text-black">
         Vieta
-        <input
-          type="text"
-          name="location"
-          required
-          defaultValue={training?.location ?? "Olaines pilsētas stadions"}
-          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black"
-        />
+        <select name="location" value={location} onChange={(event) => setLocation(event.target.value)}
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black">
+          {props.locationOptions.map((place) => <option key={place} value={place}>{place}</option>)}
+          <option value="">Cita vieta…</option>
+        </select>
       </label>
+      {location === "" && <label className="mt-3 block text-sm font-semibold text-black">
+        Vietas nosaukums vai adrese
+        <input type="text" name="customLocation" required value={customLocation} onChange={(event) => setCustomLocation(event.target.value)}
+          className="mt-1.5 w-full rounded-none border border-black/15 px-3 py-2 text-sm text-black outline-none focus:border-black" />
+        <span className="mt-1 block text-sm font-normal text-black/55">Pēc saglabāšanas vieta būs pieejama sarakstā.</span>
+      </label>}
 
       <label className="mt-4 block text-sm font-semibold text-black">
         Piezīmes (nav obligāts)
@@ -129,7 +130,7 @@ export function TrainingForm(
 
       <StadiumAvailability exclude={training ? `training-${training.id}` : undefined} />
 
-      {state?.error && <p className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}
+      {state?.error && <p role="alert" className="mt-3 text-sm font-semibold text-club-red">{state.error}</p>}
 
       <button
         type="submit"

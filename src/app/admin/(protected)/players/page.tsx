@@ -11,7 +11,7 @@ import { deletePlayer } from "./actions";
 export default async function AdminPlayersPage() {
   const teamRows = await db.query.teams.findMany({
     with: { playerTeams: { with: { player: true } } },
-    orderBy: (teams, { asc }) => [asc(teams.name)],
+    orderBy: (teams, { asc }) => [asc(teams.sort), asc(teams.name)],
   });
 
   const teamsWithPlayers = teamRows.map((team) => ({

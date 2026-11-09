@@ -41,8 +41,8 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
   const [showAfa, setShowAfa] = useState(true);
   const [errorOpen, setErrorOpen] = useState(false);
   const afaFailed = Boolean(sharedStatus && sharedStatus !== "ok");
-  const teams = ["Visas komandas", ...new Set([...teamOptions.map((team) => team.name), ...events.flatMap((event) => event.team ? [event.team] : [])])];
-  const visible = events.filter((event) => (showAfa || event.club !== "AFA Olaine") && (team === "Visas komandas" || event.team === team || event.team === null) && (filter === "all" || filter === event.eventType));
+  const teams = ["Visas komandas", ...new Set([...teamOptions.map((team) => team.name), ...events.flatMap((event) => event.teamNames ?? (event.team ? [event.team] : []))])];
+  const visible = events.filter((event) => (showAfa || event.club !== "AFA Olaine") && (team === "Visas komandas" || (event.teamNames ?? (event.team ? [event.team] : [])).includes(team) || event.team === null) && (filter === "all" || filter === event.eventType));
   const byDate = new Map<string, CalendarEvent[]>();
   for (const event of visible) byDate.set(event.dateKey, [...(byDate.get(event.dateKey) ?? []), event]);
   const [year, number] = month.split("-").map(Number);

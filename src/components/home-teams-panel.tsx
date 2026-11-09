@@ -7,6 +7,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { GameListItem } from "@/lib/games-server";
 import type { TrainingListItem } from "@/lib/trainings-server";
+import { CoachInfoModal } from "@/components/coach-info-modal";
 import { CollapsibleGrid } from "@/components/collapsible-grid";
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { MatchListCard } from "@/components/upcoming-matches";
@@ -34,10 +35,6 @@ type Coach = {
   teamNames: string[];
 };
 
-const AUTHORITY_LOGO: Record<"UEFA" | "LFF", string> = {
-  UEFA: "/uefa-logo.webp",
-  LFF: "/partners/lff.png",
-};
 
 type Team = {
   id: number;
@@ -103,9 +100,7 @@ function PlayerCell({
   );
 }
 
-/** A coach avatar in the grid — clicking it opens the detail drawer
- *  (position, license, teams) instead of navigating anywhere. Only name and
- *  position show in the grid itself; license lives in the drawer. */
+/** A coach avatar that opens the profile modal with position, license, and teams. */
 function CoachCell({
   coach,
   avatarClassName,
@@ -417,71 +412,7 @@ export function HomeTeamsPanel({
         </DrawerContent>
       </Drawer>
 
-      <Drawer
-        swipeDirection="right"
-        open={Boolean(selectedCoach)}
-        onOpenChange={(open) => {
-          if (!open) setSelectedCoach(null);
-        }}
-      >
-        <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,400px)] border-none bg-white shadow-xl data-[swipe-direction=right]:rounded-none motion-reduce:transition-none" overlayClassName="bg-black/50 supports-backdrop-filter:backdrop-blur-sm">
-          <div className="flex items-center justify-between bg-black px-4 py-3 text-white"><DrawerTitle className="text-2xl font-normal text-white">Informācija</DrawerTitle><DrawerClose aria-label="Aizvērt" className="flex size-11 items-center justify-center"><X className="size-6" /></DrawerClose></div>
-          {selectedCoach && (
-            <div className="min-h-0 flex-1 overflow-y-auto bg-white p-5 text-black">
-              <div className="flex items-center gap-4">
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-none bg-club-gray-light">
-                  {selectedCoach.photoUrl ? (
-                    <Image
-                      src={selectedCoach.photoUrl}
-                      alt={selectedCoach.name}
-                      fill
-                      sizes="80px"
-                      className="object-contain object-bottom"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <UserRound className="h-8 w-8 text-club-muted" strokeWidth={1.5} />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="text-xl text-black">{selectedCoach.name}</h3>
-                  <p className="text-sm text-black/45">{selectedCoach.position}</p>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col divide-y divide-black/10">
-                <div className="flex items-center gap-3 py-3 first:pt-0">
-                  <Image
-                    src={AUTHORITY_LOGO[selectedCoach.authority]}
-                    alt={selectedCoach.authority}
-                    width={20}
-                    height={20}
-                    className="h-5 w-5 shrink-0 rounded-none object-contain"
-                  />
-                  <div>
-                    <p className="text-xs text-black/45">Licence</p>
-                    <p className="text-sm text-black">
-                      {selectedCoach.license}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 py-3 last:pb-0">
-                  <Users className="h-4 w-4 shrink-0 text-club-red" />
-                  <div>
-                    <p className="text-xs text-black/45">Komandas</p>
-                    <p className="text-sm text-black">
-                      {selectedCoach.teamNames.length > 0
-                        ? selectedCoach.teamNames.join(", ")
-                        : "—"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </DrawerContent>
-      </Drawer>
+      <CoachInfoModal coach={selectedCoach} onClose={() => setSelectedCoach(null)} />
     </div>
   );
 }

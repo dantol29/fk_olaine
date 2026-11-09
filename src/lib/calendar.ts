@@ -1,10 +1,10 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { coaches, events, games, leagueSources, teams, trainingCoaches, trainings } from "@/db/schema";
+import { events, games, leagueSources, teams, trainings } from "@/db/schema";
 import { resolveClubLogos } from "@/lib/club-logos";
 import type { GameListItem } from "@/lib/games-server";
-import type { TrainingCoach, TrainingListItem } from "@/lib/trainings-server";
+import type { TrainingListItem } from "@/lib/trainings-server";
 
 export type CalendarEvent = {
   uid: string;
@@ -27,6 +27,8 @@ export type CalendarEvent = {
   /** Which of the club's own teams this belongs to, for the calendar's team
    *  filter. Null for general, not-team-specific events. */
   team: string | null;
+  /** Individual teams for shared training sessions. */
+  teamNames?: string[];
   /** Only set for eventType "game" — the two sides' names and resolved
    *  logo images (or null if no logo is on file for that side). */
   homeTeam?: string;
@@ -147,49 +149,29 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
   const afterKey = toDateKey(after);
   const beforeKey = toDateKey(before);
 
-  const rows = await db
-    .select({
-      id: trainings.id,
-      date: trainings.date,
-      startTime: trainings.startTime,
-      endTime: trainings.endTime,
-      location: trainings.location,
-      teamName: teams.name,
-    })
-    .from(trainings)
-    .innerJoin(teams, eq(trainings.teamId, teams.id))
-    .where(and(gte(trainings.date, afterKey), lte(trainings.date, beforeKey)));
-
-  const coachRows = await db
-    .select({
-      trainingId: trainingCoaches.trainingId,
-      name: coaches.name,
-      photoUrl: coaches.photoUrl,
-    })
-    .from(trainingCoaches)
-    .innerJoin(coaches, eq(trainingCoaches.coachId, coaches.id));
-  const coachesByTraining = new Map<number, TrainingCoach[]>();
-  for (const coach of coachRows) {
-    const list = coachesByTraining.get(coach.trainingId) ?? [];
-    list.push({ name: coach.name, photoUrl: coach.photoUrl });
-    coachesByTraining.set(coach.trainingId, list);
-  }
+  const rows = await db.query.trainings.findMany({
+    where: and(gte(trainings.date, afterKey), lte(trainings.date, beforeKey)),
+    with: { trainingTeams: { with: { team: true } }, trainingCoaches: { with: { coach: true } } },
+  });
   const todayKey = toDateKey(new Date());
 
   return rows.map((row) => {
+    const teamNames = row.trainingTeams.slice().sort((a, b) => a.team.sort - b.team.sort || a.team.name.localeCompare(b.team.name, "lv")).map(({ team }) => team.name);
+    const teamName = teamNames.join(", ");
     const [year, month, day] = dateKeyToParts(row.date);
     const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
     const end = rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime));
 
     return {
       uid: `training-${row.id}`,
-      title: `${row.teamName} treniņš`,
+      title: `${teamName} treniņš`,
       location: row.location,
       allDay: false,
       start,
       end,
       eventType: "training",
-      team: row.teamName,
+      team: teamName || null,
+      teamNames,
       trainingFixture: {
         id: row.id,
         day: String(day).padStart(2, "0"),
@@ -199,8 +181,9 @@ async function getAdminTrainingEvents(after: Date, before: Date): Promise<Calend
         startTime: row.startTime,
         endTime: row.endTime,
         location: row.location,
-        teamName: row.teamName,
-        coaches: coachesByTraining.get(row.id) ?? [],
+        teamName,
+        teamNames,
+        coaches: row.trainingCoaches.map(({ coach }) => ({ name: coach.name, photoUrl: coach.photoUrl })),
         isPast: row.date < todayKey,
       },
       ...formatLabels(start, false),

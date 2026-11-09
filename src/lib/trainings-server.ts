@@ -1,14 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { eq } from "drizzle-orm";
-
 import { db } from "@/db/client";
-import {
-  coaches as coachesTable,
-  teams as teamsTable,
-  trainingCoaches as trainingCoachesTable,
-  trainings as trainingsTable,
-} from "@/db/schema";
 import { toDateKey } from "@/lib/calendar";
 import { MONTHS } from "@/lib/games";
 
@@ -24,6 +16,7 @@ export type TrainingListItem = {
   endTime: string;
   location: string;
   teamName: string;
+  teamNames: string[];
   coaches: TrainingCoach[];
   isPast: boolean;
 };
@@ -33,36 +26,13 @@ export type TrainingListItem = {
 export const getAllTrainingsFromDb = cache(async function getAllTrainingsFromDb(): Promise<TrainingListItem[]> {
   try {
     const todayKey = toDateKey(new Date());
-    const rows = await db
-      .select({
-        id: trainingsTable.id,
-        date: trainingsTable.date,
-        startTime: trainingsTable.startTime,
-        endTime: trainingsTable.endTime,
-        location: trainingsTable.location,
-        teamName: teamsTable.name,
-      })
-      .from(trainingsTable)
-      .innerJoin(teamsTable, eq(trainingsTable.teamId, teamsTable.id))
-      .orderBy(trainingsTable.date, trainingsTable.startTime);
-
-    const coachRows = await db
-      .select({
-        trainingId: trainingCoachesTable.trainingId,
-        name: coachesTable.name,
-        photoUrl: coachesTable.photoUrl,
-      })
-      .from(trainingCoachesTable)
-      .innerJoin(coachesTable, eq(trainingCoachesTable.coachId, coachesTable.id));
-
-    const coachesByTraining = new Map<number, TrainingCoach[]>();
-    for (const row of coachRows) {
-      const list = coachesByTraining.get(row.trainingId) ?? [];
-      list.push({ name: row.name, photoUrl: row.photoUrl });
-      coachesByTraining.set(row.trainingId, list);
-    }
+    const rows = await db.query.trainings.findMany({
+      with: { trainingTeams: { with: { team: true } }, trainingCoaches: { with: { coach: true } } },
+      orderBy: (table, { asc }) => [asc(table.date), asc(table.startTime)],
+    });
 
     return rows.map((row) => {
+      const teamNames = row.trainingTeams.slice().sort((a, b) => a.team.sort - b.team.sort || a.team.name.localeCompare(b.team.name, "lv")).map(({ team }) => team.name);
       const [year, month, day] = row.date.split("-").map(Number);
       return {
         id: row.id,
@@ -73,8 +43,9 @@ export const getAllTrainingsFromDb = cache(async function getAllTrainingsFromDb(
         startTime: row.startTime,
         endTime: row.endTime,
         location: row.location,
-        teamName: row.teamName,
-        coaches: coachesByTraining.get(row.id) ?? [],
+        teamName: teamNames.join(", "),
+        teamNames,
+        coaches: row.trainingCoaches.map(({ coach }) => ({ name: coach.name, photoUrl: coach.photoUrl })),
         isPast: row.date < todayKey,
       };
     });

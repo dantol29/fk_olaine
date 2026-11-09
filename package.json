@@ -19,7 +19,7 @@
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@libsql/client": "^0.18.0",
-    "@olaine/database": "npm:@dantol29/database@0.1.0",
+    "@olaine/database": "npm:@dantol29/database@0.1.2",
     "@tailwindcss/postcss": "^4",
     "@tiptap/extension-table": "3.31.3",
     "@tiptap/extension-underline": "^3.31.3",

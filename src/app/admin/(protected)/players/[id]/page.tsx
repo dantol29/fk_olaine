@@ -11,7 +11,7 @@ export default async function AdminPlayerFormPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const teamOptions = await db.select().from(teams).orderBy(teams.name);
+  const teamOptions = await db.select().from(teams).orderBy(teams.sort, teams.name);
 
   if (id === "new") {
     return <PlayerForm mode="create" teamOptions={teamOptions} />;

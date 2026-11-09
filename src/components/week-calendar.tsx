@@ -450,9 +450,10 @@ function CalendarEventDrawer({
 
 type WeekCalendarProps = {
   events: CalendarEvent[];
+  teamOrder?: string[];
 };
 
-export function WeekCalendar({ events }: WeekCalendarProps) {
+export function WeekCalendar({ events, teamOrder }: WeekCalendarProps) {
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()));
   const [half, setHalf] = useState<0 | 1>(() => getHalfForDate(new Date()));
   const [mobileDate, setMobileDate] = useState(() => toUtcMidnight(new Date()));
@@ -550,10 +551,11 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
   const teamOptions = useMemo(() => {
     const names = new Set<string>();
     for (const event of availableEvents) {
-      if (event.team) names.add(event.team);
+      for (const name of event.teamNames ?? (event.team ? [event.team] : [])) names.add(name);
     }
-    return Array.from(names).sort((a, b) => a.localeCompare(b, "lv"));
-  }, [availableEvents]);
+    const order = new Map(teamOrder?.map((name, index) => [name, index]));
+    return Array.from(names).sort((a, b) => (order.get(a) ?? Infinity) - (order.get(b) ?? Infinity) || a.localeCompare(b, "lv"));
+  }, [availableEvents, teamOrder]);
 
   const toggleType = (type: EventType) => {
     setActiveTypes((prev) => {
@@ -602,7 +604,7 @@ export function WeekCalendar({ events }: WeekCalendarProps) {
       availableEvents.filter(
         (event) =>
           activeTypes.has(event.eventType) &&
-          (activeTeam === "all" || event.team === activeTeam),
+          (activeTeam === "all" || (event.teamNames ?? (event.team ? [event.team] : [])).includes(activeTeam)),
       ),
     [availableEvents, activeTypes, activeTeam],
   );

@@ -12,7 +12,7 @@ export default async function AdminEventFormPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const teamOptions = await db.select().from(teams).orderBy(teams.name);
+  const teamOptions = await db.select().from(teams).orderBy(teams.sort, teams.name);
 
   if (id === "new") {
     return <EventForm mode="create" teamOptions={teamOptions} />;
