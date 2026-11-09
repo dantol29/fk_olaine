@@ -38,6 +38,10 @@ This app is deployed via cPanel's "Setup Node.js App" (Phusion Passenger), runni
 
 Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`, `SITE_URL`, and the `SMTP_*` vars below) in the Node.js App's environment variable UI, then run `npm run db:push` once against production to create the schema.
 
+CloudLinux Node.js Selector keeps dependencies in its virtual environment and links them into the application as `node_modules`. The deployment uses `npm_config_include=dev cloudlinux-selector install-modules --interpreter nodejs --app-root repositories/fk_olaine_code` to let Selector manage the link and install build dependencies even in production mode. Do not replace this with `npm ci`, which removes the existing `node_modules` before installing. Ordinary npm installations can also replace the link; use Selector's installer on this host.
+
+If **Run NPM Install** reports that the application must not contain a `node_modules` folder/file, check it in File Manager or with `ls -ld node_modules`. If it is an ordinary directory rather than a symlink, move it to a backup location outside the application directory. Then use **Run NPM Install** in **Setup Node.js App** to recreate the Selector-managed link and dependencies. Leave an existing symlink in place. The deployment automates this recovery: ordinary folders/files are moved to `/home3/afaolain/fk_olaine-data/node_modules-backup-TIMESTAMP` before calling Selector; symlinks are preserved.
+
 `SITE_URL` should be the real public domain (`https://fkolaine.com`, no trailing slash) — `robots.txt` and `sitemap.xml` build their absolute links from it.
 
 For an existing database, run `node src/db/add-header-links.mjs` against the production database when deploying the editable header stripe buttons. It adds the six name/link columns with the current button defaults and preserves existing settings. The buttons can then be edited under **Iestatījumi → Galvenes joslas pogas**.

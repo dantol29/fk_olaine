@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     // Limit page-data collection workers as well as static generation;
     // minPagesPerWorker alone does not limit page-data collection.
     cpus: 1,
+    webpackMemoryOptimizations: true,
     staticGenerationMaxConcurrency: 1,
     staticGenerationMinPagesPerWorker: 50,
   },
