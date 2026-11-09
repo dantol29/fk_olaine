@@ -15,6 +15,9 @@
 
 # next.js
 /.next/
+/.next.previous/
+/.build-work/
+/tmp/restart.txt
 /out/
 
 # production

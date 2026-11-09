@@ -14,8 +14,16 @@ const nextConfig: NextConfig = {
     // minPagesPerWorker alone does not limit page-data collection.
     cpus: 1,
     webpackMemoryOptimizations: true,
+    // Keep compiler isolation when the hosting profile customizes Webpack.
+    webpackBuildWorker: true,
     staticGenerationMaxConcurrency: 1,
     staticGenerationMinPagesPerWorker: 50,
+  },
+  webpack(config, { dev }) {
+    // Avoid retaining and serializing Webpack's large filesystem cache on the
+    // resource-limited host. Other builds retain the normal incremental cache.
+    if (!dev && process.env.NEXT_LOW_MEMORY_BUILD === "1") config.cache = false;
+    return config;
   },
   images: {
     // Always unoptimized: in dev so edited local images (logos, etc.) show

@@ -44,6 +44,14 @@ If **Run NPM Install** reports that the application must not contain a `node_mod
 
 `SITE_URL` should be the real public domain (`https://fkolaine.com`, no trailing slash) — `robots.txt` and `sitemap.xml` build their absolute links from it.
 
+### Building from the hosting terminal
+
+After activating the CloudLinux environment and installing dependencies through Node.js Selector, run `npm run build:hosting`. This uses Webpack, one compiler worker, a 512 MB JavaScript heap cap per compiler process, single-threaded native work, and no Webpack filesystem cache. TypeScript checking and minification remain enabled. This trades some build speed for lower peak memory and disk I/O. The heap cap does not include all native/WASM memory and does not override CloudLinux's total account limit. `BUILD_HEAP_MB=768 npm run build:hosting` adjusts the compiler heap cap if the account has sufficient memory.
+
+The command builds a temporary source copy under `.build-work`, reuses the existing dependency symlink and database, and leaves the live `.next` untouched if compilation fails. Only after a successful build does it replace `.next`, keep the last complete build in `.next.previous`, and touch `tmp/restart.txt` to restart Passenger. Use `npm run build:rollback` to restore that previous build without recompiling. A backup is available only after a successful hosting build has replaced an existing complete build. Builds and rollbacks take an exclusive lock under `.build-work/lock`; its `pid` file identifies the process if a hard kill leaves a stale lock.
+
+The ordinary `npm run build` remains available for local/CI builds; it writes directly to `.next`, so use `build:hosting` on the live host. If rsync is used for deployments, exclude `.next`, `.next.previous`, and `.build-work` so uploads do not erase the active build or its backup. Run database migrations separately when deploying a database package change; build rollback restores compiled code only.
+
 For an existing database, run `node src/db/add-header-links.mjs` against the production database when deploying the editable header stripe buttons. It adds the six name/link columns with the current button defaults and preserves existing settings. The buttons can then be edited under **Iestatījumi → Galvenes joslas pogas**.
 
 - **Outgoing email** (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`) — used for notification emails (e.g. the LFF sync alerting an admin that a game needs review). In cPanel: Email Accounts → pick/create a mailbox (e.g. `info@yourdomain.com`) → "Connect Devices" next to it shows the exact host/port to use (typically `mail.yourdomain.com`, port `465` for SSL or `587` for STARTTLS). `SMTP_USER`/`SMTP_PASSWORD` are that mailbox's full address and password. Leave unset to disable email sending entirely — `src/lib/mailer.ts` just logs a warning and skips it rather than failing whatever triggered the notification.

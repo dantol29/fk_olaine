@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:hosting": "node scripts/build-hosting.mjs",
+    "build:rollback": "node scripts/build-hosting.mjs --rollback",
     "start": "NODE_ENV=production node server.js",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
