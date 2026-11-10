@@ -1,6 +1,4 @@
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import { getLeagueLogosForDisplay } from "@/lib/league-standings-server";
 import { getAllGamesFromDb } from "@/lib/games-server";
 import { UpcomingMatches, VideoLink } from "@/components/upcoming-matches";
@@ -15,7 +13,7 @@ export async function HomeUpcomingGames() {
           <Image src="/stadions.jpg" alt="" fill sizes="(min-width: 1280px) 1280px, 100vw" className="object-cover" />
           <div className="absolute inset-0 bg-black/75" />
           <div className="relative">
-            <h2 id="empty-match-heading" className="text-xl font-semibold uppercase sm:text-2xl">Nākamā spēle</h2>
+            <h2 id="empty-match-heading" className="sr-only">Nākamā spēle</h2>
             <div className="flex min-h-[240px] flex-col items-center justify-center px-2 pb-10 text-center sm:min-h-[300px] sm:pb-16">
               <Image src="/fk-olaine-crest-v2.png" alt="FK Olaine" width={80} height={80} className="size-16 object-contain sm:size-20" />
               <p className="mt-6 text-xl font-semibold uppercase sm:text-2xl">Gaidāmo spēļu pašlaik nav</p>
@@ -26,8 +24,5 @@ export async function HomeUpcomingGames() {
         <VideoLink />
       </div>
     )}
-    <div className="mt-6 flex justify-center">
-      <Link href="/speles" className="motion-action flex min-h-11 items-center gap-3 border-2 border-black px-5 text-sm font-semibold text-black uppercase hover:bg-black hover:text-white focus-visible:outline-black">Visas spēles<ArrowRight className="action-arrow size-4" aria-hidden="true" /></Link>
-    </div>
   </section>;
 }

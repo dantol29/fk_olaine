@@ -73,8 +73,8 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
           <Image src="/stadions.jpg" alt="" fill sizes="100vw" className="object-cover" />
           <div className="absolute inset-0 bg-black/75" />
           <div className="relative">
-            <h2 id="match-banner-heading" className="sr-only font-semibold uppercase sm:not-sr-only sm:text-2xl">{completed ? "Pēdējā spēle" : "Nākamā spēle"}</h2>
-            <div className="flex justify-center sm:-mt-7"><FixtureLeagueLogo league={leagueFor(next)} large /></div>
+            <h2 id="match-banner-heading" className={cn("sr-only font-semibold uppercase", showFixtures && "sm:not-sr-only sm:text-2xl")}>{completed ? "Pēdējā spēle" : "Nākamā spēle"}</h2>
+            <div className={cn("flex justify-center", showFixtures && "sm:-mt-7")}><FixtureLeagueLogo league={leagueFor(next)} large /></div>
             <div className={cn("mx-auto grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 sm:gap-8", completed ? "mt-6 max-w-[1280px] sm:mt-10" : "mt-6 max-w-6xl sm:mt-14")}>
               <div className="flex min-w-0 flex-col-reverse items-center gap-4 lg:flex-row lg:justify-end">
                 <h3 className={cn("text-center font-semibold uppercase lg:text-right", completed ? "text-sm sm:text-2xl" : "text-sm sm:text-xl lg:text-2xl")}>{next.home.name}</h3><TeamLogo team={next.home} className={cn("!size-16 !rounded-none !bg-transparent !ring-0", completed ? "sm:!size-28" : "sm:!size-24")} />

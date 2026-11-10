@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { BirthdaysSection } from "@/components/birthdays-section";
 import { Hero } from "@/components/hero";
+import { HomeNews } from "@/components/home-news";
 import { HomePollsSection } from "@/components/home-polls-section";
 import { HomeTeamsSection } from "@/components/home-teams-section";
 import { HomeUpcomingGames } from "@/components/home-upcoming-games";
@@ -24,6 +25,7 @@ export default function Home() {
       <main className="home-content bg-white text-black">
         <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />
+        <HomeNews />
         <HomeUpcomingGames />
         <HomeStandingsSection />
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">

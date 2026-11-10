@@ -42,6 +42,7 @@ const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin/partners", label: "Partneri", icon: Handshake },
   { href: "/admin/aptaujas", label: "Aptaujas", icon: MessageCircleQuestion },
   { href: "/admin/jaunumi", label: "Jaunumi", icon: Newspaper },
+  { href: "/admin/home-slides", label: "Sākumlapas attēli", icon: ImageIcon },
   { href: "/admin/site-settings", label: "Iestatījumi", icon: Settings },
 ];
 

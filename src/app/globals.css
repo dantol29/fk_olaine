@@ -435,12 +435,13 @@
 
 .home-hero-frame { min-height: max(640px, 100svh); }
 .home-page-hero-frame {
-  height: 95vh;
-  height: 95dvh;
+  height: clamp(360px, 55vh, 600px);
+  height: clamp(360px, 55dvh, 600px);
   min-height: 0;
 }
 .home-page-hero-frame > .home-hero-news { min-height: 0; }
 @media (max-width: 639px) {
+  .home-page-hero-frame { height: clamp(320px, 48dvh, 440px); }
   .home-hero-frame.home-hero-news { min-height: clamp(480px, 75svh, 620px); }
 }
 .home-hero-news > .hero-news-slide {
