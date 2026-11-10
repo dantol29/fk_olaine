@@ -7,22 +7,23 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { TrainingListItem } from "@/lib/trainings-server";
 import { CoachAvatars } from "@/components/training-fixture-card";
+import { CalendarEventTeams } from "@/components/calendar-event-teams";
 import { TrainingsMonthCalendar } from "@/components/trainings-month-calendar";
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
-export function TrainingRow({ training, compact = false }: { training: TrainingListItem; compact?: boolean }) {
+export function TrainingRow({ training, compact = false, showTeam = false }: { training: TrainingListItem; compact?: boolean; showTeam?: boolean }) {
   return <article className="border border-black/15 bg-white text-black">
-    <div className={cn("grid gap-5", compact ? "p-4" : "p-5 sm:grid-cols-[100px_minmax(0,1fr)] sm:gap-8 sm:p-7")}>
-      <div className={cn("flex items-center justify-between gap-4", !compact && "sm:block sm:border-r sm:border-black/15 sm:pr-6")}>
-        <div className="flex items-baseline gap-2 sm:block">
+    <div className={cn("grid", compact ? "gap-8 p-4" : "gap-5 p-5 sm:grid-cols-[100px_minmax(0,1fr)] sm:gap-8 sm:p-7")}>
+      <div className={cn("flex flex-wrap items-center justify-between gap-4", !compact && "sm:block sm:border-r sm:border-black/15 sm:pr-6")}>
+        <div className="flex items-baseline gap-2">
           <p className="text-4xl leading-none font-semibold tabular-nums">{Number(training.day)}</p>
-          <p className="text-sm text-black/55 uppercase sm:mt-2">{training.month.toLowerCase()}</p>
+          <p className="text-sm text-black/55 uppercase">{training.month.toLowerCase()}</p>
         </div>
-        <p className={cn("shrink-0 text-lg font-semibold tabular-nums", !compact && "sm:hidden")}>{training.startTime}–{training.endTime}</p>
+        <p className={cn("text-4xl leading-none font-semibold tabular-nums", !compact && "sm:hidden")}>{training.startTime}–{training.endTime}</p>
       </div>
       <div className="min-w-0">
-        {!compact && <p className="mb-3 hidden text-2xl font-semibold tabular-nums sm:block">{training.startTime}–{training.endTime}</p>}
-        <p className="flex items-start gap-2 text-lg leading-snug font-medium"><MapPin className="mt-1 size-4 shrink-0 text-black/45" aria-hidden="true" /><span>{training.location}</span></p>
+        {!compact && <p className="mb-3 hidden text-4xl leading-none font-semibold tabular-nums sm:block">{training.startTime}–{training.endTime}</p>}
+        {showTeam ? <CalendarEventTeams team={training.teamName} teamNames={training.teamNames} location={training.location} /> : <p className="flex items-start gap-2 text-lg leading-snug font-medium"><MapPin className="mt-1 size-4 shrink-0 text-black/45" aria-hidden="true" /><span>{training.location}</span></p>}
       </div>
     </div>
     {training.coaches.length > 0 && <div className={cn("flex items-center gap-3 border-t border-black/10 bg-[#f7f7f7] py-3", compact ? "px-4" : "px-5 sm:px-7")}>

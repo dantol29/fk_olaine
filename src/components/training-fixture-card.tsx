@@ -72,7 +72,7 @@ export function TrainingFixtureCard({
       </div>
 
       <div className="mt-1 flex flex-col items-center gap-1.5">
-        <span className="max-w-[140px] truncate rounded-full bg-slate-100 px-4 py-2 text-sm text-club-navy">
+        <span className="max-w-full rounded-full bg-slate-100 px-4 py-2 text-center text-sm break-words text-club-navy">
           {training.teamName}
         </span>
         <span className="text-2xl font-extrabold text-club-navy">

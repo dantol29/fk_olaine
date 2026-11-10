@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Info } from "lucide-react";
 
 import { TeamLogo } from "@/components/game-fixture-card";
+import { CalendarEventTeams } from "@/components/calendar-event-teams";
 import { YouTubeIcon } from "@/components/social-icons";
 import { cn } from "@/lib/utils";
 import { isOlaine } from "@/lib/games";
@@ -50,7 +51,7 @@ function FixtureLeagueLogo({ league, large = false }: { league?: LeagueStandings
   return <Image src={logo ?? "/fk-olaine-crest-v2.png"} alt={logo ? league?.label ?? "Līgas logo" : "FK Olaine"} width={large ? 90 : 56} height={large ? 90 : 56} className={large ? "size-16 object-contain sm:size-20" : "size-12 object-contain"} onError={() => { if (logo) setFailed(logo); }} />;
 }
 
-function VideoLink() {
+export function VideoLink() {
   return <a href="https://www.youtube.com/c/avanakeks/videos" target="_blank" rel="noopener noreferrer" className="flex min-h-16 items-center justify-center gap-3 bg-white px-4 text-sm text-black hover:underline"><span>Kluba video</span><YouTubeIcon className="size-6 text-club-red" aria-hidden="true" /><span className="font-semibold">YouTube</span></a>;
 }
 
@@ -117,13 +118,14 @@ export function MatchListCard({ game, league, completed = false, compact = false
               const opponent = home ? game.away : game.home;
               return <article className="match-hover border border-black/10 bg-white">
                 {!compact && <div className={cn("p-4", !drawer && "sm:hidden")}>
-                  <div className="mb-4 flex items-center justify-between gap-3 text-xs"><p><span className="font-semibold">{game.time}</span><span className="ml-2 text-black/45">{Number(game.day)}. {game.month.toLowerCase()}</span></p><span className="font-semibold">{home ? "Mājās" : "Izbraukumā"}</span></div>
+                  <div className="mb-4 flex items-center justify-between gap-3 text-xs"><p><span className={cn("font-semibold", drawer && "text-xl leading-none tabular-nums sm:text-2xl")}>{game.time}</span><span className="ml-2 text-black/45">{Number(game.day)}. {game.month.toLowerCase()}</span></p><span className="font-semibold">{home ? "Mājās" : "Izbraukumā"}</span></div>
                   <div className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-5">
                     <FixtureLeagueLogo league={league} />
                     <div className="flex min-w-0 items-center gap-3"><TeamLogo team={opponent} className="!size-11 shrink-0 !rounded-none !ring-0" />
-                      {completed ? <div className="min-w-0 text-sm uppercase"><p className="grid grid-cols-[3ch_minmax(0,1fr)] gap-2"><span className="border-r border-black/20 pr-2 text-center font-semibold tabular-nums">{game.homeScore ?? "—"}</span><span>{game.home.name}</span></p><p className="mt-1 grid grid-cols-[3ch_minmax(0,1fr)] gap-2"><span className="border-r border-black/20 pr-2 text-center font-semibold tabular-nums">{game.awayScore ?? "—"}</span><span>{game.away.name}</span></p></div> : <div className="min-w-0"><h3 className="text-base font-semibold uppercase">{opponent.name}</h3><p className="mt-1 text-xs text-black/45">{game.venue}</p></div>}
+                      {completed ? <div className="min-w-0 text-sm uppercase"><p className="grid grid-cols-[3ch_minmax(0,1fr)] gap-2"><span className="border-r border-black/20 pr-2 text-center font-semibold tabular-nums">{game.homeScore ?? "—"}</span><span>{game.home.name}</span></p><p className="mt-1 grid grid-cols-[3ch_minmax(0,1fr)] gap-2"><span className="border-r border-black/20 pr-2 text-center font-semibold tabular-nums">{game.awayScore ?? "—"}</span><span>{game.away.name}</span></p></div> : <div className="min-w-0"><h3 className="text-base font-semibold uppercase">{opponent.name}</h3>{!drawer && <p className="mt-1 text-xs text-black/45">{game.venue}</p>}</div>}
                     </div>
                   </div>
+                  {drawer && <CalendarEventTeams team={game.teamName} location={game.venue} className="mt-4" />}
                   {showInfo && game.fixturesUrl && <div className="mt-5 border-t border-black/15 pt-3"><a href={game.fixturesUrl} className={cn("flex min-h-10 items-center justify-center gap-2 border-2 border-black px-3 text-xs font-semibold uppercase", completed && "bg-black text-white")}><Info className="size-4" aria-hidden="true" />Spēles informācija</a></div>}
                 </div>}
                 <div className={cn("items-center", drawer ? "hidden" : compact ? "grid grid-cols-[24px_64px_minmax(0,1fr)] gap-3 p-4" : "hidden sm:grid sm:grid-cols-[36px_56px_100px_1fr] sm:gap-6 sm:p-7 lg:gap-8", !compact && !drawer && (showInfo ? "lg:grid-cols-[48px_72px_140px_1fr_220px]" : "lg:grid-cols-[48px_72px_140px_1fr]"))}>

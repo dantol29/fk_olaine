@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import type { CalendarEvent } from "@/lib/calendar";
 import { CalendarDatePicker } from "@/components/calendar-date-picker";
 import { CalendarDrawer } from "@/components/calendar-drawer";
+import { CalendarEventTeams } from "@/components/calendar-event-teams";
 import { GameFixtureCard } from "@/components/game-fixture-card";
 import { TrainingFixtureCard } from "@/components/training-fixture-card";
 import {
@@ -397,6 +398,7 @@ function CalendarEventDrawer({
 
   return (
     <CalendarDrawer open={open} onOpenChange={onOpenChange}>
+      {!event.trainingFixture && <CalendarEventTeams team={event.team} teamNames={event.teamNames} />}
       {event.gameFixture ? (
         <GameFixtureCard game={event.gameFixture} dimPast={false} />
       ) : event.trainingFixture ? (
@@ -419,11 +421,6 @@ function CalendarEventDrawer({
           <h3 className="mt-5 text-2xl leading-tight font-bold text-club-navy">
             {event.title}
           </h3>
-          {event.team && (
-            <span className="mt-4 inline-flex rounded-full bg-slate-100 px-4 py-2 text-sm text-club-navy">
-              {event.team}
-            </span>
-          )}
           <div className="mt-6 flex flex-col gap-3 text-sm text-slate-600">
             <span className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 shrink-0 text-club-red" />
