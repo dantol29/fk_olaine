@@ -68,7 +68,7 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
 
   return (
     <>
-      <div className={cn("mx-auto max-w-[1280px]", showFixtures && "mb-12")}>
+      <div className={cn("mx-auto max-w-[1280px]", showFixtures ? "mb-12" : "2xl:max-w-[1600px]")}>
         <section aria-labelledby="match-banner-heading" className={cn("relative overflow-hidden bg-black px-5 pt-6 text-white sm:px-8", completed ? "min-h-[260px] pb-8 sm:min-h-[320px] sm:pb-10" : "pb-10 sm:pb-16")}>
           <Image src="/stadions.jpg" alt="" fill sizes="100vw" className="object-cover" />
           <div className="absolute inset-0 bg-black/75" />

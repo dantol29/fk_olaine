@@ -29,18 +29,18 @@ export default function Home() {
         <HomeUpcomingGames />
         <HomeStandingsSection />
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="mx-auto max-w-[1600px]">
+          <div className="mx-auto max-w-[1600px] 2xl:max-w-[1920px]">
             <HomePollsSection />
           </div>
         </section>
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="mx-auto max-w-[1600px]">
+          <div className="mx-auto max-w-[1600px] 2xl:max-w-[1920px]">
             <HomeTeamsSection />
 
           </div>
         </section>
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="mx-auto max-w-[1280px]">
+          <div className="mx-auto max-w-[1280px] 2xl:max-w-[1600px]">
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
               <TopScorersList />
               <UpcomingBirthdays />

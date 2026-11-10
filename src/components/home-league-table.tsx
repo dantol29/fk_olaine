@@ -21,7 +21,7 @@ export function HomeLeagueTable({ leagues, schedule, today, minMonth, maxMonth }
   const logo = league?.logoUrl && !failedLogos.includes(league.logoUrl) ? league.logoUrl : null;
   return (
     <section aria-labelledby="home-table-heading" className="bg-white px-6 pb-12 sm:px-10 sm:pb-16 lg:px-14">
-      <div className="mx-auto grid max-w-[1280px] gap-16 text-black lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start lg:gap-10">
+      <div className="mx-auto grid max-w-[1280px] gap-16 text-black lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start lg:gap-10 2xl:max-w-[1600px]">
         <div className="min-w-0 lg:order-2">
           <div className="mb-4 flex items-start justify-between gap-4 lg:mb-8 lg:min-h-20 lg:pt-5">
             <div className="flex min-w-0 flex-1 items-start gap-3">

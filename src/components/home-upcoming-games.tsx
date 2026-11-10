@@ -8,9 +8,9 @@ export async function HomeUpcomingGames() {
   const next = games.filter((game) => !game.isPast).sort((a, b) => a.rawDate.localeCompare(b.rawDate) || a.time.localeCompare(b.time))[0];
   return <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
     {next ? <UpcomingMatches games={[next]} leagues={leagues} showFixtures={false} /> : (
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-[1280px] 2xl:max-w-[1600px]">
         <section aria-labelledby="empty-match-heading" className="relative overflow-hidden bg-black px-5 pt-6 text-white sm:px-8">
-          <Image src="/stadions.jpg" alt="" fill sizes="(min-width: 1280px) 1280px, 100vw" className="object-cover" />
+          <Image src="/stadions.jpg" alt="" fill sizes="(min-width: 1600px) 1600px, 100vw" className="object-cover" />
           <div className="absolute inset-0 bg-black/75" />
           <div className="relative">
             <h2 id="empty-match-heading" className="sr-only">Nākamā spēle</h2>
