@@ -22,27 +22,20 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <main className="home-content bg-white text-black">
+      <main className="home-content bg-club-navy text-white">
         <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />
-        <HomeStandingsSection upcoming={<HomeUpcomingGames />} />
         <HomeNews />
-        <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+        <HomeStandingsSection upcoming={<HomeUpcomingGames />} />
+        <section className="bg-club-navy px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto max-w-[1600px] 2xl:max-w-[1920px]">
             <HomeTeamsSection />
           </div>
         </section>
-        <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="mx-auto max-w-[1600px] 2xl:max-w-[1920px]">
-            <HomePollsSection />
-          </div>
-        </section>
-        <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
-          <div className="mx-auto max-w-[1280px] 2xl:max-w-[1600px]">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-              <TopScorersList />
-              <UpcomingBirthdays />
-            </div>
+        <section className="bg-club-navy px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
+          <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-2 lg:gap-16 2xl:max-w-[1600px]">
+            <div className="min-w-0 [container-type:inline-size]"><HomePollsSection /></div>
+            <div className="flex min-w-0 flex-col gap-12"><UpcomingBirthdays /><TopScorersList /></div>
           </div>
         </section>
         {/* Hidden per request — kept mounted (not removed) so it's a

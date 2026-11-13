@@ -23,16 +23,16 @@ export async function SiteFooter() {
     <>
       {partners.length > 0 && (
         <>
-        <section id="partners" aria-labelledby="partners-heading" className="scroll-mt-24 bg-white px-6 pt-12 pb-12 text-black sm:px-12 sm:pt-16 sm:pb-16">
+        <section id="partners" aria-labelledby="partners-heading" className="scroll-mt-24 bg-club-navy px-6 pt-12 pb-12 text-white sm:px-12 sm:pt-16 sm:pb-16">
           <div className="mx-auto max-w-[1280px] 2xl:max-w-[1600px]">
-          <h2 id="partners-heading" className="text-2xl font-semibold uppercase text-club-navy sm:text-3xl">Kluba partneri</h2>
+          <h2 id="partners-heading" className="text-2xl font-semibold uppercase text-white sm:text-3xl">Kluba partneri</h2>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:mt-8 sm:gap-8">
             {partners.map((partner) => {
               const image = (
-                <Image src={partner.logoUrl} alt={partner.name} width={partner.logoWidth} height={partner.logoHeight} className="max-h-14 w-auto max-w-full object-contain grayscale opacity-60 transition-[filter,opacity] duration-200 group-hover:grayscale-0 group-hover:opacity-100 group-focus-visible:grayscale-0 group-focus-visible:opacity-100 motion-reduce:transition-none sm:max-w-[160px]" />
+                <Image src={partner.logoUrl} alt={partner.name} width={partner.logoWidth} height={partner.logoHeight} className="max-h-14 w-auto max-w-full object-contain transition-opacity duration-200 group-hover:opacity-75 motion-reduce:transition-none sm:max-w-[160px]" />
               );
               return partner.websiteUrl ? (
-                <a key={partner.id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" className="group flex min-h-20 w-[calc(50%-0.5rem)] items-center justify-center px-4 py-3 focus-visible:outline-black sm:w-44">{image}</a>
+                <a key={partner.id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" className="group flex min-h-20 w-[calc(50%-0.5rem)] items-center justify-center px-4 py-3 focus-visible:outline-white sm:w-44">{image}</a>
               ) : <span key={partner.id} className="group flex min-h-20 w-[calc(50%-0.5rem)] items-center justify-center px-4 py-3 sm:w-44">{image}</span>;
             })}
           </div>
@@ -40,8 +40,8 @@ export async function SiteFooter() {
         </section>
         </>
       )}
-    <footer id="footer" className="scroll-mt-24 bg-club-navy text-white">
-      <div className="mx-auto max-w-[1600px] px-6 py-10 sm:px-12 sm:py-14 lg:px-20">
+    <footer id="footer" className="scroll-mt-24 bg-club-navy-light text-white">
+      <div className="mx-auto max-w-[1392px] px-6 py-10 sm:px-10 sm:py-14 lg:px-14 2xl:max-w-[1712px]">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
           <div className="shrink-0">
           <Link href="/" className="inline-flex items-center gap-3 focus-visible:outline-white">

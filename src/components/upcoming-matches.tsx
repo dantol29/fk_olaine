@@ -53,7 +53,7 @@ function FixtureLeagueLogo({ league, large = false }: { league?: LeagueStandings
 }
 
 export function VideoLink() {
-  return <a href="https://www.youtube.com/c/avanakeks/videos" target="_blank" rel="noopener noreferrer" className="flex min-h-16 items-center justify-center gap-3 bg-white px-4 text-sm text-black hover:underline"><span>Kluba video</span><YouTubeIcon className="size-6 text-club-red" aria-hidden="true" /><span className="font-semibold">YouTube</span></a>;
+  return <a href="https://www.youtube.com/c/avanakeks/videos" target="_blank" rel="noopener noreferrer" className="flex min-h-16 items-center justify-center gap-3 px-4 text-sm text-white/80 hover:text-white hover:underline"><span>Kluba video</span><YouTubeIcon className="size-6 text-club-red" aria-hidden="true" /><span className="font-semibold">YouTube</span></a>;
 }
 
 export function UpcomingMatches({ games, leagues, completed = false, showFixtures = true }: { games: GameListItem[]; leagues: LeagueStandings[]; completed?: boolean; showFixtures?: boolean }) {
@@ -70,9 +70,8 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
   return (
     <>
       <div className={cn("mx-auto max-w-[1280px]", showFixtures ? "mb-12" : "2xl:max-w-[1600px]")}>
-        <section aria-labelledby="match-banner-heading" className={cn("relative overflow-hidden bg-club-navy px-5 pt-6 text-white sm:px-8", !showFixtures && "rounded-3xl shadow-[0_-6px_24px_rgba(11,22,38,0.16)] sm:shadow-none", completed ? "min-h-[260px] pb-8 sm:min-h-[320px] sm:pb-10" : "pb-10 sm:pb-16")}>
-          {showFixtures && <><Image src="/stadions.jpg" alt="" fill sizes="100vw" className="object-cover" /><div className="absolute inset-0 bg-black/75" /></>}
-          {!showFixtures && <div aria-hidden="true" className="home-match-background" />}
+        <section aria-labelledby="match-banner-heading" className={cn("relative overflow-hidden rounded-3xl border border-white/10 bg-club-navy px-5 pt-6 text-white sm:px-8", !showFixtures && "shadow-[0_-6px_24px_rgba(11,22,38,0.16)] sm:shadow-none", completed ? "min-h-[260px] pb-8 sm:min-h-[320px] sm:pb-10" : "pb-10 sm:pb-16")}>
+          <div aria-hidden="true" className="home-match-background" />
           <div className="relative">
             <h2 id="match-banner-heading" className={cn("sr-only font-semibold uppercase", showFixtures && "sm:not-sr-only sm:text-2xl")}>{completed ? "Pēdējā spēle" : "Nākamā spēle"}</h2>
             {showFixtures && completed && <div className="flex justify-center sm:-mt-7"><FixtureLeagueLogo league={leagueFor(next)} large /></div>}
@@ -102,7 +101,7 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
           </div>
         </section>
         {showFixtures && <VideoLink />}
-        {!showFixtures && !completed && <div className="mt-4 flex justify-center"><Link href={`/speles?team=${encodeURIComponent(next.teamName)}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-club-navy/20 px-4 text-sm font-semibold text-club-navy transition hover:bg-club-navy hover:text-white"><Info className="size-4" aria-hidden="true" />Spēles informācija</Link></div>}
+        {!showFixtures && !completed && <div className="mt-4 flex justify-center"><Link href={`/speles?team=${encodeURIComponent(next.teamName)}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 text-sm font-semibold text-white transition hover:bg-white/10"><Info className="size-4" aria-hidden="true" />Spēles informācija</Link></div>}
       </div>
 
       {showFixtures && [...groups].map(([month, fixtures]) => (
@@ -127,7 +126,7 @@ export function MatchListCard({ game, league, completed = false, compact = false
                   <div className="mb-4 flex items-center justify-between gap-3 text-xs"><p><span className={cn("font-semibold", drawer && "text-xl leading-none tabular-nums sm:text-2xl")}>{game.time}</span><span className="ml-2 text-black/45">{Number(game.day)}. {game.month.toLowerCase()}</span></p><span className="font-semibold">{home ? "Mājās" : "Izbraukumā"}</span></div>
                   <div className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-5">
                     <FixtureLeagueLogo league={league} />
-                    <div className="flex min-w-0 items-center gap-3"><TeamLogo team={opponent} className="!size-11 shrink-0 !rounded-none !ring-0" />
+                    <div className="flex min-w-0 items-center gap-3"><TeamLogo team={opponent} className="!size-11 shrink-0 !rounded-none !bg-transparent !ring-0" />
                       {completed ? <div className="min-w-0 text-sm uppercase"><p className="grid grid-cols-[3ch_minmax(0,1fr)] gap-2"><span className="border-r border-black/20 pr-2 text-center font-semibold tabular-nums">{game.homeScore ?? "—"}</span><span>{game.home.name}</span></p><p className="mt-1 grid grid-cols-[3ch_minmax(0,1fr)] gap-2"><span className="border-r border-black/20 pr-2 text-center font-semibold tabular-nums">{game.awayScore ?? "—"}</span><span>{game.away.name}</span></p></div> : <div className="min-w-0"><h3 className="text-base font-semibold uppercase">{opponent.name}</h3>{!drawer && <p className="mt-1 text-xs text-black/45">{game.venue}</p>}</div>}
                     </div>
                   </div>
@@ -139,7 +138,7 @@ export function MatchListCard({ game, league, completed = false, compact = false
                   <div className={compact ? "hidden" : "hidden sm:block"}><FixtureLeagueLogo league={league} /></div>
                   <div><p className={cn("font-semibold", compact ? "text-lg" : "text-2xl")}>{game.time}</p><p className={cn("mt-1 text-black/45", compact ? "text-xs" : "text-sm")}>{Number(game.day)}. {game.month.toLowerCase()}</p></div>
                   <div className={cn("flex min-w-0 items-center", compact ? "gap-2" : "col-span-2 gap-4 sm:col-span-1")}>
-                    <TeamLogo team={opponent} className={cn("!rounded-none !ring-0", compact ? "!size-9 shrink-0" : "!size-14")} />
+                    <TeamLogo team={opponent} className={cn("!rounded-none !bg-transparent !ring-0", compact ? "!size-9 shrink-0" : "!size-14")} />
                     {completed ? <div className="min-w-0">
                       <p className={cn("grid grid-cols-[3ch_minmax(0,1fr)] items-start gap-3 uppercase", compact ? "text-xs" : "text-lg sm:text-xl")}><span className="border-r border-black/20 pr-3 text-center font-semibold tabular-nums">{game.homeScore ?? "—"}</span><span>{game.home.name}</span></p>
                       <p className={cn("mt-1 grid grid-cols-[3ch_minmax(0,1fr)] items-start gap-3 uppercase", compact ? "text-xs" : "text-lg sm:text-xl")}><span className="border-r border-black/20 pr-3 text-center font-semibold tabular-nums">{game.awayScore ?? "—"}</span><span>{game.away.name}</span></p>

@@ -67,8 +67,8 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
         <nav aria-label="Komandas" className="flex items-end gap-6 overflow-x-auto sm:gap-8 lg:min-h-12">{teams.map((name) => <button key={name} type="button" aria-pressed={name === team} onClick={() => { setTeam(name); setSelectedDate(null); }} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", name === team && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{name}</button>)}</nav>
       </div>
     </section>
-    <section className="px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14">
-      <div className="mx-auto max-w-[1440px]">
+    <section className={cn("bg-club-navy px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14", !admin && "public-calendar text-white")}>
+      <div className={cn("mx-auto max-w-[1440px] rounded-3xl bg-white p-4 sm:p-8", !admin && "bg-transparent px-0 sm:px-0")}>
         {sharedStatus === "stale" && <p role="status" className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">AFA Olaine dati ir novecojuši. Tiek rādīts pēdējais veiksmīgi ielādētais kalendārs{sharedUpdatedAt ? ` (${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", dateStyle: "short", timeStyle: "short" }).format(new Date(sharedUpdatedAt))})` : ""}. Aktuālo stadiona pieejamību nevar apstiprināt.</p>}
         <div aria-label="Notikumu veids" className="mx-auto mb-10 flex w-fit max-w-full overflow-x-auto border-b border-black/10">{FILTERS.map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} onClick={() => setFilter(item.key)} className={cn("shrink-0 border-b-4 px-4 pt-3 pb-1 text-sm font-semibold uppercase sm:px-8 sm:text-lg", filter === item.key ? "border-black" : "border-transparent text-black/40")}>{item.label}</button>)}</div>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">

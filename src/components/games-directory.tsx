@@ -50,14 +50,14 @@ export function GamesDirectory({ games, leagues, teams }: { games: GameListItem[
                 <button key={item.value} type="button" aria-pressed={activeTeam === item.value} onClick={() => { setActiveTeam(item.value); setLeagueLabel(""); setCalendarDate(null); }} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", activeTeam === item.value && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{item.name}</button>
               ))}
             </nav>
-            <div className="-mx-6 flex shrink-0 items-center justify-end bg-white px-6 py-2 sm:-mx-10 sm:px-10 lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-1">
-              <DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 bg-club-red px-5 text-xs font-semibold text-white uppercase lg:bg-white lg:text-black"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger>
+            <div className="flex shrink-0 items-center justify-end py-2 lg:pb-1">
+              <DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white/10 px-5 text-xs font-semibold text-white uppercase hover:bg-white/20"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-[#fafafa] px-6 pt-10 pb-16 text-black sm:px-10 sm:pt-12 lg:px-14">
+      <section className="public-games bg-club-navy px-6 pt-10 pb-16 text-white sm:px-10 sm:pt-12 lg:px-14">
         <div className="mx-auto max-w-[1920px]">
           <div role="tablist" aria-label="Spēļu skats" className="mx-auto mb-6 flex w-fit max-w-full border-b border-black/10">
             {VIEWS.map((item) => <button key={item.id} id={`games-tab-${item.id}`} type="button" role="tab" aria-selected={view === item.id} aria-controls={`games-panel-${item.id}`} onClick={() => setView(item.id)} onKeyDown={(event) => {
@@ -77,7 +77,7 @@ export function GamesDirectory({ games, leagues, teams }: { games: GameListItem[
                   {teamLeagues.length > 1 && <select aria-label="Līga" value={league?.id ?? ""} onChange={(event) => setLeagueLabel(event.target.value)} className="max-w-full border-b border-black/20 bg-transparent px-3 py-2 text-center text-base font-semibold">{teamLeagues.map((item) => <option key={item.id ?? item.label} value={item.id}>{item.label}{!activeTeam && item.teamName ? ` — ${item.teamName}` : ""}</option>)}</select>}
                   <Image src={leagueLogo ?? "/fk-olaine-crest-v2.png"} alt={leagueLogo ? league?.label ?? "Līgas logo" : "FK Olaine"} width={120} height={120} className="size-30 object-contain" onError={() => { if (leagueLogo) setFailedLogo(leagueLogo); }} />
                 </div>
-                <StandingsTable rows={league?.standings ?? []} label={league?.label ?? "Turnīra tabula"} />
+                <div className="overflow-hidden rounded-3xl border border-white/15 bg-transparent text-white [&_thead_tr]:border-0 [&_thead_tr]:bg-club-navy-light [&_thead_th]:py-4 [&_tbody_tr]:border-white/10 [&_tbody_tr:last-child]:border-b-0 [&_.text-club-red]:text-rose-300 [&_p]:text-white/65"><StandingsTable rows={league?.standings ?? []} label={league?.label ?? "Turnīra tabula"} /></div>
               </>
             ) : displayedGames.length > 0 ? (
               <UpcomingMatches games={displayedGames} leagues={teamLeagues} completed={view === "results"} />

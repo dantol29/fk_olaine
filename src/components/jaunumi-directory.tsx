@@ -66,7 +66,7 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
   );
 
   return (
-    <div className="bg-white">
+    <div className="public-news bg-club-navy">
       <nav aria-label="Jaunumu kategorijas" className="bg-white px-6 shadow-[0_5px_16px_rgb(0_0_0/0.08)] sm:px-10 lg:px-14">
         <div className="mx-auto flex max-w-[1920px] gap-6 overflow-x-auto sm:gap-10">
           {(["Visi", ...CATEGORIES] as const).map((category) => (
@@ -80,7 +80,7 @@ export function JaunumiDirectory({ articles }: { articles: Article[] }) {
 
       <section aria-labelledby="all-news-heading" className="px-6 pt-12 pb-10 sm:px-10 sm:pt-14 lg:px-14">
         <div className="mx-auto max-w-[1920px]">
-          <h2 id="all-news-heading" className="mb-8 text-4xl leading-tight font-semibold text-[#262626] uppercase sm:mb-10 sm:text-5xl lg:text-6xl">{activeCategory === "Visi" ? "Visi jaunumi" : activeCategory}</h2>
+          <h2 id="all-news-heading" className="mb-8 text-4xl leading-tight font-semibold text-white uppercase sm:mb-10 sm:text-5xl lg:text-6xl">{activeCategory === "Visi" ? "Visi jaunumi" : activeCategory}</h2>
 
           {pageArticles.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

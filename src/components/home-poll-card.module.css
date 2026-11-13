@@ -21,16 +21,24 @@
 .dark .track { background: var(--club-navy-light); }
 .dark .fill:not([class*="bg-club-red"]) { background: #777; }
 .dark .footer { border-color: rgb(255 255 255 / .15); }
-.split { max-width: 1280px; display: grid; overflow: hidden; padding: 0; border: 1px solid rgb(11 22 38 / .1); border-radius: 1.5rem; grid-template-columns: 1fr 1fr; }
-.split .header { display: flex; flex-direction: column; justify-content: space-between; gap: 32px; background: var(--club-navy); color: #fff; padding: 40px; }
+.split { max-width: 1280px; display: grid; overflow: hidden; padding: 0; border: 1px solid rgb(255 255 255 / .15); border-radius: 1.5rem; background: var(--club-navy); color: white; grid-template-columns: 1fr 1fr; }
+.split .header { display: flex; flex-direction: column; justify-content: space-between; gap: 32px; background: var(--club-navy-light); color: #fff; padding: 40px; }
 .split .header h2 { font-size: clamp(24px, 2.5vw, 32px); line-height: 1.2; }
 .split .header .muted { color: rgb(255 255 255 / .55); }
 .split .body { padding: 32px 40px; }
 .split .body > :first-child { margin-top: 0; }
-.split .option { border: 1px solid rgb(11 22 38 / .12); color: var(--club-navy); padding-inline: 1rem; }
+.split .option { border: 1px solid rgb(255 255 255 / .2); color: white; padding-inline: 1rem; }
 .split .option input { accent-color: var(--club-red); }
-.split .option[data-selected] { background: rgb(11 22 38 / .04); border-color: var(--club-navy); }
-.split .option:hover { background: rgb(11 22 38 / .03); border-color: var(--club-navy); }
+.split .option[data-selected] { background: rgb(255 255 255 / .1); border-color: white; }
+.split .option:hover { background: rgb(255 255 255 / .06); border-color: rgb(255 255 255 / .55); }
+.split .option:focus-within { outline-color: white; }
+.split .body .muted, .split .body .secondary, .split .footer { color: rgb(255 255 255 / .65); }
+.split .footer { border-color: rgb(255 255 255 / .15); }
+.split .track { background: rgb(255 255 255 / .15); }
+.split .fill:not([class*="bg-club-red"]) { background: rgb(255 255 255 / .45); }
+@container (max-width: 800px) {
+  .split { grid-template-columns: 1fr; }
+}
 @media (max-width: 767px) {
   .split { grid-template-columns: 1fr; }
   .split .header { padding: 28px 24px; gap: 20px; }

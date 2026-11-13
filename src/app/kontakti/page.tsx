@@ -16,7 +16,7 @@ export default async function KontaktiPage() {
 
   return <>
     <SiteHeader />
-    <main className="bg-white text-black">
+    <main className="public-contacts bg-club-navy text-white">
       <section className="contacts-page-hero bg-black px-6 pt-6 pb-8 text-white sm:px-10 sm:pt-8 sm:pb-10 lg:px-14">
         <div className="mx-auto max-w-[1920px]"><h1 className="text-5xl leading-tight font-semibold uppercase sm:text-6xl lg:text-7xl">Kontakti</h1></div>
       </section>

@@ -26,8 +26,8 @@ function Name({ name }: { name: string }) {
 }
 
 function Portrait({ name, photoUrl, cover = false }: { name: string; photoUrl: string | null; cover?: boolean }) {
-  return <div className="relative aspect-square w-full overflow-hidden bg-white">
-    {photoUrl ? <Image src={photoUrl} alt={name} fill sizes="(min-width: 1024px) 33vw, 50vw" className={cover ? "object-contain object-bottom" : "card-hover-image object-contain object-bottom"} /> : <div className="flex h-full items-center justify-center bg-[#f5f5f5]"><UserRound className="size-24 text-black/15" strokeWidth={1} /></div>}
+  return <div className="relative aspect-square w-full overflow-hidden">
+    {photoUrl ? <Image src={photoUrl} alt={name} fill sizes="(min-width: 1024px) 33vw, 50vw" className={cover ? "object-contain object-bottom" : "card-hover-image object-contain object-bottom"} /> : <div className="flex h-full items-center justify-center"><UserRound className="size-24 text-white/25" strokeWidth={1} /></div>}
   </div>;
 }
 
@@ -54,7 +54,7 @@ export function TeamsDirectory({ teams }: { teams: Teams }) {
         </nav>
       </div>
     </section>
-    <section className="bg-white px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14">
+    <section className="public-roster bg-club-navy px-6 py-10 text-white sm:px-10 sm:py-12 lg:px-14">
       <div className="mx-auto max-w-[1440px]">
         {team ? <>
           <nav aria-label="Spēlētāju pozīcijas" className="mb-10 flex flex-nowrap gap-3 overflow-x-auto [justify-content:safe_center] sm:mb-12 sm:gap-5">
@@ -65,7 +65,7 @@ export function TeamsDirectory({ teams }: { teams: Teams }) {
             <h2 className="mb-8 text-3xl font-semibold uppercase sm:text-4xl">{group.label}</h2>
             {group.players.length ? <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-8">
               {group.players.map((item) => <button key={item.id} type="button" onClick={() => setPlayer(item)} className="card-hover flex min-w-0 flex-col text-left focus-visible:outline-black">
-                <div className="relative w-full shrink-0"><Portrait name={item.name} photoUrl={item.photoUrl} cover /><div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-3"><span className="text-2xl leading-none font-semibold tabular-nums sm:text-3xl lg:text-4xl">{item.number ?? ""}</span><Image src={nationalityFlagImage(item.nationality)} alt={nationalityName(item.nationality)} title={nationalityName(item.nationality)} width={80} height={48} className="h-6 w-8 shrink-0 object-cover sm:h-7 sm:w-9" /></div></div>
+                <div className="relative w-full shrink-0"><Portrait name={item.name} photoUrl={item.photoUrl} cover /><div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-3"><span className="text-2xl leading-none font-semibold text-white tabular-nums sm:text-3xl lg:text-4xl">{item.number ?? ""}</span><Image src={nationalityFlagImage(item.nationality)} alt={nationalityName(item.nationality)} title={nationalityName(item.nationality)} width={80} height={48} className="h-6 w-8 shrink-0 object-cover sm:h-7 sm:w-9" /></div></div>
                 <div className="w-full pt-3 text-center"><Name name={item.name} /></div>
               </button>)}
             </div> : <p className="border-t border-black/10 py-6 text-sm text-black/50">Šajā pozīcijā vēl nav pievienoti spēlētāji.</p>}

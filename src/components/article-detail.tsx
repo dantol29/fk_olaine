@@ -193,7 +193,7 @@ function ArticleShare({ title }: { title: string }) {
 
 export function ArticleDetail({ article }: { article: Article }) {
   return (
-    <section aria-label="Raksta saturs" className="bg-white pb-20 text-[#262626] sm:pb-28">
+    <section aria-label="Raksta saturs" className="public-article bg-club-navy pb-20 text-white sm:pb-28">
       <div className="flex flex-wrap items-start justify-between gap-6 px-6 py-7 sm:px-10 lg:px-14">
         <div>
           <p className="text-lg font-semibold">Autors: {article.authorName ?? "FK Olaine"}</p>

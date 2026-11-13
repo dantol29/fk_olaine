@@ -35,7 +35,7 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
   return (
     <>
       <SiteHeader />
-      <main className="bg-white text-black">
+      <main className="public-club bg-club-navy text-white">
         <section className="club-page-hero bg-black px-6 pt-6 pb-8 text-white sm:px-10 sm:pt-8 sm:pb-10 lg:px-14">
           <div className="mx-auto max-w-[1920px]">
             <h1 className="max-w-[1200px] text-5xl leading-tight font-semibold break-words uppercase sm:text-6xl lg:text-7xl">{page.title}</h1>

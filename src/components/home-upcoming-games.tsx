@@ -6,7 +6,7 @@ import { UpcomingMatches } from "@/components/upcoming-matches";
 export async function HomeUpcomingGames() {
   const [games, leagues] = await Promise.all([getAllGamesFromDb(), getLeagueLogosForDisplay()]);
   const next = games.filter((game) => !game.isPast).sort((a, b) => a.rawDate.localeCompare(b.rawDate) || a.time.localeCompare(b.time))[0];
-  return <section className="relative z-10 -mt-14 bg-transparent sm:mt-0 sm:pt-16 lg:pt-0">
+  return <section className="relative z-10 bg-transparent sm:pt-16 lg:pt-0">
     {next ? <UpcomingMatches games={[next]} leagues={leagues} showFixtures={false} /> : (
       <div className="mx-auto max-w-[1280px] 2xl:max-w-[1600px]">
         <section aria-labelledby="empty-match-heading" className="relative overflow-hidden rounded-3xl bg-club-navy px-5 pt-6 text-white shadow-[0_-6px_24px_rgba(11,22,38,0.16)] sm:px-8 sm:shadow-none">

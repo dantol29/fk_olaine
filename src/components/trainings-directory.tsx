@@ -11,7 +11,7 @@ import { CalendarEventTeams } from "@/components/calendar-event-teams";
 import { TrainingsMonthCalendar } from "@/components/trainings-month-calendar";
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
-export function TrainingRow({ training, compact = false, showTeam = false, modal = false }: { training: TrainingListItem; compact?: boolean; showTeam?: boolean; modal?: boolean }) {
+export function TrainingRow({ training, compact = false, showTeam = false, modal = false, dark = false }: { training: TrainingListItem; compact?: boolean; showTeam?: boolean; modal?: boolean; dark?: boolean }) {
   if (modal) return <article className="text-club-navy">
     <div className="flex items-center justify-between gap-3 border-b border-club-navy/10 pb-4">
       <p className="flex items-baseline gap-2"><span className="text-3xl leading-none font-semibold tabular-nums">{Number(training.day)}</span><span className="text-xs font-medium uppercase text-club-navy/55">{training.month.toLowerCase()}</span></p>
@@ -23,23 +23,23 @@ export function TrainingRow({ training, compact = false, showTeam = false, modal
       <div className="min-w-0"><p className="text-xs text-club-navy/50">Treneri</p><p className="mt-0.5 text-sm font-medium leading-snug">{training.coaches.map((coach) => coach.name).join(", ")}</p></div>
     </div>}
   </article>;
-  return <article className="border border-black/15 bg-white text-black">
+  return <article className={cn("border border-black/15 bg-white text-black", dark && "overflow-hidden rounded-3xl border-white/10 bg-club-navy-light text-white")}>
     <div className={cn("grid", compact ? "gap-8 p-4" : "gap-5 p-5 sm:grid-cols-[100px_minmax(0,1fr)] sm:gap-8 sm:p-7")}>
-      <div className={cn("flex flex-wrap items-center justify-between gap-4", !compact && "sm:block sm:border-r sm:border-black/15 sm:pr-6")}>
+      <div className={cn("flex flex-wrap items-center justify-between gap-4", !compact && "sm:block sm:border-r sm:border-black/15 sm:pr-6", dark && "sm:border-white/15")}>
         <div className="flex items-baseline gap-2">
           <p className="text-4xl leading-none font-semibold tabular-nums">{Number(training.day)}</p>
-          <p className="text-sm text-black/55 uppercase">{training.month.toLowerCase()}</p>
+          <p className={cn("text-sm text-black/55 uppercase", dark && "text-white/60")}>{training.month.toLowerCase()}</p>
         </div>
         <p className={cn("text-4xl leading-none font-semibold tabular-nums", !compact && "sm:hidden")}>{training.startTime}–{training.endTime}</p>
       </div>
       <div className="min-w-0">
         {!compact && <p className="mb-3 hidden text-4xl leading-none font-semibold tabular-nums sm:block">{training.startTime}–{training.endTime}</p>}
-        {showTeam ? <CalendarEventTeams team={training.teamName} teamNames={training.teamNames} location={training.location} /> : <p className="flex items-start gap-2 text-lg leading-snug font-medium"><MapPin className="mt-1 size-4 shrink-0 text-black/45" aria-hidden="true" /><span>{training.location}</span></p>}
+        {showTeam ? <CalendarEventTeams team={training.teamName} teamNames={training.teamNames} location={training.location} /> : <p className="flex items-start gap-2 text-lg leading-snug font-medium"><MapPin className={cn("mt-1 size-4 shrink-0 text-black/45", dark && "text-white/60")} aria-hidden="true" /><span>{training.location}</span></p>}
       </div>
     </div>
-    {training.coaches.length > 0 && <div className={cn("flex items-center gap-3 border-t border-black/10 bg-[#f7f7f7] py-3", compact ? "px-4" : "px-5 sm:px-7")}>
+    {training.coaches.length > 0 && <div className={cn("flex items-center gap-3 border-t border-black/10 bg-[#f7f7f7] py-3", compact ? "px-4" : "px-5 sm:px-7", dark && "border-white/10 bg-white/[0.03]")}>
       <CoachAvatars coaches={training.coaches} avatarClassName="size-8 text-xs" />
-      <div className="min-w-0"><p className="text-[11px] text-black/45 uppercase">Treneri</p><p className="mt-0.5 text-sm leading-snug">{training.coaches.map((coach) => coach.name).join(", ")}</p></div>
+      <div className="min-w-0"><p className={cn("text-[11px] text-black/45 uppercase", dark && "text-white/55")}>Treneri</p><p className="mt-0.5 text-sm leading-snug">{training.coaches.map((coach) => coach.name).join(", ")}</p></div>
     </div>}
   </article>;
 }
@@ -66,16 +66,16 @@ export function TrainingsDirectory({ trainings, birthdays, teams }: { trainings:
           <nav aria-label="Komandas" className="flex min-w-0 gap-6 overflow-x-auto sm:gap-8">
             {teamNames.map((name) => <button key={name} type="button" aria-pressed={activeTeam === name} onClick={() => { setActiveTeam(name); setCalendarDate(null); }} className={cn("relative shrink-0 pt-3 pb-2 text-base uppercase sm:text-lg", activeTeam === name && "font-semibold after:absolute after:inset-x-0 after:bottom-0 after:h-1 after:bg-white")}>{name}</button>)}
           </nav>
-          <div className="-mx-6 flex shrink-0 justify-end bg-white px-6 py-2 sm:-mx-10 sm:px-10 lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-1"><DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 bg-club-red px-5 text-xs font-semibold text-white uppercase lg:bg-white lg:text-black"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger></div>
+          <div className="flex shrink-0 justify-end py-2 lg:pb-1"><DrawerTrigger className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white/10 px-5 text-xs font-semibold text-white uppercase hover:bg-white/20"><CalendarDays className="size-5" aria-hidden="true" />Skatīt kalendārā</DrawerTrigger></div>
         </div>
       </div>
     </section>
-    <section className="bg-[#fafafa] px-6 pt-10 pb-16 text-black sm:px-10 sm:pt-12 lg:px-14">
+    <section className="public-trainings bg-club-navy px-6 pt-10 pb-16 text-white sm:px-10 sm:pt-12 lg:px-14">
       <div className="mx-auto max-w-[1920px]">
         {visible.length ? [...groups].map(([month, sessions]) => <section key={month} className="mb-10">
           <h2 className="mb-6 text-center text-lg font-semibold text-black/40 uppercase">{new Intl.DateTimeFormat("lv-LV", { month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${month}-15T12:00:00Z`))}</h2>
-          <div className="space-y-5">{sessions.map((training) => <TrainingRow key={training.id} training={training} />)}</div>
-        </section>) : <div className="border border-black/10 bg-white px-6 py-16 text-center"><CalendarDays className="mx-auto mb-5 size-10 text-black/30" aria-hidden="true" /><h2 className="text-xl font-semibold">Gaidāmo treniņu pašlaik nav</h2><p className="mt-3 text-sm text-black/55">{teamNames.length === 0 ? "Treniņu grafiks tiks papildināts." : "Izvēlies citu komandu vai apskati iepriekšējos treniņus kalendārā."}</p></div>}
+          <div className="space-y-5">{sessions.map((training) => <TrainingRow key={training.id} training={training} dark />)}</div>
+        </section>) : <div className="rounded-3xl border border-white/10 bg-club-navy-light px-6 py-16 text-center"><CalendarDays className="mx-auto mb-5 size-10 text-white/40" aria-hidden="true" /><h2 className="text-xl font-semibold">Gaidāmo treniņu pašlaik nav</h2><p className="mt-3 text-sm text-white/60">{teamNames.length === 0 ? "Treniņu grafiks tiks papildināts." : "Izvēlies citu komandu vai apskati iepriekšējos treniņus kalendārā."}</p></div>}
         {birthdays && <div className="mx-auto mt-16 max-w-[1280px] border-t border-black/10 pt-10">{birthdays}</div>}
       </div>
     </section>

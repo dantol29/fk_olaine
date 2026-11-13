@@ -158,13 +158,13 @@ export function MonthCalendar({
       className={cn(
         "ml-[calc(50%-50vw)] w-screen rounded-2xl bg-club-navy pt-6 pr-4 pb-4 pl-6 text-white sm:ml-0 sm:w-full sm:min-w-0 sm:max-w-full sm:pt-8 sm:pr-5 sm:pb-5 sm:pl-8 lg:rounded-b-none",
         compact && "p-5 sm:p-5",
-        home && "ml-0 w-full rounded-none bg-white px-0 pt-0 pb-0 pl-0 text-black sm:px-0 sm:pt-0 sm:pb-0",
+        home && "ml-0 w-full rounded-none bg-transparent px-0 pt-0 pb-0 pl-0 text-white sm:px-0 sm:pt-0 sm:pb-0",
         className,
       )}
     >
       <div className={cn("flex items-start justify-between gap-4 pr-4 pl-2 sm:px-0", home && "min-h-10 px-0")}>
         <h3 className={cn("text-3xl tracking-[-0.02em] sm:text-4xl", compact && "text-2xl sm:text-2xl", home && "text-2xl font-semibold uppercase sm:text-3xl")}>
-          {FULL_MONTHS_LV[month]}{events !== EMPTY_EVENTS && <span className={cn("ml-2 text-sm text-white/55", home && "font-normal text-black/55")}>{year}</span>}
+          {FULL_MONTHS_LV[month]}{events !== EMPTY_EVENTS && <span className={cn("ml-2 text-sm text-white/55", home && "font-normal")}>{year}</span>}
         </h3>
         <div className="flex shrink-0 items-center gap-2">
           <button
@@ -172,7 +172,7 @@ export function MonthCalendar({
             onClick={() => goToMonth(-1)}
             disabled={Boolean(minMonth && cursorMonth <= minMonth)}
             aria-label="Iepriekšējais mēnesis"
-            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-xl border-0 bg-club-navy text-white hover:bg-club-navy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black")}
+            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-xl border-0 bg-white/10 text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white")}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -181,15 +181,15 @@ export function MonthCalendar({
             onClick={() => goToMonth(1)}
             disabled={Boolean(maxMonth && cursorMonth >= maxMonth)}
             aria-label="Nākamais mēnesis"
-            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-xl border-0 bg-club-navy text-white hover:bg-club-navy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black")}
+            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-xl border-0 bg-white/10 text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white")}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div className={cn(home && "mt-6 overflow-hidden rounded-3xl border border-club-navy/10 lg:mt-4")}>
-      <div className={cn("mt-6 grid grid-cols-7 gap-x-1 text-center text-sm font-semibold text-white/40 uppercase sm:gap-x-2 sm:text-xs", home && "mt-0 gap-x-0 bg-club-navy text-white sm:gap-x-0")}>
+      <div className={cn(home && "mt-6 overflow-hidden rounded-3xl border border-white/15 lg:mt-4")}>
+      <div className={cn("mt-6 grid grid-cols-7 gap-x-1 text-center text-sm font-semibold text-white/40 uppercase sm:gap-x-2 sm:text-xs", home && "mt-0 gap-x-0 bg-club-navy-light text-white sm:gap-x-0")}>
         {WEEKDAY_SHORT_LV.map((label) => (
           <span key={label} className={home ? "py-3" : undefined}>{label}</span>
         ))}
@@ -213,9 +213,9 @@ export function MonthCalendar({
                 !cell.muted && !isToday && "text-white",
                 isToday && "bg-club-navy-light/70 text-white",
                 isActive && "bg-club-red text-white",
-                home && "rounded-none text-black",
-                home && cell.muted && "text-black/20",
-                home && isToday && "bg-black text-white",
+                home && "rounded-none text-white",
+                home && cell.muted && "text-white/25",
+                home && isToday && "bg-white/20 text-white",
                 home && isActive && "bg-club-red text-white",
               )}
             >
@@ -229,7 +229,7 @@ export function MonthCalendar({
           ])];
           const dot = (
             <span className="flex h-1.5 items-center justify-center gap-1" aria-hidden="true">
-              {kinds.length ? kinds.map((kind) => <span key={kind} className={cn("size-1.5 rounded-full", kind === "game" ? "bg-club-red" : kind === "training" ? (home ? "bg-black" : "bg-white") : (home ? "bg-black/40" : "bg-white/45"))} />) : <span className="size-1.5" />}
+              {kinds.length ? kinds.map((kind) => <span key={kind} className={cn("size-1.5 rounded-full", kind === "game" ? "bg-club-red" : kind === "training" ? "bg-white" : "bg-white/45")} />) : <span className="size-1.5" />}
             </span>
           );
 
@@ -237,7 +237,7 @@ export function MonthCalendar({
             return (
               <div
                 key={`${cell.year}-${cell.month}-${index}`}
-                className={cn("flex flex-col items-center justify-start gap-1.5 py-1", home && "min-h-14 border-r border-b border-black/10 py-2", home && cell.muted && "bg-black/[0.02]")}
+                className={cn("flex flex-col items-center justify-start gap-1.5 py-1", home && "min-h-14 border-r border-b border-white/10 py-2", home && cell.muted && "bg-white/[0.02]")}
               >
                 {number}
                 {dot}
@@ -259,7 +259,7 @@ export function MonthCalendar({
                 setSelectedDateKey(dateKey);
                 setDrawerOpen(true);
               }}
-              className={cn("flex flex-col items-center justify-start gap-1.5 rounded-lg py-1 transition hover:bg-white/5", home && "min-h-14 rounded-none border-r border-b border-black/10 py-2 hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black")}
+              className={cn("flex flex-col items-center justify-start gap-1.5 rounded-lg py-1 transition hover:bg-white/5", home && "min-h-14 rounded-none border-r border-b border-white/10 py-2 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white")}
             >
               {number}
               {dot}
@@ -269,8 +269,8 @@ export function MonthCalendar({
       </div>
       </div>
 
-      {events !== EMPTY_EVENTS && <div className={cn("mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/15 pt-4 text-xs text-white/65", home && "border-black/15 text-black/60")}>
-        {[{ label: "Spēles", color: "bg-club-red" }, { label: "Treniņi", color: home ? "bg-black" : "bg-white" }, { label: "Pasākumi", color: home ? "bg-black/40" : "bg-white/45" }].map(({ label, color }) => <span key={label} className="flex items-center gap-1.5"><span className={cn("size-1.5 rounded-full", color)} aria-hidden="true" />{label}</span>)}
+      {events !== EMPTY_EVENTS && <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/65">
+        {[{ label: "Spēles", color: "bg-club-red" }, { label: "Treniņi", color: "bg-white" }, { label: "Pasākumi", color: "bg-white/45" }].map(({ label, color }) => <span key={label} className="flex items-center gap-1.5"><span className={cn("size-1.5 rounded-full", color)} aria-hidden="true" />{label}</span>)}
       </div>}
       <CalendarModal open={drawerOpen} onOpenChange={setDrawerOpen}
         title={selectedDateKey ? new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${selectedDateKey}T12:00:00Z`)) : "Kalendāra notikumi"}>
