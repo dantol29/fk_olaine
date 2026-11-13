@@ -277,7 +277,7 @@ export function MonthCalendar({
         {selectedGames.length + selectedEvents.length === 0 ? (
           <p className="text-sm text-slate-400">Šajā dienā nav ieplānotu notikumu.</p>
         ) : (
-          <div className="flex flex-col gap-5">
+          <div className="divide-y divide-club-navy/15 [&>div:not(:first-child)]:pt-6 [&>div:not(:last-child)]:pb-6">
             {selectedGames.map((game) => <div key={game.id}>
               <MatchListCard game={game} league={leagueForGame(game, leagues)} completed={game.isPast} drawer showInfo={false} />
             </div>)}

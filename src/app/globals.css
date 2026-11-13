@@ -18,6 +18,9 @@
 .admin-content .rich-text-editor :is(h2, h3) { color: var(--club-navy); }
 .admin-content :is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--club-navy); outline-offset: 3px; }
 .home-content { --color-club-navy: var(--club-navy); --color-club-gray-light: #f5f5f5; }
+.home-player-info-enter { animation: home-player-info-enter 300ms ease-out both; }
+@keyframes home-player-info-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .home-player-info-enter { animation: none; } }
 /* Public dark surfaces; cards, dialogs and administration retain their own colors. */
 .public-roster nav button { border-color: rgb(255 255 255 / .35); color: white; }
 .public-roster nav button[aria-pressed="true"], .public-roster nav button:hover { background: white; color: var(--club-navy); }
@@ -66,8 +69,6 @@
 .public-article button[class*="border-black"] { border-color: rgb(255 255 255 / .5); color: white; }
 .public-article button[class*="border-black"]:hover { background: rgb(255 255 255 / .1); }
 .public-article [class*="border-black/"] { border-color: rgb(255 255 255 / .2); }
-.public-news > section:last-child button { border-color: rgb(255 255 255 / .3); color: white; }
-.public-news > section:last-child button:hover { background: rgb(255 255 255 / .1); }
 .home-match-background {
   position: absolute;
   inset: -35%;

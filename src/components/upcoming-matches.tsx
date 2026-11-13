@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Info } from "lucide-react";
 
@@ -74,6 +73,10 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
           <div aria-hidden="true" className="home-match-background" />
           <div className="relative">
             <h2 id="match-banner-heading" className={cn("sr-only font-semibold uppercase", showFixtures && "sm:not-sr-only sm:text-2xl")}>{completed ? "Pēdējā spēle" : "Nākamā spēle"}</h2>
+            {!showFixtures && !completed && <div className="ml-auto max-w-[75%] text-right">
+              <p className="text-sm font-semibold tabular-nums sm:text-base">{Number(next.day)}. {next.month.toLowerCase()} {next.year} · {next.time}</p>
+              <p className="mt-1 text-xs text-white/70 sm:text-sm">{next.venue}</p>
+            </div>}
             {showFixtures && completed && <div className="flex justify-center sm:-mt-7"><FixtureLeagueLogo league={leagueFor(next)} large /></div>}
             {showFixtures && !completed && <div className="text-center sm:mt-4">
               <p className="text-xl leading-tight font-semibold tabular-nums sm:text-3xl">{Number(next.day)}. {next.month.toLowerCase()} <span className="mx-1.5 text-white/40" aria-hidden="true">·</span> {next.time}</p>
@@ -101,7 +104,6 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
           </div>
         </section>
         {showFixtures && <VideoLink />}
-        {!showFixtures && !completed && <div className="mt-4 flex justify-center"><Link href={`/speles?team=${encodeURIComponent(next.teamName)}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 text-sm font-semibold text-white transition hover:bg-white/10"><Info className="size-4" aria-hidden="true" />Spēles informācija</Link></div>}
       </div>
 
       {showFixtures && [...groups].map(([month, fixtures]) => (

@@ -19,7 +19,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function Home() {
+export default async function Home() {
+  const poll = await HomePollsSection();
   return (
     <>
       <main className="home-content bg-club-navy text-white">
@@ -34,8 +35,10 @@ export default function Home() {
         </section>
         <section className="bg-club-navy px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-2 lg:gap-16 2xl:max-w-[1600px]">
-            <div className="min-w-0 [container-type:inline-size]"><HomePollsSection /></div>
-            <div className="flex min-w-0 flex-col gap-12"><UpcomingBirthdays /><TopScorersList /></div>
+            {poll ? <>
+              <div className="min-w-0 [container-type:inline-size]">{poll}</div>
+              <div className="flex min-w-0 flex-col gap-12"><UpcomingBirthdays /><TopScorersList /></div>
+            </> : <><UpcomingBirthdays /><TopScorersList /></>}
           </div>
         </section>
         {/* Hidden per request — kept mounted (not removed) so it's a

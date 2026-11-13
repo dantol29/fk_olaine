@@ -53,15 +53,15 @@ export async function TopScorersList({
         <h3 id="top-scorers-heading" className="text-2xl font-semibold uppercase sm:text-3xl">Bombardieri</h3>
         <span className="pb-1 text-xs text-white/55 uppercase">Vārti</span>
       </div>
-      <ol className="divide-y divide-white/10">
+      <ol className="border-t border-white/20">
         {scorers.map((scorer, index) => (
-          <li key={scorer.id} className="flex items-center gap-3 px-4 py-5 sm:gap-5 sm:px-5">
-            <span aria-label={`${index + 1}. vieta`} className={cn("w-7 shrink-0 text-2xl leading-none font-semibold tabular-nums", index === 0 ? "text-rose-300" : "text-white/40")}>{String(index + 1).padStart(2, "0")}</span>
-            <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f5f5f5] sm:h-28 sm:w-20">
-              {scorer.photoUrl ? <Image src={scorer.photoUrl} alt="" fill sizes="80px" className="object-cover object-top" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-8 text-black/20" strokeWidth={1} /></div>}
+          <li key={scorer.id} className="flex items-center gap-3 border-b border-white/10 py-4 sm:gap-5">
+            <span aria-label={`${index + 1}. vieta`} className={cn("w-8 shrink-0 text-2xl leading-none font-semibold tabular-nums sm:text-3xl", index === 0 ? "text-rose-300" : "text-white/35")}>{String(index + 1).padStart(2, "0")}</span>
+            <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-club-navy-light sm:h-28 sm:w-20">
+              {scorer.photoUrl ? <Image src={scorer.photoUrl} alt="" fill sizes="80px" className="object-cover object-top" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-8 text-white/30" strokeWidth={1} /></div>}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-base leading-tight font-semibold sm:text-xl">{scorer.name}</p>
+              <p className="text-base leading-tight font-semibold uppercase sm:text-xl">{scorer.name}</p>
               <div className="mt-2 space-y-1">
                 {scorer.teamBreakdown.map((entry) => <p key={entry.teamName} className="text-xs text-white/60">{entry.teamName}<span className="mx-1.5 text-white/30">/</span><span className="tabular-nums">{entry.goals}</span></p>)}
               </div>
