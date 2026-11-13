@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { CalendarDays, X } from "lucide-react";
 import { useState } from "react";
 
@@ -21,7 +22,8 @@ const VIEWS: { id: View; label: string }[] = [
 ];
 
 export function GamesDirectory({ games, leagues, teams }: { games: GameListItem[]; leagues: LeagueStandings[]; teams: { id: number; name: string }[] }) {
-  const [selectedTeam, setActiveTeam] = useState("");
+  const searchParams = useSearchParams();
+  const [selectedTeam, setActiveTeam] = useState(() => searchParams.get("team") ?? "");
   const [view, setView] = useState<View>("fixtures");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarDate, setCalendarDate] = useState<string | null>(null);

@@ -23,26 +23,32 @@ export async function SiteFooter() {
     <>
       {partners.length > 0 && (
         <>
-        <div aria-hidden="true" className="h-20 bg-[#e8e8e8] sm:h-24" />
-        <section id="partners" aria-labelledby="partners-heading" className="scroll-mt-24 bg-white px-6 pt-6 pb-12 text-black sm:px-12 sm:pb-14">
-          <h2 id="partners-heading" className="text-center text-lg font-semibold uppercase sm:text-xl">Kluba partneri</h2>
-          <div className="mx-auto mt-10 grid max-w-5xl grid-cols-2 items-center justify-center gap-x-6 gap-y-8 sm:mt-14 sm:flex sm:flex-wrap sm:gap-x-14">
+        <section id="partners" aria-labelledby="partners-heading" className="scroll-mt-24 bg-white px-6 pt-12 pb-12 text-black sm:px-12 sm:pt-16 sm:pb-16">
+          <div className="mx-auto max-w-[1280px] 2xl:max-w-[1600px]">
+          <h2 id="partners-heading" className="text-2xl font-semibold uppercase text-club-navy sm:text-3xl">Kluba partneri</h2>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:mt-8 sm:gap-8">
             {partners.map((partner) => {
               const image = (
                 <Image src={partner.logoUrl} alt={partner.name} width={partner.logoWidth} height={partner.logoHeight} className="max-h-14 w-auto max-w-full object-contain grayscale opacity-60 transition-[filter,opacity] duration-200 group-hover:grayscale-0 group-hover:opacity-100 group-focus-visible:grayscale-0 group-focus-visible:opacity-100 motion-reduce:transition-none sm:max-w-[160px]" />
               );
               return partner.websiteUrl ? (
-                <a key={partner.id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" className="group flex min-h-16 items-center justify-center focus-visible:outline-black">{image}</a>
-              ) : <span key={partner.id} className="group flex min-h-16 items-center justify-center">{image}</span>;
+                <a key={partner.id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" className="group flex min-h-20 w-[calc(50%-0.5rem)] items-center justify-center px-4 py-3 focus-visible:outline-black sm:w-44">{image}</a>
+              ) : <span key={partner.id} className="group flex min-h-20 w-[calc(50%-0.5rem)] items-center justify-center px-4 py-3 sm:w-44">{image}</span>;
             })}
+          </div>
           </div>
         </section>
         </>
       )}
-    <footer id="footer" className="scroll-mt-24 bg-black text-white">
-      <div className="mx-auto max-w-[1600px] px-6 py-6 sm:px-12 sm:py-8 lg:px-20">
-        <div className="flex flex-col items-center justify-between gap-x-8 gap-y-4 lg:flex-row lg:items-start">
-          <div aria-label="Sociālie tīkli" className="flex shrink-0 items-center gap-1">
+    <footer id="footer" className="scroll-mt-24 bg-club-navy text-white">
+      <div className="mx-auto max-w-[1600px] px-6 py-10 sm:px-12 sm:py-14 lg:px-20">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
+          <div className="shrink-0">
+          <Link href="/" className="inline-flex items-center gap-3 focus-visible:outline-white">
+            <Image src="/fk-olaine-crest-v2.png" alt="" width={56} height={58} className="h-14 w-auto" />
+            <span className="text-xl font-semibold">FK OLAINE</span>
+          </Link>
+          <div aria-label="Sociālie tīkli" className="mt-5 flex items-center gap-2">
             <a href="https://www.facebook.com/afaolaine.sievietes/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="motion-icon flex size-11 items-center justify-center hover:text-white/70 focus-visible:outline-white">
               <FacebookIcon className="size-7" />
             </a>
@@ -53,12 +59,13 @@ export async function SiteFooter() {
               <YouTubeIcon className="size-7" aria-hidden="true" />
             </a>
           </div>
+          </div>
 
-          <nav aria-label="Kājenes navigācija" className="flex flex-col items-center justify-center gap-x-6 gap-y-0 sm:flex-row sm:flex-wrap sm:gap-y-2 lg:justify-end lg:gap-x-9">
+          <nav aria-label="Kājenes navigācija" className="flex flex-wrap gap-x-6 gap-y-1 lg:max-w-3xl lg:justify-end lg:gap-x-9">
             {navItems.map((item) => <Link key={item.href} href={item.href} className={navLinkClass}>{item.title}</Link>)}
           </nav>
         </div>
-        <p className="mt-5 text-center text-xs text-white/45 lg:text-right">
+        <p className="mt-8 border-t border-white/15 pt-5 text-xs text-white/55 lg:text-right">
           Izstrāde:{" "}
           <a href="https://42days.eu/lv" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline focus-visible:outline-white">42days</a>
         </p>

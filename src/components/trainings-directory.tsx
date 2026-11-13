@@ -11,7 +11,18 @@ import { CalendarEventTeams } from "@/components/calendar-event-teams";
 import { TrainingsMonthCalendar } from "@/components/trainings-month-calendar";
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
-export function TrainingRow({ training, compact = false, showTeam = false }: { training: TrainingListItem; compact?: boolean; showTeam?: boolean }) {
+export function TrainingRow({ training, compact = false, showTeam = false, modal = false }: { training: TrainingListItem; compact?: boolean; showTeam?: boolean; modal?: boolean }) {
+  if (modal) return <article className="text-club-navy">
+    <div className="flex items-center justify-between gap-3 border-b border-club-navy/10 pb-4">
+      <p className="flex items-baseline gap-2"><span className="text-3xl leading-none font-semibold tabular-nums">{Number(training.day)}</span><span className="text-xs font-medium uppercase text-club-navy/55">{training.month.toLowerCase()}</span></p>
+      <p className="text-xl font-semibold tabular-nums sm:text-2xl">{training.startTime}–{training.endTime}</p>
+    </div>
+    <div className="py-4"><CalendarEventTeams team={training.teamName} teamNames={training.teamNames} location={training.location} /></div>
+    {training.coaches.length > 0 && <div className="flex items-center gap-3 border-t border-club-navy/10 pt-4">
+      <CoachAvatars coaches={training.coaches} avatarClassName="size-8 text-xs" />
+      <div className="min-w-0"><p className="text-xs text-club-navy/50">Treneri</p><p className="mt-0.5 text-sm font-medium leading-snug">{training.coaches.map((coach) => coach.name).join(", ")}</p></div>
+    </div>}
+  </article>;
   return <article className="border border-black/15 bg-white text-black">
     <div className={cn("grid", compact ? "gap-8 p-4" : "gap-5 p-5 sm:grid-cols-[100px_minmax(0,1fr)] sm:gap-8 sm:p-7")}>
       <div className={cn("flex flex-wrap items-center justify-between gap-4", !compact && "sm:block sm:border-r sm:border-black/15 sm:pr-6")}>

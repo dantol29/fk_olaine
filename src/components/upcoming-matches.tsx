@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Info } from "lucide-react";
 
@@ -69,24 +70,28 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
   return (
     <>
       <div className={cn("mx-auto max-w-[1280px]", showFixtures ? "mb-12" : "2xl:max-w-[1600px]")}>
-        <section aria-labelledby="match-banner-heading" className={cn("relative overflow-hidden bg-black px-5 pt-6 text-white sm:px-8", completed ? "min-h-[260px] pb-8 sm:min-h-[320px] sm:pb-10" : "pb-10 sm:pb-16")}>
-          <Image src="/stadions.jpg" alt="" fill sizes="100vw" className="object-cover" />
-          <div className="absolute inset-0 bg-black/75" />
+        <section aria-labelledby="match-banner-heading" className={cn("relative overflow-hidden bg-club-navy px-5 pt-6 text-white sm:px-8", !showFixtures && "rounded-3xl shadow-[0_-6px_24px_rgba(11,22,38,0.16)] sm:shadow-none", completed ? "min-h-[260px] pb-8 sm:min-h-[320px] sm:pb-10" : "pb-10 sm:pb-16")}>
+          {showFixtures && <><Image src="/stadions.jpg" alt="" fill sizes="100vw" className="object-cover" /><div className="absolute inset-0 bg-black/75" /></>}
+          {!showFixtures && <div aria-hidden="true" className="home-match-background" />}
           <div className="relative">
             <h2 id="match-banner-heading" className={cn("sr-only font-semibold uppercase", showFixtures && "sm:not-sr-only sm:text-2xl")}>{completed ? "Pēdējā spēle" : "Nākamā spēle"}</h2>
-            <div className={cn("flex justify-center", showFixtures && "sm:-mt-7")}><FixtureLeagueLogo league={leagueFor(next)} large /></div>
+            {showFixtures && completed && <div className="flex justify-center sm:-mt-7"><FixtureLeagueLogo league={leagueFor(next)} large /></div>}
+            {showFixtures && !completed && <div className="text-center sm:mt-4">
+              <p className="text-xl leading-tight font-semibold tabular-nums sm:text-3xl">{Number(next.day)}. {next.month.toLowerCase()} <span className="mx-1.5 text-white/40" aria-hidden="true">·</span> {next.time}</p>
+              <p className="mt-2 text-sm text-white/75 sm:text-base">{next.venue}</p>
+            </div>}
             <div className={cn("mx-auto grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 sm:gap-8", completed ? "mt-6 max-w-[1280px] sm:mt-10" : "mt-6 max-w-6xl sm:mt-14")}>
               <div className="flex min-w-0 flex-col-reverse items-center gap-4 lg:flex-row lg:justify-end">
                 <h3 className={cn("text-center font-semibold uppercase lg:text-right", completed ? "text-sm sm:text-2xl" : "text-sm sm:text-xl lg:text-2xl")}>{next.home.name}</h3><TeamLogo team={next.home} className={cn("!size-16 !rounded-none !bg-transparent !ring-0", completed ? "sm:!size-28" : "sm:!size-24")} />
               </div>
               <div className={cn("text-center", completed && "self-start pt-5 sm:self-center sm:pt-0")}>
+                {!completed && <span className="text-sm font-semibold text-white/60 sm:text-base">VS</span>}
                 {completed ? (
                   <div aria-label={`Rezultāts: ${next.homeScore ?? "nav pieejams"} pret ${next.awayScore ?? "nav pieejams"}`} className="grid grid-cols-[2ch_auto_2ch] items-center gap-1 text-2xl leading-none font-semibold tabular-nums sm:gap-5 sm:text-6xl lg:gap-8 lg:text-7xl">
                     <span>{next.homeScore ?? "—"}</span><span aria-hidden="true" className="text-sm font-normal sm:text-xl">:</span><span>{next.awayScore ?? "—"}</span>
                   </div>
-                ) : <><p className="text-xs font-semibold whitespace-nowrap sm:hidden">{next.time}, {Number(next.day)}. {next.month.toLowerCase()}</p><p className="hidden text-4xl font-semibold sm:block">{next.time}</p></>}
+                ) : null}
                 {completed && !hasScore(next) && <p className="mt-2 text-xs text-white/70">Rezultāts nav pieejams</p>}
-                {!completed && <><p className="mt-4 hidden text-lg font-semibold sm:block">{Number(next.day)}. {next.month.toLowerCase()} {next.year}</p><p className="mt-1 text-xs text-white/80 sm:text-sm">{next.venue}</p></>}
               </div>
               <div className="flex min-w-0 flex-col items-center gap-4 lg:flex-row">
                 <TeamLogo team={next.away} className={cn("!size-16 !rounded-none !bg-transparent !ring-0", completed ? "sm:!size-28" : "sm:!size-24")} />
@@ -96,7 +101,8 @@ export function UpcomingMatches({ games, leagues, completed = false, showFixture
             {!completed && <div className="mt-8 sm:mt-12"><Countdown game={next} /></div>}
           </div>
         </section>
-        <VideoLink />
+        {showFixtures && <VideoLink />}
+        {!showFixtures && !completed && <div className="mt-4 flex justify-center"><Link href={`/speles?team=${encodeURIComponent(next.teamName)}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-club-navy/20 px-4 text-sm font-semibold text-club-navy transition hover:bg-club-navy hover:text-white"><Info className="size-4" aria-hidden="true" />Spēles informācija</Link></div>}
       </div>
 
       {showFixtures && [...groups].map(([month, fixtures]) => (

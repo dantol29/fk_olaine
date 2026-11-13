@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { asc } from "drizzle-orm";
 import { db } from "@/db/client";
 import { teams as teamsTable } from "@/db/schema";
@@ -63,7 +64,7 @@ export default async function SpelesPage() {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(gamesJsonLd) }}
           />
         )}
-        <GamesDirectory games={games} leagues={leagues} teams={teams} />
+        <Suspense><GamesDirectory games={games} leagues={leagues} teams={teams} /></Suspense>
       </main>
       <JoinTeamCta />
       <SiteFooter />

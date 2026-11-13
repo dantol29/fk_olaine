@@ -25,18 +25,16 @@ export default function Home() {
       <main className="home-content bg-white text-black">
         <h1 className="sr-only">FK Olaine — Olaines futbola klubs</h1>
         <Hero />
+        <HomeStandingsSection upcoming={<HomeUpcomingGames />} />
         <HomeNews />
-        <HomeUpcomingGames />
-        <HomeStandingsSection />
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto max-w-[1600px] 2xl:max-w-[1920px]">
-            <HomePollsSection />
+            <HomeTeamsSection />
           </div>
         </section>
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <div className="mx-auto max-w-[1600px] 2xl:max-w-[1920px]">
-            <HomeTeamsSection />
-
+            <HomePollsSection />
           </div>
         </section>
         <section className="bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14">

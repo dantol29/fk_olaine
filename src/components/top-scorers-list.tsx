@@ -53,12 +53,12 @@ export async function TopScorersList({
         <h3 id="top-scorers-heading" className="text-2xl font-semibold uppercase sm:text-3xl">Bombardieri</h3>
         <span className="pb-1 text-xs text-black/45 uppercase">Vārti</span>
       </div>
-      <ol className="divide-y divide-black/10">
+      <ol className="divide-y divide-club-navy/10">
         {scorers.map((scorer, index) => (
-          <li key={scorer.id} className="flex items-center gap-3 py-6 sm:gap-5">
+          <li key={scorer.id} className="flex items-center gap-3 px-4 py-5 sm:gap-5 sm:px-5">
             <span aria-label={`${index + 1}. vieta`} className={cn("w-7 shrink-0 text-2xl leading-none font-semibold tabular-nums", index === 0 ? "text-club-red" : "text-black/25")}>{String(index + 1).padStart(2, "0")}</span>
-            <div className="relative h-24 w-16 shrink-0 overflow-hidden bg-[#f5f5f5] sm:h-28 sm:w-20">
-              {scorer.photoUrl ? <Image src={scorer.photoUrl} alt="" fill sizes="80px" className="object-contain object-bottom" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-8 text-black/20" strokeWidth={1} /></div>}
+            <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f5f5f5] sm:h-28 sm:w-20">
+              {scorer.photoUrl ? <Image src={scorer.photoUrl} alt="" fill sizes="80px" className="object-cover object-top" /> : <div className="flex h-full items-center justify-center"><UserRound className="size-8 text-black/20" strokeWidth={1} /></div>}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-base leading-tight font-semibold sm:text-xl">{scorer.name}</p>

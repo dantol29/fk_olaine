@@ -162,7 +162,7 @@ export function MonthCalendar({
         className,
       )}
     >
-      <div className={cn("flex items-start justify-between gap-4 pr-4 pl-2 sm:px-0", home && "px-0")}>
+      <div className={cn("flex items-start justify-between gap-4 pr-4 pl-2 sm:px-0", home && "min-h-10 px-0")}>
         <h3 className={cn("text-3xl tracking-[-0.02em] sm:text-4xl", compact && "text-2xl sm:text-2xl", home && "text-2xl font-semibold uppercase sm:text-3xl")}>
           {FULL_MONTHS_LV[month]}{events !== EMPTY_EVENTS && <span className={cn("ml-2 text-sm text-white/55", home && "font-normal text-black/55")}>{year}</span>}
         </h3>
@@ -172,7 +172,7 @@ export function MonthCalendar({
             onClick={() => goToMonth(-1)}
             disabled={Boolean(minMonth && cursorMonth <= minMonth)}
             aria-label="Iepriekšējais mēnesis"
-            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-none border-2 border-black text-black hover:border-black hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black")}
+            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-xl border-0 bg-club-navy text-white hover:bg-club-navy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black")}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -181,20 +181,21 @@ export function MonthCalendar({
             onClick={() => goToMonth(1)}
             disabled={Boolean(maxMonth && cursorMonth >= maxMonth)}
             aria-label="Nākamais mēnesis"
-            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-none border-2 border-black text-black hover:border-black hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black")}
+            className={cn("flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white transition hover:border-white/30 hover:bg-white/10 disabled:cursor-default disabled:opacity-30", home && "rounded-xl border-0 bg-club-navy text-white hover:bg-club-navy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black")}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div className={cn("mt-6 grid grid-cols-7 gap-x-1 text-center text-sm font-semibold text-white/40 uppercase sm:gap-x-2 sm:text-xs", home && "mt-6 gap-x-0 bg-black text-white sm:mt-12 sm:gap-x-0")}>
+      <div className={cn(home && "mt-6 overflow-hidden rounded-3xl border border-club-navy/10 lg:mt-4")}>
+      <div className={cn("mt-6 grid grid-cols-7 gap-x-1 text-center text-sm font-semibold text-white/40 uppercase sm:gap-x-2 sm:text-xs", home && "mt-0 gap-x-0 bg-club-navy text-white sm:gap-x-0")}>
         {WEEKDAY_SHORT_LV.map((label) => (
           <span key={label} className={home ? "py-3" : undefined}>{label}</span>
         ))}
       </div>
 
-      <div className={cn("mt-2 grid grid-cols-7 gap-x-1 gap-y-2 sm:gap-x-2 sm:gap-y-3", home && "mt-0 gap-0 border-l border-black/10 sm:gap-0")}>
+      <div className={cn("mt-2 grid grid-cols-7 gap-x-1 gap-y-2 sm:gap-x-2 sm:gap-y-3", home && "mt-0 gap-0 sm:gap-0")}>
         {cells.map((cell, index) => {
           const dateKey = toDateKey(cell.year, cell.month, cell.day);
           const dayGames = cell.muted ? [] : (gamesByDate.get(dateKey) ?? []);
@@ -266,12 +267,13 @@ export function MonthCalendar({
           );
         })}
       </div>
+      </div>
 
       {events !== EMPTY_EVENTS && <div className={cn("mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/15 pt-4 text-xs text-white/65", home && "border-black/15 text-black/60")}>
         {[{ label: "Spēles", color: "bg-club-red" }, { label: "Treniņi", color: home ? "bg-black" : "bg-white" }, { label: "Pasākumi", color: home ? "bg-black/40" : "bg-white/45" }].map(({ label, color }) => <span key={label} className="flex items-center gap-1.5"><span className={cn("size-1.5 rounded-full", color)} aria-hidden="true" />{label}</span>)}
       </div>}
       <CalendarModal open={drawerOpen} onOpenChange={setDrawerOpen}
-        title={selectedDateKey ? new Intl.DateTimeFormat("lv-LV", { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${selectedDateKey}T12:00:00Z`)) : "Kalendāra notikumi"}>
+        title={selectedDateKey ? new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${selectedDateKey}T12:00:00Z`)) : "Kalendāra notikumi"}>
         {selectedGames.length + selectedEvents.length === 0 ? (
           <p className="text-sm text-slate-400">Šajā dienā nav ieplānotu notikumu.</p>
         ) : (
@@ -282,7 +284,7 @@ export function MonthCalendar({
             {selectedEvents.map((event) => <div key={event.uid}>
               <p className="mb-2 text-xs font-semibold text-black/45 uppercase">{event.club ?? "FK Olaine"} · {event.eventType === "game" ? "Spēle" : event.eventType === "training" ? "Treniņš" : "Pasākums"}</p>
               {event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={event.gameFixture.isPast} drawer showInfo={false} />
-                : event.trainingFixture ? <TrainingRow training={event.trainingFixture} compact showTeam />
+                : event.trainingFixture ? <TrainingRow training={event.trainingFixture} modal />
                   : <article className="border border-black/10 bg-white p-5 text-black">
                     <p className="text-xl leading-none font-semibold text-black tabular-nums sm:text-2xl">{event.allDay ? "Visa diena" : `${event.timeLabel ?? ""}–${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit" }).format(new Date(event.end))}`}</p>
                     <h3 className="mt-2 text-lg font-semibold">{event.title}</h3>
