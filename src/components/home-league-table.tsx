@@ -21,8 +21,8 @@ export function HomeLeagueTable({ leagues, schedule, today, minMonth, maxMonth, 
   return (
     <section aria-labelledby="home-table-heading" className="bg-white px-6 pb-12 sm:px-10 sm:pb-16 lg:px-14">
       <div className="mx-auto grid max-w-[1280px] gap-12 text-black lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-12 lg:pt-16 2xl:max-w-[1600px]">
-        <div className="min-w-0 lg:col-span-2 lg:row-start-1">{upcoming}</div>
-        <div className="min-w-0 lg:col-start-2 lg:row-start-2">
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1">{upcoming}</div>
+        <div className="min-w-0 lg:col-span-2 lg:row-start-2">
           <div className="mb-4 flex min-h-10 items-start justify-between gap-4">
             <div className="flex min-w-0 flex-1 items-start gap-3">
               <h2 id="home-table-heading" aria-live="polite" aria-atomic="true" className="min-w-0 text-2xl leading-tight font-semibold break-words uppercase sm:text-3xl">{league?.label ?? "Turnīra tabula"}</h2>
@@ -33,10 +33,10 @@ export function HomeLeagueTable({ leagues, schedule, today, minMonth, maxMonth, 
             </div>}
           </div>
           <div className="overflow-hidden rounded-3xl border border-club-navy/10 bg-white [&_thead_tr]:border-0 [&_thead_tr]:bg-club-navy [&_thead_tr]:text-white [&_thead_th]:py-4 [&_tbody_tr:last-child]:border-b-0">
-            <StandingsTable rows={league?.standings ?? []} label={league?.label ?? "Turnīra tabula"} compact />
+            <StandingsTable rows={league?.standings ?? []} label={league?.label ?? "Turnīra tabula"} compact expandedDesktop />
           </div>
         </div>
-        <aside aria-label="Kalendārs" className="min-w-0 lg:col-start-1 lg:row-start-2">
+        <aside aria-label="Kalendārs" className="min-w-0 lg:col-start-2 lg:row-start-1">
           {schedule.sharedStatus === "stale" && <p role="status" className="mb-3 text-sm text-amber-800">AFA Olaine dati var būt novecojuši.</p>}
           {schedule.sharedStatus === "unavailable" && <p role="status" className="mb-3 text-sm text-amber-800">AFA Olaine notikumi pašlaik nav pieejami. Tiek rādīti FK Olaine notikumi.</p>}
           <MonthCalendar events={schedule.events} leagues={leagues} today={today} minMonth={minMonth} maxMonth={maxMonth} compact theme="home" />

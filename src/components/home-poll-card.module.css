@@ -21,13 +21,14 @@
 .dark .track { background: var(--club-navy-light); }
 .dark .fill:not([class*="bg-club-red"]) { background: #777; }
 .dark .footer { border-color: rgb(255 255 255 / .15); }
-.split { max-width: 1280px; display: grid; overflow: hidden; padding: 0; border: 1px solid rgb(11 22 38 / .1); grid-template-columns: 1fr 1fr; }
+.split { max-width: 1280px; display: grid; overflow: hidden; padding: 0; border: 1px solid rgb(11 22 38 / .1); border-radius: 1.5rem; grid-template-columns: 1fr 1fr; }
 .split .header { display: flex; flex-direction: column; justify-content: space-between; gap: 32px; background: var(--club-navy); color: #fff; padding: 40px; }
-.split .header h2 { font-size: clamp(28px, 3vw, 40px); }
+.split .header h2 { font-size: clamp(24px, 2.5vw, 32px); line-height: 1.2; }
 .split .header .muted { color: rgb(255 255 255 / .55); }
 .split .body { padding: 32px 40px; }
 .split .body > :first-child { margin-top: 0; }
-.split .option { border: 1px solid rgb(11 22 38 / .12); padding-inline: 1rem; }
+.split .option { border: 1px solid rgb(11 22 38 / .12); color: var(--club-navy); padding-inline: 1rem; }
+.split .option input { accent-color: var(--club-red); }
 .split .option[data-selected] { background: rgb(11 22 38 / .04); border-color: var(--club-navy); }
 .split .option:hover { background: rgb(11 22 38 / .03); border-color: var(--club-navy); }
 @media (max-width: 767px) {
