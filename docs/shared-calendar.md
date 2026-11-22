@@ -37,3 +37,21 @@ combined calendar, not to its homepage/game/team listings.
 Build and restart both applications through the existing deployment process.
 No database migration is needed for this integration. Configure and check the
 feed before treating the calendar as a complete view of stadium availability.
+
+## FK feed for AFA
+
+FK serves its own bookings at `/api/shared-calendar` with the same
+`SHARED_CALENDAR_SECRET` (`Authorization: Bearer <secret>`). AFA reads them to
+warn about venue clashes in its admin forms; it does not store them.
+
+- Query: `from` and `to` (`YYYY-MM-DD`, inclusive, at most 366 days apart).
+  The feed holds the bookings that start on those dates.
+- Response: `{ version: 1, club: "FK Olaine", timezone: "Europe/Riga", generatedAt, events }`.
+- Each event: `uid` (`fk-olaine:game-N`, `fk-olaine:training-N`, `fk-olaine:event-N`),
+  `club`, `readOnly`, `title`, `location`, `allDay`, `start`, `end` (ISO UTC), `dateKey`
+  (Riga date of `start`), `eventType` (`game`, `training`, `other`), `team`, and,
+  where they apply, `teamNames`, `homeTeam`, `awayTeam`, `homeLogo`, `awayLogo`.
+- Only these fields are shared: fixture drawer data such as coaches stays in FK.
+- A booking with an invalid time, or one that does not end after it starts, is
+  left out and logged instead of failing the feed.
+- AFA bookings are not repeated in this feed.
