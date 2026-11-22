@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { getScheduleForRange, toDateKey, type CalendarEvent } from "@/lib/calendar";
+import { rigaDateKey, splitIntoDays } from "@/lib/shared-calendar-days";
 
 export type SharedCalendarStatus = "ok" | "unconfigured" | "unavailable" | "stale";
 export type CombinedSchedule = { events: CalendarEvent[]; sharedStatus: SharedCalendarStatus; sharedError?: string; sharedUpdatedAt?: string };
@@ -9,29 +10,42 @@ class FeedError extends Error {}
 
 const label = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit" });
 
-function parseEvent(value: unknown, from: string, to: string): CalendarEvent {
-  if (!value || typeof value !== "object") throw new FeedError("AFA kalendārā ir notikums ar nederīgu datumu, laiku vai datiem.");
+const dateFormat = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", day: "2-digit", month: "2-digit", year: "numeric" });
+const weekdayFormat = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", weekday: "long" });
+const dayFormat = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", day: "2-digit" });
+const monthFormat = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", month: "short" });
+
+/** One AFA entry as FK calendar entries: one, or one per day for a multi-day event (see shared-calendar-days.ts),
+ *  keeping the days within from..to. Null when the entry is not usable; the caller skips it, so one bad entry does
+ *  not hide AFA's whole schedule. */
+function parseEvent(value: unknown, from: string, to: string): CalendarEvent[] | null {
+  if (!value || typeof value !== "object") return null;
   const row = value as Record<string, unknown>;
   const start = new Date(String(row.start));
   const end = new Date(String(row.end));
   if (typeof row.uid !== "string" || !/^afa-olaine:(game|training|event)-[0-9]+$/.test(row.uid)
     || typeof row.title !== "string" || typeof row.dateKey !== "string"
-    || row.dateKey < from || row.dateKey > to || !Number.isFinite(start.getTime())
-    || !Number.isFinite(end.getTime()) || end <= start || toDateKey(start) !== row.dateKey
+    || !Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start
+    || toDateKey(start) !== row.dateKey || row.dateKey > to || rigaDateKey(new Date(end.getTime() - 1)) < from
     || !["game", "training", "other"].includes(String(row.eventType))
     || (row.location !== null && typeof row.location !== "string")
-    || (row.team !== null && typeof row.team !== "string")) throw new FeedError("AFA kalendārā ir notikums ar nederīgu datumu, laiku vai datiem.");
-  const date = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", day: "2-digit", month: "2-digit", year: "numeric" }).format(start);
-  return {
-    uid: row.uid, title: row.title, location: row.location as string | null,
-    start, end, dateKey: row.dateKey, allDay: row.allDay === true,
-    eventType: row.eventType as CalendarEvent["eventType"], team: row.team as string | null,
-    club: "AFA Olaine", readOnly: true,
-    weekdayLabel: new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", weekday: "long" }).format(start),
-    dateLabel: date, timeLabel: label.format(start),
-    dayLabel: new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", day: "2-digit" }).format(start),
-    monthLabel: new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", month: "short" }).format(start),
-  };
+    || (row.team !== null && typeof row.team !== "string")) return null;
+  const { uid, title } = row;
+  return splitIntoDays(start, end)
+    .filter((piece) => piece.dateKey >= from && piece.dateKey <= to)
+    .map((piece) => ({
+      // The days after the first get their own ids, so each day's piece is a separate calendar entry.
+      uid: piece.part === 1 ? uid : `${uid}@${piece.dateKey}`,
+      title: piece.parts === 1 ? title : `${title} (${piece.part}. diena no ${piece.parts})`,
+      location: row.location as string | null,
+      start: piece.start, end: piece.end, dateKey: piece.dateKey, allDay: row.allDay === true,
+      eventType: row.eventType as CalendarEvent["eventType"], team: row.team as string | null,
+      club: "AFA Olaine" as const, readOnly: true,
+      weekdayLabel: weekdayFormat.format(piece.start),
+      dateLabel: dateFormat.format(piece.start), timeLabel: label.format(piece.start),
+      dayLabel: dayFormat.format(piece.start),
+      monthLabel: monthFormat.format(piece.start),
+    }));
 }
 
 type ImportedSchedule = { events: CalendarEvent[]; status: SharedCalendarStatus; error?: string; updatedAt?: string };
@@ -106,7 +120,10 @@ async function importedSchedule(after: Date, before: Date): Promise<ImportedSche
       if (!data || typeof data !== "object") throw new FeedError("AFA kalendāra atbildes formāts nav derīgs.");
       const payload = data as Record<string, unknown>;
       if (payload.version !== 1 || payload.club !== "AFA Olaine" || !Array.isArray(payload.events)) throw new FeedError("AFA kalendāra atbildes formāts nav derīgs.");
-      return payload.events.map((event) => parseEvent(event, range.from, range.to));
+      const parsed = payload.events.map((event) => parseEvent(event, range.from, range.to));
+      const skipped = parsed.filter((events) => events === null).length;
+      if (skipped > 0) console.warn(`AFA shared calendar: skipped ${skipped} invalid event(s) for ${range.from}..${range.to}`);
+      return parsed.flatMap((events) => events ?? []);
     }));
     const events = [...new Map(chunks.flat().map((event) => [event.uid, event])).values()];
     return { events, status: "ok" };

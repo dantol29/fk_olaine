@@ -23,6 +23,19 @@ AFA's SITE_URL must be its own public origin.
 - Admin calendars and availability checks always fetch fresh data with a four-second timeout.
 - Fetch ranges are split into <=366-day chunks to support three calendar years.
 
+## Multi-day AFA events
+
+Since the shared database 0.1.4 an AFA event can end on a later day. AFA's feed
+then returns every event that overlaps the requested range, so `dateKey` (the
+Riga date of `start`) can be before `from`. FK cuts such an event into one entry
+per Riga day (`src/lib/shared-calendar-days.ts`): the first from its start to
+23:59, the days between whole, the last from midnight to its end. Each piece is
+an ordinary one-day entry for the calendars and the venue checks; the pieces
+after the first get the id `<uid>@<date>` and the title "(N. diena no M)".
+
+An AFA entry that is not valid (bad time, ends before it starts, unknown type)
+is skipped and logged; it no longer hides the rest of AFA's schedule.
+
 Occupancy aliases for Olaines pilsētas stadions live in `stadium-venue.ts`.
 Add explicit aliases for equivalent venue names; keep separate pitches distinct.
 
