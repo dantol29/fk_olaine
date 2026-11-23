@@ -4,13 +4,13 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LeagueStandings } from "@/lib/league-standings-server";
-import type { CombinedSchedule } from "@/lib/shared-calendar";
+import type { CalendarEvent } from "@/lib/calendar";
 import { MonthCalendar } from "@/components/month-calendar";
 import { StandingsTable } from "@/components/standings-table";
 
-export function HomeLeagueTable({ leagues, schedule, today, minMonth, maxMonth, upcoming }: {
+export function HomeLeagueTable({ leagues, events, today, minMonth, maxMonth, upcoming }: {
   leagues: LeagueStandings[];
-  schedule: CombinedSchedule;
+  events: CalendarEvent[];
   today: string;
   minMonth: string;
   maxMonth: string;
@@ -37,9 +37,7 @@ export function HomeLeagueTable({ leagues, schedule, today, minMonth, maxMonth, 
           </div>
         </div>
         <aside aria-label="Kalendārs" className="min-w-0 text-white lg:col-start-1 lg:row-start-2">
-          {schedule.sharedStatus === "stale" && <p role="status" className="mb-3 text-sm text-amber-200">AFA Olaine dati var būt novecojuši.</p>}
-          {schedule.sharedStatus === "unavailable" && <p role="status" className="mb-3 text-sm text-amber-200">AFA Olaine notikumi pašlaik nav pieejami. Tiek rādīti FK Olaine notikumi.</p>}
-          <MonthCalendar events={schedule.events} leagues={leagues} today={today} minMonth={minMonth} maxMonth={maxMonth} compact theme="home" />
+          <MonthCalendar events={events} leagues={leagues} today={today} minMonth={minMonth} maxMonth={maxMonth} compact theme="home" />
         </aside>
       </div>
     </section>

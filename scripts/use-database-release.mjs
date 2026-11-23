@@ -17,8 +17,7 @@ if (process.argv.includes("--token-stdin")) {
 }
 if (!process.env.NODE_AUTH_TOKEN) throw new Error("Set NODE_AUTH_TOKEN to a GitHub token (classic) with read:packages before installing the private release.");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const secondApp = process.argv.slice(3).find((value) => !value.startsWith("--"));
-const targets = [root, path.resolve(secondApp ?? path.join(root, "../afaolaine_website"))];
+const targets = [root];
 for (const target of targets) {
   if (!existsSync(path.join(target, "package.json"))) throw new Error(`Application not found: ${target}`);
 }

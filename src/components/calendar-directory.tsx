@@ -1,9 +1,7 @@
 "use client";
 
-import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import type { SharedCalendarStatus } from "@/lib/shared-calendar";
 import { useState } from "react";
 
 import { leagueForGame } from "@/lib/game-league";
@@ -12,7 +10,6 @@ import type { CalendarEvent } from "@/lib/calendar";
 import { cn } from "@/lib/utils";
 import { MatchListCard } from "@/components/upcoming-matches";
 import { TrainingRow } from "@/components/trainings-directory";
-import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { CalendarModal } from "@/components/calendar-modal";
 import { CalendarEventTeams } from "@/components/calendar-event-teams";
 
@@ -23,7 +20,7 @@ const FILTERS = [
   { key: "other", label: "Pasākumi" },
 ] as const;
 const WEEKDAYS = ["Pr", "Ot", "Tr", "Ce", "Pk", "Se", "Sv"];
-const accent = { game: "bg-club-red", training: "bg-black", other: "bg-black/35" };
+const accent = { game: "bg-club-red", training: "bg-[#39e75f]", other: "bg-white ring-1 ring-black/30" };
 
 function monthOffset(month: string, offset: number) {
   const [year, number] = month.split("-").map(Number);
@@ -34,18 +31,15 @@ function dateLabel(date: string) {
   return new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", timeZone: "Europe/Riga" }).format(new Date(`${date}T12:00:00Z`));
 }
 
-export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth, sharedStatus, sharedError, sharedUpdatedAt, admin = false }: { sharedUpdatedAt?: string; sharedError?: string; sharedStatus?: SharedCalendarStatus; admin?: boolean; events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
+export function CalendarDirectory({ events, leagues = [], teamOptions, today, minMonth, maxMonth, admin = false }: { admin?: boolean; events: CalendarEvent[]; leagues?: LeagueStandings[]; teamOptions: { id: number; name: string }[]; today: string; minMonth: string; maxMonth: string }) {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [team, setTeam] = useState("Visas komandas");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [showAfa, setShowAfa] = useState(true);
-  const [errorOpen, setErrorOpen] = useState(false);
   const [now] = useState(() => Date.now());
-  const afaFailed = Boolean(sharedStatus && sharedStatus !== "ok");
   const teams = ["Visas komandas", ...new Set([...teamOptions.map((team) => team.name), ...events.flatMap((event) => event.teamNames ?? (event.team ? [event.team] : []))])];
-  const visible = events.filter((event) => (showAfa || event.club !== "AFA Olaine") && (team === "Visas komandas" || (event.teamNames ?? (event.team ? [event.team] : [])).includes(team) || event.team === null) && (filter === "all" || filter === event.eventType));
+  const visible = events.filter((event) => (team === "Visas komandas" || (event.teamNames ?? (event.team ? [event.team] : [])).includes(team) || event.team === null) && (filter === "all" || filter === event.eventType));
   const byDate = new Map<string, CalendarEvent[]>();
   for (const event of visible) byDate.set(event.dateKey, [...(byDate.get(event.dateKey) ?? []), event]);
   const [year, number] = month.split("-").map(Number);
@@ -69,11 +63,10 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
     </section>
     <section className={cn("bg-club-navy px-6 py-10 text-black sm:px-10 sm:py-12 lg:px-14", !admin && "public-calendar text-white")}>
       <div className={cn("mx-auto max-w-[1440px] rounded-3xl bg-white p-4 sm:p-8", !admin && "bg-transparent px-0 sm:px-0")}>
-        {sharedStatus === "stale" && <p role="status" className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">AFA Olaine dati ir novecojuši. Tiek rādīts pēdējais veiksmīgi ielādētais kalendārs{sharedUpdatedAt ? ` (${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", dateStyle: "short", timeStyle: "short" }).format(new Date(sharedUpdatedAt))})` : ""}. Aktuālo stadiona pieejamību nevar apstiprināt.</p>}
         <div aria-label="Notikumu veids" className="mx-auto mb-10 flex w-fit max-w-full overflow-x-auto border-b border-black/10">{FILTERS.map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} onClick={() => setFilter(item.key)} className={cn("shrink-0 border-b-4 px-4 pt-3 pb-1 text-sm font-semibold uppercase sm:px-8 sm:text-lg", filter === item.key ? "border-black" : "border-transparent text-black/40")}>{item.label}</button>)}</div>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold uppercase sm:text-3xl">{new Intl.DateTimeFormat("lv-LV", { month: "long", year: "numeric", timeZone: "Europe/Riga" }).format(new Date(`${month}-15T12:00:00Z`))}</h2>
-          <div className="flex items-center gap-3"><button type="button" aria-pressed={afaFailed ? undefined : showAfa} aria-haspopup={afaFailed ? "dialog" : undefined} aria-label={afaFailed ? "AFA Olaine kalendāra kļūda — rādīt informāciju" : "Rādīt AFA Olaine notikumus"} title={afaFailed ? "AFA Olaine kalendāra kļūda" : showAfa ? "Paslēpt AFA Olaine notikumus" : "Rādīt AFA Olaine notikumus"} onClick={() => afaFailed ? setErrorOpen(true) : setShowAfa((value) => !value)} className={cn("grid size-11 shrink-0 place-items-center border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black", afaFailed ? "border-red-600 bg-red-600 hover:bg-red-700" : showAfa ? "border-black bg-black" : "border-black/20 bg-white hover:border-black/50")}><Image src="/afa-olaine-logo.png" alt="" width={32} height={32} className={cn("size-8 object-contain transition-opacity", !afaFailed && !showAfa && "opacity-35 grayscale")} /></button><button type="button" onClick={() => setMonth(today.slice(0, 7))} className="min-h-11 border-2 border-black px-4 text-xs font-semibold uppercase hover:bg-black hover:text-white">Šodien</button><button type="button" aria-label="Iepriekšējais mēnesis" disabled={month <= minMonth} onClick={() => setMonth(monthOffset(month, -1))} className={controlClass}><ChevronLeft className="size-5" /></button><button type="button" aria-label="Nākamais mēnesis" disabled={month >= maxMonth} onClick={() => setMonth(monthOffset(month, 1))} className={controlClass}><ChevronRight className="size-5" /></button></div>
+          <div className="flex items-center gap-3"><button type="button" onClick={() => setMonth(today.slice(0, 7))} className="min-h-11 border-2 border-black px-4 text-xs font-semibold uppercase hover:bg-black hover:text-white">Šodien</button><button type="button" aria-label="Iepriekšējais mēnesis" disabled={month <= minMonth} onClick={() => setMonth(monthOffset(month, -1))} className={controlClass}><ChevronLeft className="size-5" /></button><button type="button" aria-label="Nākamais mēnesis" disabled={month >= maxMonth} onClick={() => setMonth(monthOffset(month, 1))} className={controlClass}><ChevronRight className="size-5" /></button></div>
         </div>
         <div className="grid grid-cols-7 border-x border-t border-black/10 bg-black text-white">{WEEKDAYS.map((day) => <span key={day} className="py-3 text-center text-xs font-semibold uppercase sm:text-sm">{day}</span>)}</div>
         <div className="grid grid-cols-7 border-t border-l border-black/10">
@@ -81,7 +74,7 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
             const dayEvents = byDate.get(cell.key) ?? [];
             return <button key={cell.key} type="button" disabled={cell.muted} aria-label={`${dateLabel(cell.key)}, ${dayEvents.length} notikumi`} aria-pressed={selectedDate === cell.key} onClick={() => { setSelectedDate(cell.key); setOpen(true); }} className={cn("flex min-h-20 min-w-0 flex-col items-center border-r border-b border-black/10 p-2 text-left sm:min-h-36 sm:items-start sm:p-3 lg:min-h-44", cell.muted ? "bg-[#fafafa] text-black/20" : "hover:bg-[#f5f5f5]")}>
               <span className={cn("flex size-8 shrink-0 items-center justify-center text-sm font-semibold", selectedDate === cell.key ? "bg-club-red text-white" : cell.key === today && "bg-black text-white")}>{cell.day}</span>
-              {!cell.muted && <><span className="mt-2 flex gap-1 sm:hidden">{[...new Set(dayEvents.map((event) => event.eventType))].map((type) => <span key={type} className={cn("size-1.5 rounded-full", accent[type])} />)}</span><span className="mt-2 hidden w-full space-y-2 sm:block">{dayEvents.slice(0, 2).map((event) => <span key={event.uid} className="block border-l-2 border-black/15 pl-2"><span className="flex items-center gap-1.5 text-xs font-semibold"><span className={cn("size-1.5 shrink-0 rounded-full", accent[event.eventType])} />{event.timeLabel ?? "Visa diena"}</span><span className="mt-1 block line-clamp-2 text-xs leading-snug text-black/65">{event.title}</span>{(event.teamNames?.length || event.team) && <span className="mt-1 block text-[10px] text-black/65">{event.teamNames?.length ? event.teamNames.join(", ") : event.team}</span>}<span className="mt-1 block text-[10px] font-semibold text-black/45">{event.club ?? "FK Olaine"}</span></span>)}{dayEvents.length > 2 && <span className="block text-xs font-semibold">+{dayEvents.length - 2} vēl</span>}</span></>}
+              {!cell.muted && <><span className="mt-2 flex gap-1 sm:hidden">{[...new Set(dayEvents.map((event) => event.eventType))].map((type) => <span key={type} className={cn("size-1.5 rounded-full", accent[type])} />)}</span><span className="mt-2 hidden w-full space-y-2 sm:block">{dayEvents.slice(0, 2).map((event) => <span key={event.uid} className="block border-l-2 border-black/15 pl-2"><span className="flex items-center gap-1.5 text-xs font-semibold"><span className={cn("size-1.5 shrink-0 rounded-full", accent[event.eventType])} />{event.timeLabel ?? "Visa diena"}</span><span className="mt-1 block line-clamp-2 text-xs leading-snug text-black/65">{event.title}</span>{(event.teamNames?.length || event.team) && <span className="mt-1 block text-[10px] text-black/65">{event.teamNames?.length ? event.teamNames.join(", ") : event.team}</span>}<span className="mt-1 block text-[10px] font-semibold text-black/45">FK Olaine</span></span>)}{dayEvents.length > 2 && <span className="block text-xs font-semibold">+{dayEvents.length - 2} vēl</span>}</span></>}
             </button>;
           })}
         </div>
@@ -89,15 +82,9 @@ export function CalendarDirectory({ events, leagues = [], teamOptions, today, mi
         {!monthEvents.length && <p className="mt-8 border border-black/10 px-6 py-8 text-center text-sm text-black/50">Šajā mēnesī nav notikumu ar izvēlētajiem filtriem.</p>}
       </div>
     </section>
-    <Drawer swipeDirection="right" open={errorOpen} onOpenChange={setErrorOpen}>
-      <DrawerContent className="!h-dvh !max-h-dvh !w-[min(100vw,520px)] border-none bg-white data-[swipe-direction=right]:rounded-none" overlayClassName="bg-black/50">
-        <div className="flex items-center justify-between gap-4 bg-red-600 px-6 py-4 text-white"><DrawerTitle className="text-xl text-white">AFA Olaine kalendāra kļūda</DrawerTitle><DrawerClose aria-label="Aizvērt" className="grid size-11 shrink-0 place-items-center"><X className="size-6" /></DrawerClose></div>
-        <div className="space-y-4 overflow-y-auto p-6 text-black"><p>{sharedError ?? "AFA Olaine kalendāru pašlaik nevar ielādēt."}</p><p className="text-sm text-black/60">{sharedStatus === "stale" ? "FK Olaine notikumi ir aktuāli; AFA Olaine notikumi ir no pēdējās veiksmīgās ielādes un var būt novecojuši." : "Tiek rādīti tikai FK Olaine notikumi."} Stadiona pieejamību nevar pilnībā apstiprināt.</p><button type="button" onClick={() => window.location.reload()} className="min-h-11 border-2 border-black px-4 text-sm font-semibold">Mēģināt vēlreiz</button></div>
-      </DrawerContent>
-    </Drawer>
     <CalendarModal open={open} onOpenChange={setOpen} title={selectedDate ? dateLabel(selectedDate) : "Kalendārs"}>
         <div className="divide-y divide-club-navy/15 text-black [&>div:not(:first-child)]:pt-6 [&>div:not(:last-child)]:pb-6">
-          {selectedEvents.length ? selectedEvents.map((event) => <div key={event.uid}><p className="mb-2 text-xs font-semibold text-black/45 uppercase">{event.club ?? "FK Olaine"} · {FILTERS.find((item) => item.key === event.eventType)?.label}{event.readOnly && " · Tikai lasīšanai"}</p>{event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={new Date(event.start).getTime() <= now} drawer showInfo={false} /> : event.trainingFixture ? <TrainingRow training={event.trainingFixture} modal /> : <article className="border border-black/10 p-5"><p className="text-xl leading-none font-semibold text-black tabular-nums sm:text-2xl">{event.allDay ? "Visa diena" : `${event.timeLabel}–${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit" }).format(new Date(event.end))}`}</p><h3 className="mt-2 text-lg font-semibold">{event.title}</h3><CalendarEventTeams team={event.team} teamNames={event.teamNames} location={event.location} className="mt-3" /></article>}{admin && !event.readOnly && <Link href={`/admin/${event.eventType === "game" ? "games" : event.eventType === "training" ? "trainings" : "events"}/${event.uid.split("-").at(-1)}`} className="mt-3 inline-flex min-h-11 items-center border border-black/20 px-4 text-sm font-semibold">Rediģēt</Link>}</div>) : <div className="py-12 text-center"><CalendarDays className="mx-auto mb-4 size-10 text-black/25" aria-hidden="true" /><p className="text-sm text-black/50">Šajā dienā nav ieplānotu notikumu.</p></div>}
+          {selectedEvents.length ? selectedEvents.map((event) => <div key={event.uid}><p className="mb-2 text-xs font-semibold text-black/45 uppercase">FK Olaine · {FILTERS.find((item) => item.key === event.eventType)?.label}</p>{event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={new Date(event.start).getTime() <= now} drawer showInfo={false} /> : event.trainingFixture ? <TrainingRow training={event.trainingFixture} modal /> : <article className="border border-black/10 p-5"><p className="text-xl leading-none font-semibold text-black tabular-nums sm:text-2xl">{event.allDay ? "Visa diena" : `${event.timeLabel}–${new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit" }).format(new Date(event.end))}`}</p><h3 className="mt-2 text-lg font-semibold">{event.title}</h3><CalendarEventTeams team={event.team} teamNames={event.teamNames} location={event.location} className="mt-3" /></article>}{admin && <Link href={`/admin/${event.eventType === "game" ? "games" : event.eventType === "training" ? "trainings" : "events"}/${event.uid.split("-").at(-1)}`} className="mt-3 inline-flex min-h-11 items-center border border-black/20 px-4 text-sm font-semibold">Rediģēt</Link>}</div>) : <div className="py-12 text-center"><CalendarDays className="mx-auto mb-4 size-10 text-black/25" aria-hidden="true" /><p className="text-sm text-black/50">Šajā dienā nav ieplānotu notikumu.</p></div>}
         </div>
     </CalendarModal>
   </>;

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-type Booking = { uid: string; club: string; title: string; start: string; end: string };
-type Result = { sharedStatus: string; events: Booking[] };
+type Booking = { uid: string; title: string; start: string; end: string };
+type Result = { events: Booking[] };
 const clock = new Intl.DateTimeFormat("lv-LV", { timeZone: "Europe/Riga", hour: "2-digit", minute: "2-digit" });
 function wallTime(date: string, time: string) {
   const guess = new Date(`${date}T${time}:00Z`);
@@ -56,11 +56,11 @@ export function StadiumAvailability({ exclude }: { exclude?: string }) {
   const clashes = result?.events.filter((event) => start < new Date(event.end).getTime() && new Date(event.start).getTime() < end) ?? [];
   return <div ref={ref} className="mt-5 border border-black/15 bg-white p-4 text-sm" aria-live="polite">
     <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Vietas noslodze</h2><Link href="/admin/calendar" target="_blank" rel="noopener noreferrer" className="underline">Atvērt kalendāru</Link></div>
-    {!input.date || !input.location.trim() ? <p className="mt-2 text-black/55">Izvēlies datumu un vietu, lai pārbaudītu abu klubu rezervācijas.</p> : status === "loading" || status === "idle" ? <p className="mt-2 text-black/55">Pārbauda rezervācijas…</p> : status === "error" ? <p className="mt-2 text-amber-800">Pieejamību nevar pārbaudīt. Pārbaudi kalendāru pirms saglabāšanas.</p> : <>
-      {result?.sharedStatus !== "ok" && <p className="mt-2 text-amber-800">AFA Olaine rezervācijas nav pieejamas. Vietas pieejamību nevar pilnībā apstiprināt.</p>}
+    <p className="mt-2 text-black/55">Tiek pārbaudītas tikai FK Olaine rezervācijas.</p>
+    {!input.date || !input.location.trim() ? <p className="mt-2 text-black/55">Izvēlies datumu un vietu, lai pārbaudītu rezervācijas.</p> : status === "loading" || status === "idle" ? <p className="mt-2 text-black/55">Pārbauda rezervācijas…</p> : status === "error" ? <p className="mt-2 text-amber-800">Pieejamību nevar pārbaudīt. Pārbaudi kalendāru pirms saglabāšanas.</p> : <>
       {input.start && input.end && end <= start && <p className="mt-2 text-club-red">Beigu laikam jābūt pēc sākuma laika.</p>}
       {clashes.length > 0 && <p className="mt-2 font-semibold text-club-red">Izvēlētais laiks pārklājas ar {clashes.length} rezervāciju(-ām).</p>}
-      {result?.events.length ? <ul className="mt-3 space-y-3">{result.events.map((event) => <li key={event.uid} className={clashes.some((item) => item.uid === event.uid) ? "border-l-2 border-club-red pl-3" : "border-l-2 border-black/15 pl-3"}><p className="font-semibold">{event.club} · {clock.format(new Date(event.start))}–{clock.format(new Date(event.end))}</p><p className="mt-1 text-black/60">{event.title}</p></li>)}</ul> : <p className="mt-2 text-black/55">{result?.sharedStatus === "ok" ? "Šajā vietā nav reģistrētu rezervāciju." : "FK Olaine rezervāciju nav."}</p>}
+      {result?.events.length ? <ul className="mt-3 space-y-3">{result.events.map((event) => <li key={event.uid} className={clashes.some((item) => item.uid === event.uid) ? "border-l-2 border-club-red pl-3" : "border-l-2 border-black/15 pl-3"}><p className="font-semibold">{clock.format(new Date(event.start))}–{clock.format(new Date(event.end))}</p><p className="mt-1 text-black/60">{event.title}</p></li>)}</ul> : <p className="mt-2 text-black/55">Šajā vietā nav reģistrētu FK Olaine rezervāciju.</p>}
     </>}
   </div>;
 }

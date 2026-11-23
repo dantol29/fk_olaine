@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
-import { getCombinedScheduleForRange } from "@/lib/shared-calendar";
-import { rigaWallClockToUtc } from "@/lib/calendar";
-import { normalizeVenue } from "@/lib/stadium-venue";
+import { getScheduleForRange, rigaWallClockToUtc } from "@/lib/calendar";
+import { bookingsForVenueOnDay } from "@/lib/stadium-venue";
 
 export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
@@ -17,8 +16,11 @@ export async function GET(request: NextRequest) {
   try {
     // Include the previous day to catch overnight bookings.
     const previous = new Date(date); previous.setUTCDate(previous.getUTCDate() - 1);
-    const schedule = await getCombinedScheduleForRange(previous, date);
-    return NextResponse.json({ sharedStatus: schedule.sharedStatus, events: schedule.events.filter((event) => event.uid !== exclude && event.end.getTime() > rigaWallClockToUtc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0).getTime() && event.location && normalizeVenue(event.location) === normalizeVenue(location)).map((event) => ({ uid: event.uid, club: event.club, title: event.title, start: event.start, end: event.end })) }, { headers });
+    const events = await getScheduleForRange(previous, date);
+    const dayStart = rigaWallClockToUtc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0);
+    const next = new Date(date); next.setUTCDate(next.getUTCDate() + 1);
+    const dayEnd = rigaWallClockToUtc(next.getUTCFullYear(), next.getUTCMonth() + 1, next.getUTCDate(), 0, 0);
+    return NextResponse.json({ events: bookingsForVenueOnDay(events, location, dayStart, dayEnd, exclude).map((event) => ({ uid: event.uid, title: event.title, start: event.start, end: event.end })) }, { headers });
   } catch {
     return NextResponse.json({ error: "Unable to check availability" }, { status: 503, headers });
   }

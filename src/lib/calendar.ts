@@ -8,8 +8,6 @@ import type { TrainingListItem } from "@/lib/trainings-server";
 
 export type CalendarEvent = {
   uid: string;
-  club?: "FK Olaine" | "AFA Olaine";
-  readOnly?: boolean;
   title: string;
   location: string | null;
   allDay: boolean;

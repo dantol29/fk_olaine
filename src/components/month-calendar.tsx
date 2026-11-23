@@ -229,7 +229,7 @@ export function MonthCalendar({
           ])];
           const dot = (
             <span className="flex h-1.5 items-center justify-center gap-1" aria-hidden="true">
-              {kinds.length ? kinds.map((kind) => <span key={kind} className={cn("size-1.5 rounded-full", kind === "game" ? "bg-club-red" : kind === "training" ? "bg-white" : "bg-white/45")} />) : <span className="size-1.5" />}
+              {kinds.length ? kinds.map((kind) => <span key={kind} className={cn("size-1.5 rounded-full", kind === "game" ? "bg-club-red" : kind === "training" ? "bg-[#39e75f]" : "bg-white")} />) : <span className="size-1.5" />}
             </span>
           );
 
@@ -270,7 +270,7 @@ export function MonthCalendar({
       </div>
 
       {events !== EMPTY_EVENTS && <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/65">
-        {[{ label: "Spēles", color: "bg-club-red" }, { label: "Treniņi", color: "bg-white" }, { label: "Pasākumi", color: "bg-white/45" }].map(({ label, color }) => <span key={label} className="flex items-center gap-1.5"><span className={cn("size-1.5 rounded-full", color)} aria-hidden="true" />{label}</span>)}
+        {[{ label: "Spēles", color: "bg-club-red" }, { label: "Treniņi", color: "bg-[#39e75f]" }, { label: "Pasākumi", color: "bg-white" }].map(({ label, color }) => <span key={label} className="flex items-center gap-1.5"><span className={cn("size-1.5 rounded-full", color)} aria-hidden="true" />{label}</span>)}
       </div>}
       <CalendarModal open={drawerOpen} onOpenChange={setDrawerOpen}
         title={selectedDateKey ? new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${selectedDateKey}T12:00:00Z`)) : "Kalendāra notikumi"}>
@@ -282,7 +282,7 @@ export function MonthCalendar({
               <MatchListCard game={game} league={leagueForGame(game, leagues)} completed={game.isPast} drawer showInfo={false} />
             </div>)}
             {selectedEvents.map((event) => <div key={event.uid}>
-              <p className="mb-2 text-xs font-semibold text-black/45 uppercase">{event.club ?? "FK Olaine"} · {event.eventType === "game" ? "Spēle" : event.eventType === "training" ? "Treniņš" : "Pasākums"}</p>
+              <p className="mb-2 text-xs font-semibold text-black/45 uppercase">FK Olaine · {event.eventType === "game" ? "Spēle" : event.eventType === "training" ? "Treniņš" : "Pasākums"}</p>
               {event.gameFixture ? <MatchListCard game={event.gameFixture} league={leagueForGame(event.gameFixture, leagues)} completed={event.gameFixture.isPast} drawer showInfo={false} />
                 : event.trainingFixture ? <TrainingRow training={event.trainingFixture} modal />
                   : <article className="border border-black/10 bg-white p-5 text-black">
