@@ -8,6 +8,8 @@
 # - The uploads folder is packed into BACKUP_DIR/uploads.<date-time>.tar.gz. The newest KEEP_UPLOADS_BACKUPS archives
 #   are kept (default 10).
 # The new copies are made first; only then are older ones removed, so a failed run never loses an existing backup.
+# - The time stamp and the commands that restore this copy are written to .last-backup in the application folder
+#   (LAST_BACKUP_FILE moves it); npm run build:hosting and npm run db:migrate read it (scripts/deploy-status.mjs).
 # Override the locations with DATA_DIR, BACKUP_DIR and UPLOADS_SRC.
 set -euo pipefail
 
@@ -17,6 +19,7 @@ BACKUP_DIR="${BACKUP_DIR:-$HOME/fk_olaine-backups}"
 UPLOADS_SRC="${UPLOADS_SRC:-$APP_DIR/public/uploads}"
 KEEP_DB_BACKUPS="${KEEP_DB_BACKUPS:-100}"
 KEEP_UPLOADS_BACKUPS="${KEEP_UPLOADS_BACKUPS:-10}"
+LAST_BACKUP_FILE="${LAST_BACKUP_FILE:-$APP_DIR/.last-backup}"
 TS="$(date +%Y%m%d-%H%M%S)"
 STAMP='[0-9]{8}-[0-9]{6}'
 
@@ -55,10 +58,26 @@ for ts in $(ls "$BACKUP_DIR" | sed -nE "s/^uploads\.($STAMP)\.tar\.gz$/\1/p" | s
   rm -f "$BACKUP_DIR/uploads.$ts.tar.gz"
 done
 
+# Restoring: the newer database's -journal/-wal/-shm files must go first, or SQLite would replay them onto the old copy.
+RESTORE_DB="rm -f $DATA_DIR/app.db-journal $DATA_DIR/app.db-wal $DATA_DIR/app.db-shm && cp -p $BACKUP_DIR/app.db.$TS $DATA_DIR/app.db"
+for f in app.db-journal app.db-wal app.db-shm; do
+  if [ -e "$BACKUP_DIR/$f.$TS" ]; then
+    RESTORE_DB="$RESTORE_DB && cp -p $BACKUP_DIR/$f.$TS $DATA_DIR/$f"
+  fi
+done
+RESTORE_PHOTOS=""
+if [ -n "$UPLOADS_ARCHIVE" ]; then
+  RESTORE_PHOTOS="tar -xzf $UPLOADS_ARCHIVE -C $(dirname "$UPLOADS_SRC")"
+fi
+printf 'TS=%s\nDB_RESTORE=%s\nPHOTOS_RESTORE=%s\n' "$TS" "$RESTORE_DB" "$RESTORE_PHOTOS" > "$LAST_BACKUP_FILE"
+
 echo "TS=$TS"
 ls -l "$BACKUP_DIR" | grep "$TS"
 [ -n "$UPLOADS_ARCHIVE" ] && echo "Uploads: $archived_files files in $(basename "$UPLOADS_ARCHIVE")"
 echo "Kept: $(ls "$BACKUP_DIR" | grep -cE "^app\.db\.$STAMP$" || true) database copies (limit $KEEP_DB_BACKUPS), $(ls "$BACKUP_DIR" | grep -cE "^uploads\.$STAMP\.tar\.gz$" || true) uploads archives (limit $KEEP_UPLOADS_BACKUPS)."
-echo "To roll back the database: stop the app, cp -p $BACKUP_DIR/app.db.$TS $DATA_DIR/app.db, start the app."
-[ -n "$UPLOADS_ARCHIVE" ] && echo "To restore the photos: tar -xzf $UPLOADS_ARCHIVE -C $(dirname "$UPLOADS_SRC")"
+echo "To roll back the database: stop the app in Setup Node.js App, run: $RESTORE_DB — then start the app."
+if [ -n "$RESTORE_PHOTOS" ]; then
+  echo "To restore the photos: $RESTORE_PHOTOS"
+fi
+echo "Recorded in $LAST_BACKUP_FILE; npm run build:hosting and npm run db:migrate accept a backup up to 2 hours old."
 exit 0

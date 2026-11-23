@@ -140,3 +140,38 @@ test("a wrong hosting environment stops the build before anything is copied or b
     assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "working-build");
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test("packages that differ from package-lock.json stop the build before anything is built", async () => {
+  const root = fixture();
+  try {
+    let built = false;
+    await assert.rejects(buildForHosting({
+      root,
+      logDir: path.join(root, "logs"),
+      checkPackages: () => ["@olaine/database: installed 0.1.3, package-lock.json has 0.1.4"],
+      runBuild: async () => { built = true; return { code: 0, signal: null }; },
+    }), /installed 0\.1\.3[\s\S]*Run npm install/);
+    assert.equal(built, false);
+    assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "working-build");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("on the host a build needs a fresh backup, unless BUILD_WITHOUT_BACKUP is set", async () => {
+  const root = fixture();
+  const onHost = () => ({ onHost: true, database: "file:/home/site-data/app.db" });
+  const build = async ({ cwd }) => {
+    mkdirSync(path.join(cwd, ".next"));
+    writeFileSync(path.join(cwd, ".next/BUILD_ID"), "new-build");
+    return { code: 0, signal: null };
+  };
+  try {
+    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => null, allowNoBackup: false, runBuild: build }),
+      /No database backup[\s\S]*bash scripts\/backup-db\.sh/);
+    assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "working-build");
+    const old = { ts: "20261124-070000", ageMinutes: 300, restoreDatabase: "cp -p b a", restorePhotos: null };
+    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => old, allowNoBackup: false, runBuild: build }),
+      /300 minutes old/);
+    await buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => null, allowNoBackup: true, runBuild: build });
+    assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "new-build");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

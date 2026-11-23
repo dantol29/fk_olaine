@@ -11,6 +11,11 @@
 //
 // The build reads the database, so it first runs scripts/check-hosting-env.mjs: on the host it stops when another
 // site's environment (or none) is active, and it prints the database it will read.
+//
+// Before building it also stops when the installed packages do not match package-lock.json (run `npm install` first)
+// and, on the host, when no database backup was made in the last two hours (`bash scripts/backup-db.sh`;
+// BUILD_WITHOUT_BACKUP=1 builds anyway). After a build, and after a rollback, it prints how to undo the deploy: the
+// build, the database and the packages (scripts/deploy-status.mjs).
 
 import { spawn } from "node:child_process";
 import { cpSync, createWriteStream, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
@@ -19,6 +24,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { checkHostingEnv } from "./check-hosting-env.mjs";
+import { BACKUP_MAX_AGE_MINUTES, backupProblem, currentCommit, packageMismatches, readLastBackup, recoveryLines } from "./deploy-status.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const excluded = new Set([".git", ".codex", ".agents", ".aws", ".impeccable", ".build-work", "uploads", "coverage"]);
@@ -105,11 +111,27 @@ export async function buildForHosting({
   allowLogErrors = process.env.BUILD_ALLOW_LOG_ERRORS === "1",
   now = new Date(),
   checkEnv = (siteRoot) => checkHostingEnv({ root: siteRoot }),
+  checkPackages = packageMismatches,
+  readBackup = readLastBackup,
+  allowNoBackup = process.env.BUILD_WITHOUT_BACKUP === "1",
 } = {}) {
   const heap = Number(heapMb);
   if (!Number.isInteger(heap) || heap < 256 || heap > 4096) throw new Error("BUILD_HEAP_MB must be an integer between 256 and 4096.");
-  const { database } = checkEnv(root);
+  const { onHost, database } = checkEnv(root);
   console.log(`Database: ${database}`);
+  console.log(`Code: ${currentCommit(root)}`);
+  const mismatches = checkPackages(root);
+  if (mismatches.length > 0) {
+    throw new Error(`The installed packages do not match package-lock.json; nothing has been built or changed:\n`
+      + `${mismatches.map((line) => `  ${line}`).join("\n")}\nRun npm install, then npm run build:hosting again.`);
+  }
+  const backup = readBackup(root);
+  const missingBackup = onHost ? backupProblem(backup) : null;
+  if (missingBackup && !allowNoBackup) {
+    throw new Error(`${missingBackup} Nothing has been built or changed. Run bash scripts/backup-db.sh first `
+      + `(it must be less than ${BACKUP_MAX_AGE_MINUTES} minutes old), or BUILD_WITHOUT_BACKUP=1 npm run build:hosting to build anyway.`);
+  }
+  if (backup) console.log(`Last backup: ${backup.ts} (${backup.ageMinutes} min ago).`);
   const { work, release } = lockBuild(root);
   let staging;
   try {
@@ -153,6 +175,7 @@ export async function buildForHosting({
     promote(root, candidate, work);
     restart(root);
     console.log("Build installed; previous complete build retained in .next.previous; Passenger restart requested.");
+    console.log(recoveryLines(root, backup).join("\n"));
   } finally {
     if (staging) rmSync(staging, { recursive: true, force: true });
     release();
@@ -175,6 +198,10 @@ export function rollbackBuild(root = projectRoot) {
     if (hadLive) renameSync(swap, previous);
     restart(root);
     console.log("Previous build restored; Passenger restart requested.");
+    const backup = readLastBackup(root);
+    console.log(backup?.restoreDatabase
+      ? `The database was not changed. If this deploy ran db:migrate, restore it too: stop the app in Setup Node.js App, run: ${backup.restoreDatabase} — then start the app (copy ${backup.ts}).`
+      : "The database was not changed, and no backup is recorded for this site.");
   } finally { release(); }
 }
 

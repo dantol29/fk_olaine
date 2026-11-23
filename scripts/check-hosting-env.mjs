@@ -8,12 +8,15 @@
 // - another site's environment is active (the prompt still shows it after `cd`): a migration would change that
 //   site's database;
 // - no environment is active: the database defaults to an empty ./local.db and a migration "succeeds" on it.
-// Both stop here. Off the host (no ~/nodevenv) the check only reports the database.
+// Both stop here. Off the host (no ~/nodevenv) the check only reports the database. With --require-backup (used by
+// `npm run db:migrate`) it also stops on the host when no database backup was made in the last two hours.
 
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+
+import { BACKUP_MAX_AGE_MINUTES, backupProblem, readLastBackup } from "./deploy-status.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 /** A database on the host must be an absolute file or a remote libSQL URL, never the relative development default. */
@@ -59,7 +62,12 @@ export function checkHostingEnv({ root = projectRoot, env = process.env, home = 
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const { database } = checkHostingEnv();
+    const { onHost, database } = checkHostingEnv();
+    // `npm run db:migrate` passes --require-backup: a migration changes the live database, so it needs a fresh copy.
+    const missingBackup = onHost && process.argv.includes("--require-backup") ? backupProblem(readLastBackup(projectRoot)) : null;
+    if (missingBackup) {
+      throw new Error(`${missingBackup} Run bash scripts/backup-db.sh first (it must be less than ${BACKUP_MAX_AGE_MINUTES} minutes old).`);
+    }
     console.log(`Hosting check passed. Database: ${database}`);
   } catch (error) {
     console.error(`Stopped: ${error.message}`);

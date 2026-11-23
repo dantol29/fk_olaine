@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -22,10 +22,10 @@ function setup() {
   return { dir, data, backups, uploads };
 }
 
-function run({ data, backups, uploads }, extraEnv = {}) {
+function run({ dir, data, backups, uploads }, extraEnv = {}) {
   return spawnSync("bash", [script], {
     encoding: "utf8",
-    env: { ...process.env, DATA_DIR: data, BACKUP_DIR: backups, UPLOADS_SRC: uploads, ...extraEnv },
+    env: { ...process.env, DATA_DIR: data, BACKUP_DIR: backups, UPLOADS_SRC: uploads, LAST_BACKUP_FILE: path.join(dir, "last-backup"), ...extraEnv },
   });
 }
 
@@ -84,5 +84,29 @@ test("without a database it stops and removes nothing", () => {
     assert.equal(result.status, 1);
     assert.match(result.stderr, /No database/);
     assert.equal(names(paths.backups, /^app\.db\./).length, 5);
+  } finally { rmSync(paths.dir, { recursive: true, force: true }); }
+});
+
+test("records the restore command, which brings the old database back without the newer -wal file", () => {
+  const paths = setup();
+  try {
+    writeFileSync(path.join(paths.data, "app.db-wal"), "wal before");
+    const result = run(paths);
+    assert.equal(result.status, 0, result.stderr);
+    const recorded = Object.fromEntries(readFileSync(path.join(paths.dir, "last-backup"), "utf8").trim().split("\n")
+      .map((line) => [line.slice(0, line.indexOf("=")), line.slice(line.indexOf("=") + 1)]));
+    assert.match(recorded.TS, /^\d{8}-\d{6}$/);
+    assert.match(recorded.PHOTOS_RESTORE, /^tar -xzf .*uploads\.\d{8}-\d{6}\.tar\.gz -C /);
+    assert.ok(result.stdout.includes(recorded.DB_RESTORE));
+
+    // A migration later changes the database and leaves its own -wal and -shm files.
+    writeFileSync(path.join(paths.data, "app.db"), "migrated");
+    writeFileSync(path.join(paths.data, "app.db-wal"), "wal after");
+    writeFileSync(path.join(paths.data, "app.db-shm"), "shm after");
+    const restore = spawnSync("bash", ["-c", recorded.DB_RESTORE], { encoding: "utf8" });
+    assert.equal(restore.status, 0, restore.stderr);
+    assert.equal(readFileSync(path.join(paths.data, "app.db"), "utf8"), "database");
+    assert.equal(readFileSync(path.join(paths.data, "app.db-wal"), "utf8"), "wal before");
+    assert.equal(existsSync(path.join(paths.data, "app.db-shm")), false);
   } finally { rmSync(paths.dir, { recursive: true, force: true }); }
 });
