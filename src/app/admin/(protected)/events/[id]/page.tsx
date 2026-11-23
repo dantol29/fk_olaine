@@ -19,8 +19,8 @@ export default async function AdminEventFormPage({
   }
 
   const eventId = Number(id);
-  const [event] = await db.select().from(events).where(eq(events.id, eventId));
+  const event = await db.query.events.findFirst({ where: eq(events.id, eventId), with: { eventTeams: true } });
   if (!event) notFound();
 
-  return <EventForm mode="edit" event={event} teamOptions={teamOptions} />;
+  return <EventForm mode="edit" event={{ ...event, teamIds: event.eventTeams.map((link) => link.teamId) }} teamOptions={teamOptions} />;
 }

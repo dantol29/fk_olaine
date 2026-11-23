@@ -10,6 +10,7 @@ export function bookingsForVenueOnDay<T extends { uid: string; location: string 
   events: T[], location: string, dayStart: Date, dayEnd: Date, exclude: string | null,
 ): T[] {
   const venue = normalizeVenue(location);
-  return events.filter((event) => event.uid !== exclude && event.location !== null
+  // Each day of a multi-day event is "event-<id>@<date>"; all of them belong to the excluded event.
+  return events.filter((event) => event.uid.split("@")[0] !== exclude && event.location !== null
     && normalizeVenue(event.location) === venue && event.start < dayEnd && event.end > dayStart);
 }

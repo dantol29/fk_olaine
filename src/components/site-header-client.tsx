@@ -29,6 +29,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
   { title: "Sākums", href: "/" },
   { title: "Jaunumi", href: "/jaunumi" },
   { title: "Spēles", href: "/speles" },
+  { title: "Notikumi", href: "/notikumi" },
   { title: "Komandas", href: "/komandas" },
   { title: "Treniņi", href: "/treninji" },
   { title: "Kalendārs", href: "/kalendars" },

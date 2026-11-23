@@ -1,8 +1,10 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { events, games, leagueSources, teams, trainings } from "@/db/schema";
 import { resolveClubLogos } from "@/lib/club-logos";
+import { eventPath, formatEventSpan, splitIntoDays } from "@/lib/events";
+import { getTeamsByEvent } from "@/lib/events-server";
 import type { GameListItem } from "@/lib/games-server";
 import type { TrainingListItem } from "@/lib/trainings-server";
 
@@ -37,6 +39,11 @@ export type CalendarEvent = {
   gameFixture?: GameListItem;
   /** The exact fixture data used by the trainings calendar drawer. */
   trainingFixture?: TrainingListItem;
+  /** Only for an event (eventType "other"): its page, its admin id, and, for an event of several days, when it
+   *  starts and ends ("05.12. 10:00 – 07.12.2026 16:00"); each of its days is a separate calendar entry. */
+  href?: string;
+  eventId?: number;
+  span?: string;
 };
 
 function capitalize(value: string) {
@@ -193,36 +200,55 @@ async function getAdminEvents(after: Date, before: Date): Promise<CalendarEvent[
   const afterKey = toDateKey(after);
   const beforeKey = toDateKey(before);
 
-  const rows = await db
-    .select({
-      id: events.id,
-      title: events.title,
-      date: events.date,
-      startTime: events.startTime,
-      endTime: events.endTime,
-      location: events.location,
-      teamName: teams.name,
-    })
-    .from(events)
-    .leftJoin(teams, eq(events.teamId, teams.id))
-    .where(and(gte(events.date, afterKey), lte(events.date, beforeKey)));
+  const [rows, teamsByEvent] = await Promise.all([
+    db
+      .select({
+        id: events.id,
+        title: events.title,
+        date: events.date,
+        endDate: events.endDate,
+        startTime: events.startTime,
+        endTime: events.endTime,
+        location: events.location,
+      })
+      .from(events)
+      // An event of several days counts on every day it covers, so one that started earlier still shows.
+      .where(and(lte(events.date, beforeKey), gte(sql`coalesce(${events.endDate}, ${events.date})`, afterKey))),
+    getTeamsByEvent(),
+  ]);
 
-  return rows.map((row) => {
+  return rows.flatMap((row) => {
     const [year, month, day] = dateKeyToParts(row.date);
+    const [endYear, endMonth, endDay] = dateKeyToParts(row.endDate ?? row.date);
     const start = rigaWallClockToUtc(year, month, day, ...timeToParts(row.startTime));
-    const end = rigaWallClockToUtc(year, month, day, ...timeToParts(row.endTime));
-
-    return {
-      uid: `event-${row.id}`,
+    const end = rigaWallClockToUtc(endYear, endMonth, endDay, ...timeToParts(row.endTime));
+    const teamNames = teamsByEvent.get(row.id)?.map((team) => team.name) ?? [];
+    const pieces = splitIntoDays(start, end);
+    const shared = {
       title: row.title,
       location: row.location,
-      allDay: false,
-      start,
-      end,
-      eventType: "other",
-      team: row.teamName,
-      ...formatLabels(start, false),
+      eventType: "other" as const,
+      // An event without teams belongs to no team: it is not shown under a team filter.
+      team: teamNames.join(", ") || null,
+      teamNames,
+      href: eventPath(row.id, row.title),
+      eventId: row.id,
+      ...(pieces.length > 1 ? { span: formatEventSpan(row.date, row.startTime, row.endDate, row.endTime) } : {}),
     };
+    return pieces.map((piece) => {
+      const middle = piece.part > 1 && piece.part < piece.parts;
+      const labels = formatLabels(piece.start, middle);
+      return {
+        ...shared,
+        uid: piece.parts === 1 ? `event-${row.id}` : `event-${row.id}@${piece.dateKey}`,
+        allDay: middle,
+        start: piece.start,
+        end: piece.end,
+        ...labels,
+        // The last day shows when it ends; the first, when it starts; the days between are whole.
+        timeLabel: piece.parts > 1 && piece.part === piece.parts ? `līdz ${row.endTime}` : piece.parts > 1 && piece.part === 1 ? `no ${row.startTime}` : labels.timeLabel,
+      };
+    });
   });
 }
 
