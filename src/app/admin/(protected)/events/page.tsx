@@ -5,7 +5,6 @@ import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
 import { events } from "@/db/schema";
-import { formatEventSpan } from "@/lib/events";
 import { getTeamsByEvent } from "@/lib/events-server";
 
 import { deleteEvent } from "./actions";
@@ -53,19 +52,13 @@ export default async function AdminEventsPage() {
         </thead>
         <tbody>
           {rows.map((event) => (
-            <tr data-admin-search-item={`${event.title} ${event.date} ${event.startTime} ${event.teamName ?? ""}`} key={event.id} className="border-b border-black/10 last:border-0">
+            <tr data-admin-search-item={`${event.title} ${event.date} ${event.endDate ?? ""} ${event.startTime} ${event.teamName ?? ""}`} key={event.id} className="border-b border-black/10 last:border-0">
               <td className="p-4 font-semibold text-black">{event.title}</td>
-              {/* Several days: the start time goes with the first day and the end time with the last, in one cell. */}
-              {event.endDate ? (
-                <td colSpan={2} className="p-4 text-black">{formatEventSpan(event.date, event.startTime, event.endDate, event.endTime)}</td>
-              ) : (
-                <>
-                  <td className="p-4 text-black">{event.date}</td>
-                  <td className="p-4 text-black/55">
-                    {event.startTime}–{event.endTime}
-                  </td>
-                </>
-              )}
+              {/* Several days read "2026-12-12 – 2026-12-14", with the first day's start and the last day's end time. */}
+              <td className="p-4 text-black">{event.endDate ? `${event.date} – ${event.endDate}` : event.date}</td>
+              <td className="p-4 text-black/55">
+                {event.startTime}–{event.endTime}
+              </td>
               <td className="p-4 text-black/55">{event.teamName ?? "—"}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
