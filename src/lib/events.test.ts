@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { eventIdFromSlug, eventPath, formatEventSpan, parseEventInput, splitIntoDays } from "./events";
+import { parseEventInput } from "./event-input";
+import { eventIdFromSlug, eventPath, formatEventSpan, splitIntoDays } from "./events";
 
 function form(fields: Record<string, string | string[]>) {
   const data = new FormData();
