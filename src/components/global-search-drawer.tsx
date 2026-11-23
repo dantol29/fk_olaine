@@ -280,7 +280,7 @@ export function GlobalSearchDrawer({ triggerClassName, open: controlledOpen, onO
                       {results.articles.map((article) => (
                         <Link
                           key={article.slug}
-                          href={`/jaunumi/${article.slug}`}
+                          href={article.path}
                           onClick={close}
                           className="group flex items-start gap-4 py-4 text-black focus-visible:outline-black"
                         >

@@ -17,6 +17,7 @@ export async function HomeNewsCarousel({
   const articles = await getArticles();
   const items = articles.slice(0, 3).map((article) => ({
     slug: article.slug,
+    path: article.path,
     title: article.title,
     excerpt: article.excerpt,
     date: article.date,

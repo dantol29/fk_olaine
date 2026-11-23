@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 export type NewsCarouselItem = {
   slug: string;
+  path: string;
   title: string;
   excerpt: string;
   date: string;
@@ -128,14 +129,14 @@ export function NewsCarousel({
         <div key={article.slug} className={cn("relative z-10 max-w-3xl", featured && "hero-news-content")}>
           {featured && <p className="hero-news-meta mb-3 flex items-center gap-3 text-xs font-medium text-white/85">{article.date} <span>Jaunumi</span></p>}
           <Heading className={cn("relative z-10 max-w-md text-3xl text-white sm:text-4xl", featured && "max-w-3xl text-4xl leading-[1.08] font-bold tracking-tight text-balance sm:text-5xl xl:text-[3.5rem]")}>
-            <Link href={`/jaunumi/${article.slug}`}>{article.title}</Link>
+            <Link href={article.path}>{article.title}</Link>
           </Heading>
           <p className={cn("relative z-10 mt-3 line-clamp-2 max-w-md text-base text-white/70", featured && "max-w-xl text-base leading-relaxed text-white/85 sm:mt-5 sm:text-lg")}>
             {article.excerpt}
           </p>
           {featured && (
             <div className="mt-4 flex flex-wrap items-center gap-2.5">
-              <Link href={`/jaunumi/${article.slug}`} className="motion-action hero-news-read inline-flex h-11 items-center border border-white px-4 text-xs font-semibold text-white uppercase hover:bg-white/10">
+              <Link href={article.path} className="motion-action hero-news-read inline-flex h-11 items-center border border-white px-4 text-xs font-semibold text-white uppercase hover:bg-white/10">
                 Lasīt vairāk
               </Link>
             </div>

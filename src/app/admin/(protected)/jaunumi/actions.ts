@@ -7,28 +7,11 @@ import { redirect } from "next/navigation";
 import { db } from "@/db/client";
 import { articles } from "@/db/schema";
 import { requireAdminSession } from "@/lib/auth";
+import { slugify } from "@/lib/slug";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 const CATEGORIES = ["Klubs", "Komandas", "Spēles", "Treniņi", "Pasākumi"] as const;
 
-function slugify(value: string): string {
-  const withoutDiacritics = value
-    .toLowerCase()
-    .replace(/[āä]/g, "a")
-    .replace(/[čć]/g, "c")
-    .replace(/[ēé]/g, "e")
-    .replace(/ģ/g, "g")
-    .replace(/[īí]/g, "i")
-    .replace(/ķ/g, "k")
-    .replace(/ļ/g, "l")
-    .replace(/ņ/g, "n")
-    .replace(/[šś]/g, "s")
-    .replace(/[ūü]/g, "u")
-    .replace(/[žź]/g, "z");
-  return withoutDiacritics
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 function parseArticleInput(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -193,7 +176,7 @@ export async function updateArticle(
   revalidatePath("/admin/jaunumi");
   revalidatePath("/jaunumi");
   revalidatePath("/");
-  revalidatePath(`/jaunumi/${existing.slug}`);
+  revalidatePath("/jaunumi/[slug]", "page");
   redirect("/admin/jaunumi");
 }
 

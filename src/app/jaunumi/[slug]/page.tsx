@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
-import { getArticleBySlug } from "@/lib/jaunumi-server";
+import { getArticleByAddress } from "@/lib/jaunumi-server";
 import { ArticleDetail } from "@/components/article-detail";
 import { RelatedNews } from "@/components/related-news";
 import { JoinTeamCta } from "@/components/join-team-cta";
@@ -17,14 +17,14 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-  if (!article) return {};
+  const found = await getArticleByAddress((await params).slug);
+  if (!found) return {};
+  const { article } = found;
 
   return {
     title: article.title,
     description: article.excerpt,
-    alternates: { canonical: `/jaunumi/${slug}` },
+    alternates: { canonical: article.path },
     openGraph: {
       title: article.title,
       description: article.excerpt,
@@ -45,9 +45,11 @@ export default async function ArticlePage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-  if (!article) notFound();
+  const found = await getArticleByAddress((await params).slug);
+  if (!found) notFound();
+  // An old address (the slug alone) moves to the current one, /jaunumi/<slug>-<id>.
+  if (!found.isCurrentAddress) permanentRedirect(found.article.path);
+  const { article } = found;
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -64,7 +66,7 @@ export default async function ArticlePage({
       name: "FK Olaine",
       logo: { "@type": "ImageObject", url: `${SITE_URL}/fk-olaine-crest-v2.png` },
     },
-    mainEntityOfPage: `${SITE_URL}/jaunumi/${slug}`,
+    mainEntityOfPage: `${SITE_URL}${article.path}`,
   };
 
   return (
@@ -90,7 +92,7 @@ export default async function ArticlePage({
           </div>
         </section>
         <ArticleDetail article={article} />
-        <RelatedNews slug={slug} />
+        <RelatedNews slug={article.slug} />
       </main>
       <JoinTeamCta />
       <SiteFooter />
