@@ -1,13 +1,24 @@
 #!/usr/bin/env bash
-# Copies the production SQLite database (and any -journal/-wal/-shm file next to it)
-# into the backups folder, adding the date and time to each name,
-# e.g. app.db.20261112-153045. Run it on the server before every deploy.
-# Override the locations with DATA_DIR and BACKUP_DIR if they differ.
+# Backs up the production database and the uploaded photos. Run it on the server before every deploy (and, if
+# scheduled, once a day). Shared by AFA Olaine and FK Olaine; only the default data folder differs. See
+# docs/hosting.md.
+#
+# - The SQLite database (and any -journal/-wal/-shm file next to it) is copied into BACKUP_DIR with the date and time
+#   in each name, e.g. app.db.20261112-153045. The newest KEEP_DB_BACKUPS copies are kept (default 100).
+# - The uploads folder is packed into BACKUP_DIR/uploads.<date-time>.tar.gz. The newest KEEP_UPLOADS_BACKUPS archives
+#   are kept (default 10).
+# The new copies are made first; only then are older ones removed, so a failed run never loses an existing backup.
+# Override the locations with DATA_DIR, BACKUP_DIR and UPLOADS_SRC.
 set -euo pipefail
 
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA_DIR="${DATA_DIR:-$HOME/fk_olaine-data}"
 BACKUP_DIR="${BACKUP_DIR:-$HOME/fk_olaine-backups}"
+UPLOADS_SRC="${UPLOADS_SRC:-$APP_DIR/public/uploads}"
+KEEP_DB_BACKUPS="${KEEP_DB_BACKUPS:-100}"
+KEEP_UPLOADS_BACKUPS="${KEEP_UPLOADS_BACKUPS:-10}"
 TS="$(date +%Y%m%d-%H%M%S)"
+STAMP='[0-9]{8}-[0-9]{6}'
 
 if [ ! -e "$DATA_DIR/app.db" ]; then
   echo "No database at $DATA_DIR/app.db" >&2
@@ -21,6 +32,33 @@ for f in app.db app.db-journal app.db-wal app.db-shm; do
   fi
 done
 
+UPLOADS_ARCHIVE=""
+if [ -d "$UPLOADS_SRC" ]; then
+  UPLOADS_ARCHIVE="$BACKUP_DIR/uploads.$TS.tar.gz"
+  # -h stores the files a link points to, in case the uploads folder is a link to another place.
+  tar -czhf "$UPLOADS_ARCHIVE" -C "$(dirname "$UPLOADS_SRC")" "$(basename "$UPLOADS_SRC")"
+  source_files="$(find -L "$UPLOADS_SRC" -type f | wc -l | tr -d ' ')"
+  archived_files="$(tar -tzf "$UPLOADS_ARCHIVE" | grep -cv '/$' || true)"
+  if [ "$source_files" != "$archived_files" ]; then
+    echo "Uploads archive has $archived_files files, the folder has $source_files: check $UPLOADS_ARCHIVE" >&2
+    exit 1
+  fi
+else
+  echo "No uploads folder at $UPLOADS_SRC; only the database was backed up." >&2
+fi
+
+# Older copies beyond the limits: whole sets by date-time, newest first.
+for ts in $(ls "$BACKUP_DIR" | sed -nE "s/^app\.db\.($STAMP)$/\1/p" | sort -r | tail -n +"$((KEEP_DB_BACKUPS + 1))"); do
+  rm -f "$BACKUP_DIR/app.db.$ts" "$BACKUP_DIR/app.db-journal.$ts" "$BACKUP_DIR/app.db-wal.$ts" "$BACKUP_DIR/app.db-shm.$ts"
+done
+for ts in $(ls "$BACKUP_DIR" | sed -nE "s/^uploads\.($STAMP)\.tar\.gz$/\1/p" | sort -r | tail -n +"$((KEEP_UPLOADS_BACKUPS + 1))"); do
+  rm -f "$BACKUP_DIR/uploads.$ts.tar.gz"
+done
+
 echo "TS=$TS"
 ls -l "$BACKUP_DIR" | grep "$TS"
-echo "To roll back: stop the app, cp -p $BACKUP_DIR/app.db.$TS $DATA_DIR/app.db, start the app."
+[ -n "$UPLOADS_ARCHIVE" ] && echo "Uploads: $archived_files files in $(basename "$UPLOADS_ARCHIVE")"
+echo "Kept: $(ls "$BACKUP_DIR" | grep -cE "^app\.db\.$STAMP$" || true) database copies (limit $KEEP_DB_BACKUPS), $(ls "$BACKUP_DIR" | grep -cE "^uploads\.$STAMP\.tar\.gz$" || true) uploads archives (limit $KEEP_UPLOADS_BACKUPS)."
+echo "To roll back the database: stop the app, cp -p $BACKUP_DIR/app.db.$TS $DATA_DIR/app.db, start the app."
+[ -n "$UPLOADS_ARCHIVE" ] && echo "To restore the photos: tar -xzf $UPLOADS_ARCHIVE -C $(dirname "$UPLOADS_SRC")"
+exit 0

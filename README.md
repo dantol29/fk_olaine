@@ -61,7 +61,7 @@ From the cPanel terminal, in the app folder the site runs from:
 ```bash
 source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate
 cd ~/repositories/fk_olaine_code
-bash scripts/backup-db.sh          # copy of the database with the date and time; prints TS and the rollback command
+bash scripts/backup-db.sh          # database copy and photo archive with the date and time; prints the restore commands
 cat .next/BUILD_ID; echo           # the running build, to compare with afterwards
 git status -sb                     # local changes on the server (package-lock.json) must be stashed before the pull
 git stash                          # only if git status lists modified tracked files
@@ -77,7 +77,7 @@ npm run build:hosting; echo "EXIT=$?"
 cat .next/BUILD_ID; echo; ls -l --time-style=long-iso .next/BUILD_ID .next.previous/BUILD_ID
 ```
 
-A successful run ends with "Build installed; … Passenger restart requested", `EXIT=0` and a new `BUILD_ID` with today's time; the previous build stays in `.next.previous` for `npm run build:rollback`. `scripts/backup-db.sh` copies `app.db` (and any `-journal`, `-wal` or `-shm` file) from `~/fk_olaine-data` to `~/fk_olaine-backups`; set `DATA_DIR` or `BACKUP_DIR` if the database lives elsewhere. To roll the data back, stop the app in **Setup Node.js App**, copy the backup over `app.db` with `cp -p`, and start the app again.
+A successful run ends with "Build installed; … Passenger restart requested", `EXIT=0` and a new `BUILD_ID` with today's time; the previous build stays in `.next.previous` for `npm run build:rollback`. `scripts/backup-db.sh` copies the SQLite file (and any `-journal`, `-wal` or `-shm` file next to it) into `~/fk_olaine-backups` with the date and time in each name, e.g. `app.db.20261112-153045`, and packs the uploaded photos (`public/uploads`) into `uploads.<date-time>.tar.gz` there. It keeps the newest 100 database copies and the newest 10 photo archives (`KEEP_DB_BACKUPS`, `KEEP_UPLOADS_BACKUPS`) and deletes older ones only after the new copies are made. It prints the `TS` value and the commands to restore the database and the photos. Set `DATA_DIR`, `BACKUP_DIR` or `UPLOADS_SRC` if those point elsewhere. To roll the data back, stop the app in **Setup Node.js App**, copy the backup over `app.db` with `cp -p`, and start the app again.
 
 For an existing database, run `node src/db/add-header-links.mjs` against the production database when deploying the editable header stripe buttons. It adds the six name/link columns with the current button defaults and preserves existing settings. The buttons can then be edited under **Iestatījumi → Galvenes joslas pogas**.
 

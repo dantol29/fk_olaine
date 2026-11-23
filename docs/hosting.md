@@ -11,15 +11,17 @@ folder (`~`). Facts marked *checked* were seen on the server on 2026-11-23; valu
 | Application folder (the code the site runs from, a git checkout of `main`) | `~/repositories/afa_olaine` | `~/repositories/fk_olaine_code` |
 | Node.js environment (Node 24) | `~/nodevenv/repositories/afa_olaine/24` | `~/nodevenv/repositories/fk_olaine_code/24` |
 | Database (`TURSO_DATABASE_URL`) | `~/afa_olaine-data/app.db` | `~/fk_olaine-data/app.db` |
-| Database backups (`scripts/backup-db.sh`) | `~/afa_olaine-backups` | `~/fk_olaine-backups` |
+| Database copies and photo archives (`scripts/backup-db.sh`) | `~/afa_olaine-backups` | `~/fk_olaine-backups` |
+| Uploaded photos (`UPLOADS_DIR=public/uploads`) | `~/repositories/afa_olaine/public/uploads` | `~/repositories/fk_olaine_code/public/uploads` |
 | Build logs (`npm run build:hosting`) | `~/build-<date>-<time>.log` | same |
 
 - *Checked:* FK is deployed from the terminal in `~/repositories/fk_olaine_code`. The cPanel Git copy
   `~/repositories/fk_olaine` is empty and not used; `.cpanel.yml` describes that unused route.
 - *Checked:* on the FK server copy `package-lock.json` is modified locally (dependency installs on the host); it is
   stashed before `git pull`. Untracked leftovers (`--get`, `--data-urlencode`, `node_modules.backup/`) are harmless.
-- `UPLOADS_DIR` is `public/uploads` for both sites, i.e. inside the application folder (*not yet checked* whether it is
-  a link to a folder outside it). Never delete or rsync over it.
+- *Checked:* the uploaded photos are ordinary folders inside the application folders (not links): AFA 46 files, 25 MB;
+  FK 29 files, 42 MB (2026-11-23). They are untracked by git, so `git pull` leaves them alone, but never run
+  `git clean -fdx` or an rsync with `--delete` over an application folder. `scripts/backup-db.sh` archives them.
 
 ## Settings (environment variables)
 
@@ -38,8 +40,9 @@ Set only in **Setup Node.js App** of each site. There are no `.env` files in the
 - the shell does not see the settings: `echo $TURSO_DATABASE_URL` prints nothing;
 - every `node`/`npm` run does: `node -e 'console.log(process.env.TURSO_DATABASE_URL)'` prints the site's database.
   So `npm run build:hosting`, `npm run db:migrate` and any `node` script get the site's settings automatically;
-- the wrapper also sets `CL_APP_ROOT` (the application of the activated environment), `CL_VIRTUAL_ENV` and
-  `CL_NODEHOME`;
+- the wrapper also sets `CL_APP_ROOT` (the activated application, relative to the home folder, e.g.
+  `repositories/afa_olaine`), `CL_VIRTUAL_ENV` (e.g. `~/nodevenv/repositories/afa_olaine/24`) and `CL_NODEHOME`. Node gets
+  `NODE_ENV=production` for both sites;
 - the settings come from **the activated environment, not the current folder**. After
   `source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate` and `cd ~/repositories/afa_olaine`, Node gets FK's
   settings, so an AFA migration would change FK's database. The prompt shows the active environment, e.g.
@@ -71,6 +74,19 @@ source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd ~/repositori
 - FK's build printed "AFA shared calendar could not be loaded" (*checked*): FK's pages built ahead read AFA's feed and
   fall back without it; the running site shows AFA's entries (*checked* on `/kalendars`).
 
+## Backups
+
+`bash scripts/backup-db.sh` (shared; only the default folders differ) copies the database with the date and time in
+the name and packs the photos into `uploads.<date-time>.tar.gz`, keeping the newest 100 database copies and the newest
+10 photo archives; it prints the commands to restore both. Run it before every deploy. *Checked* on 2026-11-23: AFA had
+12 database copies (newest that morning), FK none; nothing runs it on a schedule yet.
+
+## Scheduled jobs
+
+*Checked* (`crontab -l`): every 6 hours at :15 the LFF fixture sync (`POST /api/cron/sync-fixtures` with
+`CRON_SECRET`) runs for each site, logging to `~/cron-sync.log` (FK) and `~/cron-sync_afa_olaine.log` (AFA). The
+top-scorer sync is not scheduled.
+
 ## Database changes
 
 1. Back up: `bash scripts/backup-db.sh` (prints `TS` and the rollback command).
@@ -78,8 +94,7 @@ source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd ~/repositori
 3. Build as above. Rolling the build back does not roll the database back; restore the backup for that (stop the app
    in Setup Node.js App, `cp -p` the backup over `app.db`, start the app).
 
-## Not yet checked
+## Disk
 
-- Scheduled jobs (`crontab -l`): the LFF fixture and top-scorer sync, and whether any backup runs on a schedule.
-- Where `public/uploads` really points for each site.
-- Free disk space and the account quota.
+*Checked:* the shared volume has about 214 GB free (79% used); the account's home folder takes 29 GB; no separate quota
+was reported.
