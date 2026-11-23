@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { UserRound } from "lucide-react";
+import { ChevronLeft, ChevronRight, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { getTeamsRoster } from "@/components/home-teams-section";
 import { PlayerInfoModal } from "@/components/player-info-modal";
@@ -9,6 +9,12 @@ import { cn } from "@/lib/utils";
 
 type Teams = Awaited<ReturnType<typeof getTeamsRoster>>;
 type Player = Teams[number]["players"][number];
+
+const arrowClass = "flex size-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+
+function snapPosition(slide: HTMLElement) {
+  return Math.max(0, slide.offsetLeft - (parseFloat(getComputedStyle(slide).scrollMarginLeft) || 0));
+}
 
 export function HomeTeamsShowcase({ teams, className }: { teams: Teams; className?: string }) {
   const [profile, setProfile] = useState<Player | null>(null);
@@ -30,27 +36,41 @@ export function HomeTeamsShowcase({ teams, className }: { teams: Teams; classNam
     const slide = rail?.children.item(next) as HTMLElement | null;
     if (rail && slide) {
       programmaticScroll.current = true;
-      rail.scrollTo({ left: slide.offsetLeft, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+      rail.scrollTo({ left: snapPosition(slide), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
       if (scrollTimer.current) clearTimeout(scrollTimer.current);
       scrollTimer.current = setTimeout(() => { programmaticScroll.current = false; }, 500);
     }
   }
 
-  return <section className={cn("relative isolate overflow-hidden bg-club-navy text-white", className)} aria-label={team.name}>
+  return <section className={cn("relative isolate bg-club-navy text-white", className)} aria-labelledby="home-players-heading">
+    <div className="mb-4 flex min-h-10 items-start justify-between gap-4">
+      <h2 id="home-players-heading" className="min-w-0 text-2xl leading-tight font-semibold break-words uppercase sm:text-3xl">Spēlētāji</h2>
+      {players.length > 1 && (
+        <div role="group" aria-label="Spēlētāju izvēle" className="flex shrink-0 items-center gap-2">
+          <button type="button" aria-label="Iepriekšējais spēlētājs" onClick={() => select((activeIndex - 1 + players.length) % players.length)} className={arrowClass}>
+            <ChevronLeft className="size-4" aria-hidden="true" />
+          </button>
+          <button type="button" aria-label="Nākamais spēlētājs" onClick={() => select((activeIndex + 1) % players.length)} className={arrowClass}>
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
+    </div>
     {selected ? <>
-      <div className="relative mt-5 sm:mt-16">
-        <div ref={railRef} role="region" aria-label={`${team.name} spēlētāji`} tabIndex={0} className="no-scrollbar relative flex snap-x snap-mandatory overflow-x-auto pt-8 after:w-[calc(100%-260px)] after:shrink-0 after:content-[''] sm:pt-28 sm:after:w-[calc(100%-280px)]" onScroll={(event) => {
+      <div className="relative overflow-hidden">
+        <div ref={railRef} role="region" aria-label={`${team.name} spēlētāji`} tabIndex={0} className="no-scrollbar relative flex snap-x snap-mandatory overflow-x-auto pt-8 [--previous-peek:72px] after:w-[calc(100%-260px-var(--previous-peek))] after:shrink-0 after:content-[''] sm:pt-28 sm:[--previous-peek:120px] lg:[--previous-peek:200px] sm:after:w-[calc(100%-280px-var(--previous-peek))]" onScroll={(event) => {
           const rail = event.currentTarget;
           if (scrollTimer.current) clearTimeout(scrollTimer.current);
           scrollTimer.current = setTimeout(() => {
             if (programmaticScroll.current) { programmaticScroll.current = false; return; }
-            const children = Array.from(rail.children) as HTMLElement[];
+            const children = Array.from(rail.querySelectorAll<HTMLElement>("[data-player-slide]"));
             if (!children.length) return;
-            const closest = children.reduce((best, child, index) => Math.abs(child.offsetLeft - rail.scrollLeft) < Math.abs(children[best].offsetLeft - rail.scrollLeft) ? index : best, 0);
+            const positions = children.map(snapPosition);
+            const closest = positions.reduce((best, left, index) => Math.abs(left - rail.scrollLeft) < Math.abs(positions[best] - rail.scrollLeft) ? index : best, 0);
             setSelectedIndex(closest);
           }, 120);
         }}>
-          {players.map((item, index) => <article key={item.id} className={cn("relative h-[420px] w-[260px] shrink-0 snap-start sm:h-[460px] sm:w-[280px]", index > 0 && "-ml-7 sm:-ml-10", index === activeIndex && "z-10")}>
+          {players.map((item, index) => <article key={item.id} data-player-slide className={cn("relative h-[420px] w-[260px] shrink-0 snap-start sm:h-[460px] sm:w-[280px]", index > 0 && "-ml-7 scroll-ml-[var(--previous-peek)] sm:-ml-10", index === activeIndex && "z-10")}>
             <div className={cn("relative h-full origin-bottom transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none", index === 0 && "origin-bottom-left", index === activeIndex ? "scale-[1.16] sm:scale-[1.23]" : "scale-[0.94]")}>
               <button type="button" aria-label={`Izvēlēties ${item.name}`} aria-pressed={index === activeIndex} onClick={() => select(index)} className="relative block h-full w-full focus-visible:outline-white">
                 {item.photoUrl ? <Image src={item.photoUrl} alt="" fill sizes="(min-width: 640px) 280px, 260px" className={cn("object-contain object-bottom transition-[filter] duration-300 motion-reduce:transition-none", index !== activeIndex && "brightness-[0.55] sm:brightness-[0.82]")} /> : <span className="flex h-full items-center justify-center"><UserRound className="size-24 text-white/20" strokeWidth={1} aria-hidden="true" /></span>}
