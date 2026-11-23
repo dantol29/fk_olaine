@@ -1,27 +1,31 @@
-import { eq } from "drizzle-orm";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { db } from "@/db/client";
-import { events, teams } from "@/db/schema";
+import { events } from "@/db/schema";
+import { getTeamsByEvent } from "@/lib/events-server";
 
 import { deleteEvent } from "./actions";
 
 export default async function AdminEventsPage() {
-  const rows = await db
-    .select({
-      id: events.id,
-      title: events.title,
-      date: events.date,
-      startTime: events.startTime,
-      endTime: events.endTime,
-      teamName: teams.name,
-    })
-    .from(events)
-    .leftJoin(teams, eq(events.teamId, teams.id))
-    .orderBy(events.date);
+  const [eventRows, teamsByEvent] = await Promise.all([
+    db
+      .select({
+        id: events.id,
+        title: events.title,
+        date: events.date,
+        endDate: events.endDate,
+        startTime: events.startTime,
+        endTime: events.endTime,
+      })
+      .from(events)
+      .orderBy(events.date),
+    getTeamsByEvent(),
+  ]);
+  // Several teams read "A, B"; none belongs to no team.
+  const rows = eventRows.map((row) => ({ ...row, teamName: teamsByEvent.get(row.id)?.map((team) => team.name).join(", ") || null }));
 
   return (
     <div>
@@ -48,13 +52,14 @@ export default async function AdminEventsPage() {
         </thead>
         <tbody>
           {rows.map((event) => (
-            <tr data-admin-search-item={`${event.title} ${event.date} ${event.startTime} ${event.teamName ?? "Viss klubs"}`} key={event.id} className="border-b border-black/10 last:border-0">
+            <tr data-admin-search-item={`${event.title} ${event.date} ${event.endDate ?? ""} ${event.startTime} ${event.teamName ?? ""}`} key={event.id} className="border-b border-black/10 last:border-0">
               <td className="p-4 font-semibold text-black">{event.title}</td>
-              <td className="p-4 text-black">{event.date}</td>
+              {/* Several days read "2026-12-12 – 2026-12-14", with the first day's start and the last day's end time. */}
+              <td className="p-4 text-black">{event.endDate ? `${event.date} – ${event.endDate}` : event.date}</td>
               <td className="p-4 text-black/55">
                 {event.startTime}–{event.endTime}
               </td>
-              <td className="p-4 text-black/55">{event.teamName ?? "Viss klubs"}</td>
+              <td className="p-4 text-black/55">{event.teamName ?? "—"}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
                   <Link

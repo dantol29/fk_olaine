@@ -12,6 +12,7 @@ export async function SiteFooter() {
   const navItems = [
     { title: "Jaunumi", href: "/jaunumi" },
     { title: "Spēles", href: "/speles" },
+    { title: "Notikumi", href: "/notikumi" },
     { title: "Komandas", href: "/komandas" },
     ...clubPages.map((page) => ({ title: page.title, href: `/klubs/${page.slug}` })),
     { title: "Treniņi", href: "/treninji" },

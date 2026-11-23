@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/client";
-import { articles, clubPages } from "@/db/schema";
+import { articles, clubPages, events } from "@/db/schema";
+import { articlePath } from "@/lib/article-path";
+import { eventPath } from "@/lib/events";
 import { getSiteUrl } from "@/lib/site-url";
 import { parseClubPageMedia } from "@/lib/club-page-media";
 
@@ -13,20 +15,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/`, changeFrequency: "daily", priority: 1 },
     { url: `${siteUrl}/komandas`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${siteUrl}/speles`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${siteUrl}/notikumi`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${siteUrl}/treninji`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${siteUrl}/jaunumi`, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteUrl}/kontakti`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${siteUrl}/kalendars`, changeFrequency: "daily", priority: 0.6 },
   ];
 
-  const [rows, pageRows] = await Promise.all([
-    db.select({ slug: articles.slug, createdAt: articles.createdAt }).from(articles),
+  const [rows, pageRows, eventRows] = await Promise.all([
+    db.select({ id: articles.id, slug: articles.slug, createdAt: articles.createdAt }).from(articles),
     db.select({ slug: clubPages.slug, updatedAt: clubPages.updatedAt, images: clubPages.images })
       .from(clubPages)
       .where(eq(clubPages.isPublished, true)),
+    db.select({ id: events.id, title: events.title, image: events.image }).from(events),
   ]);
   const articleRoutes: MetadataRoute.Sitemap = rows.map((row) => ({
-    url: `${siteUrl}/jaunumi/${row.slug}`,
+    url: `${siteUrl}${articlePath(row)}`,
     lastModified: new Date(row.createdAt),
     changeFrequency: "monthly",
     priority: 0.6,
@@ -40,5 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     images: parseClubPageMedia(row.images).photos.map((photo) => new URL(photo.src, siteUrl).href),
   }));
 
-  return [...staticRoutes, ...articleRoutes, ...clubPageRoutes];
+  const eventRoutes: MetadataRoute.Sitemap = eventRows.map((row) => ({
+    url: `${siteUrl}${eventPath(row.id, row.title)}`,
+    changeFrequency: "monthly",
+    priority: 0.5,
+    ...(row.image ? { images: [new URL(row.image, siteUrl).href] } : {}),
+  }));
+
+  return [...staticRoutes, ...articleRoutes, ...clubPageRoutes, ...eventRoutes];
 }

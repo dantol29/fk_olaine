@@ -29,7 +29,7 @@ export function FeaturedNews({ articles }: { articles: Article[] }) {
               </div>
             );
             return (
-              <Link key={article.slug} href={`/jaunumi/${article.slug}`} className={cn(tileClass, "card-hover focus-visible:outline-white")}>
+              <Link key={article.slug} href={article.path} className={cn(tileClass, "card-hover focus-visible:outline-white")}>
                 <div className={imageClass}><Image src={article.image} alt="" fill preload={index === 0} sizes={index === 0 ? "(min-width: 640px) 50vw, 100vw" : index === 1 ? "(min-width: 640px) 50vw, 28vw" : "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 28vw"} className="card-hover-image object-cover" /></div>
                 <div className={cn("absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent", index !== 0 && "hidden sm:block")} />
                 <div className="relative">

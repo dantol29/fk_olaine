@@ -4,11 +4,12 @@ import { like, or } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { articles, coaches, players, teams } from "@/db/schema";
+import { articlePath } from "@/lib/article-path";
 
 const RESULT_LIMIT = 5;
 
 export type SearchResults = {
-  articles: { slug: string; title: string; excerpt: string; image: string }[];
+  articles: { slug: string; path: string; title: string; excerpt: string; image: string }[];
   players: { id: number; name: string; photoUrl: string | null; teamName: string | null }[];
   coaches: {
     id: number;
@@ -57,6 +58,7 @@ export async function searchSite(query: string): Promise<SearchResults> {
   return {
     articles: articleRows.map((article) => ({
       slug: article.slug,
+      path: articlePath(article),
       title: article.title,
       excerpt: article.excerpt,
       image: article.image,
