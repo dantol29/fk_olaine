@@ -8,12 +8,17 @@
 // The build output is also written to `~/build-<date>-<time>.log` (BUILD_LOG_DIR overrides the folder). Next.js can
 // finish with exit code 0 even when a page could not read the database, so the log is checked for BUILD_LOG_ERRORS
 // before the new build is installed. BUILD_ALLOW_LOG_ERRORS=1 installs it anyway, after the log has been read.
+//
+// The build reads the database, so it first runs scripts/check-hosting-env.mjs: on the host it stops when another
+// site's environment (or none) is active, and it prints the database it will read.
 
 import { spawn } from "node:child_process";
 import { cpSync, createWriteStream, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+
+import { checkHostingEnv } from "./check-hosting-env.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const excluded = new Set([".git", ".codex", ".agents", ".aws", ".impeccable", ".build-work", "uploads", "coverage"]);
@@ -99,9 +104,12 @@ export async function buildForHosting({
   logDir = process.env.BUILD_LOG_DIR ?? homedir(),
   allowLogErrors = process.env.BUILD_ALLOW_LOG_ERRORS === "1",
   now = new Date(),
+  checkEnv = (siteRoot) => checkHostingEnv({ root: siteRoot }),
 } = {}) {
   const heap = Number(heapMb);
   if (!Number.isInteger(heap) || heap < 256 || heap > 4096) throw new Error("BUILD_HEAP_MB must be an integer between 256 and 4096.");
+  const { database } = checkEnv(root);
+  console.log(`Database: ${database}`);
   const { work, release } = lockBuild(root);
   let staging;
   try {

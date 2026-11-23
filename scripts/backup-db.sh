@@ -5,8 +5,8 @@
 # Override the locations with DATA_DIR and BACKUP_DIR if they differ.
 set -euo pipefail
 
-DATA_DIR="${DATA_DIR:-/home3/afaolain/fk_olaine-data}"
-BACKUP_DIR="${BACKUP_DIR:-/home3/afaolain/fk_olaine-backups}"
+DATA_DIR="${DATA_DIR:-$HOME/fk_olaine-data}"
+BACKUP_DIR="${BACKUP_DIR:-$HOME/fk_olaine-backups}"
 TS="$(date +%Y%m%d-%H%M%S)"
 
 if [ ! -e "$DATA_DIR/app.db" ]; then

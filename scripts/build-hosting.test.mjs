@@ -124,3 +124,19 @@ test("only error lines count; the usual hosting warnings do not", () => {
     "SqliteError: SQLITE_ERROR: no such table: event_teams",
   ].join("\n")), ["SqliteError: SQLITE_ERROR: no such table: event_teams"]);
 });
+
+test("a wrong hosting environment stops the build before anything is copied or built", async () => {
+  const root = fixture();
+  try {
+    let built = false;
+    await assert.rejects(buildForHosting({
+      root,
+      logDir: path.join(root, "logs"),
+      checkEnv: () => { throw new Error("The active environment belongs to fk_olaine_code, but this is afa_olaine."); },
+      runBuild: async () => { built = true; return { code: 0, signal: null }; },
+    }), /belongs to fk_olaine_code/);
+    assert.equal(built, false);
+    assert.equal(existsSync(path.join(root, ".build-work")), false);
+    assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "working-build");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
