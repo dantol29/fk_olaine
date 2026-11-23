@@ -50,7 +50,32 @@ After activating the CloudLinux environment and installing dependencies through 
 
 The command builds a temporary source copy under `.build-work`, reuses the existing dependency symlink and database, and leaves the live `.next` untouched if compilation fails. Only after a successful build does it replace `.next`, keep the last complete build in `.next.previous`, and touch `tmp/restart.txt` to restart Passenger. Use `npm run build:rollback` to restore that previous build without recompiling. A backup is available only after a successful hosting build has replaced an existing complete build. Builds and rollbacks take an exclusive lock under `.build-work/lock`; its `pid` file identifies the process if a hard kill leaves a stale lock.
 
+The build output is also written to `~/build-<date>-<time>.log` (`BUILD_LOG_DIR` overrides the folder). Next.js can finish with exit code 0 even when a page could not read the database, so the new build is installed only if that log has no error lines (`no such column`, `no such table`, `SQLITE`, `Error`); otherwise the live site is unchanged and the first matching lines are printed. Error lines that turn out to be harmless can be accepted with `BUILD_ALLOW_LOG_ERRORS=1 npm run build:hosting`. The same script is used by AFA Olaine.
+
 The ordinary `npm run build` remains available for local/CI builds; it writes directly to `.next`, so use `build:hosting` on the live host. If rsync is used for deployments, exclude `.next`, `.next.previous`, and `.build-work` so uploads do not erase the active build or its backup. Run database migrations separately when deploying a database package change; build rollback restores compiled code only.
+
+### Updating production
+
+From the cPanel terminal, in the app folder the site runs from:
+
+```bash
+source /home3/afaolain/nodevenv/repositories/fk_olaine_code/24/bin/activate
+cd /home3/afaolain/repositories/fk_olaine_code
+bash scripts/backup-db.sh          # copy of the database with the date and time; prints TS and the rollback command
+cat .next/BUILD_ID; echo           # the running build, to compare with afterwards
+git status -sb                     # local changes on the server (package-lock.json) must be stashed before the pull
+git stash                          # only if git status lists modified tracked files
+git pull
+```
+
+Install dependencies through Node.js Selector only if `package.json` or `package-lock.json` changed, and run `npm run db:migrate` only if the `@olaine/database` version changed (it needs the production database settings; see "Shared database package"). Then:
+
+```bash
+npm run build:hosting; echo "EXIT=$?"
+cat .next/BUILD_ID; echo; ls -l --time-style=long-iso .next/BUILD_ID .next.previous/BUILD_ID
+```
+
+A successful run ends with "Build installed; … Passenger restart requested", `EXIT=0` and a new `BUILD_ID` with today's time; the previous build stays in `.next.previous` for `npm run build:rollback`. `scripts/backup-db.sh` copies `app.db` (and any `-journal`, `-wal` or `-shm` file) from `/home3/afaolain/fk_olaine-data` to `/home3/afaolain/fk_olaine-backups`; set `DATA_DIR` or `BACKUP_DIR` if the database lives elsewhere. To roll the data back, stop the app in **Setup Node.js App**, copy the backup over `app.db` with `cp -p`, and start the app again.
 
 For an existing database, run `node src/db/add-header-links.mjs` against the production database when deploying the editable header stripe buttons. It adds the six name/link columns with the current button defaults and preserves existing settings. The buttons can then be edited under **Iestatījumi → Galvenes joslas pogas**.
 
