@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db/client";
 import { eventTeams, events, teams } from "@/db/schema";
 import { requireAdminSession } from "@/lib/auth";
-import { parseEventInput } from "@/lib/events";
+import { parseEventInput } from "@/lib/event-input";
 import { deleteUploadedPhoto, saveUploadedPhoto } from "@/lib/uploads";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -34,35 +34,59 @@ function uploadedFiles(formData: FormData, name: string): File[] {
   return formData.getAll(name).filter((entry): entry is File => entry instanceof File && entry.size > 0);
 }
 
+async function deletePhotos(urls: readonly string[]) {
+  for (const url of urls) await deleteUploadedPhoto(url);
+}
+
+type ResolvedPhotos = { photos: EventPhotos; added: string[]; replaced: string[] };
+
 /** The photos after this save, as for news: a new main photo replaces the old one, new gallery photos replace the
  *  whole gallery, and the "remove" boxes clear them. New files are stored first; `replaced` lists the old files to
- *  delete once the event is saved, so a failed save never loses a photo that is still in use. */
-async function resolveEventPhotos(formData: FormData, current: EventPhotos): Promise<{ photos: EventPhotos; replaced: string[] } | { error: string }> {
+ *  delete once the event is saved, so a failed save never loses a photo that is still in use, and `added` the new
+ *  files to delete when the save fails, so they are not left behind unused. */
+async function resolveEventPhotos(formData: FormData, current: EventPhotos): Promise<ResolvedPhotos | { error: string }> {
   const [image] = uploadedFiles(formData, "image");
   const galleryFiles = uploadedFiles(formData, "gallery");
   const photos = { ...current };
+  const added: string[] = [];
   try {
-    if (image) photos.image = await saveUploadedPhoto(image, "events");
-    else if (formData.get("removeImage") === "on") photos.image = null;
+    if (image) {
+      photos.image = await saveUploadedPhoto(image, "events");
+      added.push(photos.image);
+    } else if (formData.get("removeImage") === "on") {
+      photos.image = null;
+    }
     if (galleryFiles.length > 0) {
       const urls: string[] = [];
-      for (const file of galleryFiles) urls.push(await saveUploadedPhoto(file, "events"));
+      for (const file of galleryFiles) {
+        const url = await saveUploadedPhoto(file, "events");
+        urls.push(url);
+        added.push(url);
+      }
       photos.gallery = urls.join("\n");
     } else if (formData.get("removeGallery") === "on") {
       photos.gallery = null;
     }
   } catch (error) {
+    // A later file was refused (wrong type, too large): the ones already stored for this save are not used.
+    await deletePhotos(added);
     return { error: (error as Error).message };
   }
   const replaced = [
     ...(current.image && photos.image !== current.image ? [current.image] : []),
     ...(photos.gallery !== current.gallery ? galleryUrls(current.gallery) : []),
   ];
-  return { photos, replaced };
+  return { photos, added, replaced };
 }
 
-async function deletePhotos(urls: readonly string[]) {
-  for (const url of urls) await deleteUploadedPhoto(url);
+/** Runs the database write; if it fails, the photos stored for it are deleted before the error goes on. */
+async function savingPhotos(resolved: ResolvedPhotos, write: () => Promise<void>) {
+  try {
+    await write();
+  } catch (error) {
+    await deletePhotos(resolved.added);
+    throw error;
+  }
 }
 
 function revalidateEventPages() {
@@ -88,10 +112,10 @@ export async function createEvent(
   const resolved = await resolveEventPhotos(formData, { image: null, gallery: null });
   if ("error" in resolved) return resolved;
 
-  await db.transaction(async (tx) => {
+  await savingPhotos(resolved, () => db.transaction(async (tx) => {
     const [inserted] = await tx.insert(events).values({ ...eventFields, ...resolved.photos, createdAt: Date.now() }).returning({ id: events.id });
     await syncEventTeams(tx, inserted.id, teamIds);
-  });
+  }));
   revalidateEventPages();
   redirect("/admin/events");
 }
@@ -113,10 +137,10 @@ export async function updateEvent(
   const resolved = await resolveEventPhotos(formData, existing);
   if ("error" in resolved) return resolved;
 
-  await db.transaction(async (tx) => {
+  await savingPhotos(resolved, () => db.transaction(async (tx) => {
     await tx.update(events).set({ ...eventFields, ...resolved.photos }).where(eq(events.id, id));
     await syncEventTeams(tx, id, teamIds);
-  });
+  }));
   await deletePhotos(resolved.replaced);
   revalidateEventPages();
   redirect("/admin/events");
