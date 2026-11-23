@@ -175,3 +175,23 @@ test("on the host a build needs a fresh backup, unless BUILD_WITHOUT_BACKUP is s
     assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "new-build");
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test("the build copy has a fixed path and starts with the live build's Webpack cache", async () => {
+  const root = fixture();
+  try {
+    mkdirSync(path.join(root, ".next/cache/webpack/server-production"), { recursive: true });
+    writeFileSync(path.join(root, ".next/cache/webpack/server-production/0.pack"), "cache");
+    let seen = null;
+    await buildForHosting({ root, logDir: path.join(root, "logs"), runBuild: async ({ cwd }) => {
+      seen = { cwd, cache: readFileSync(path.join(cwd, ".next/cache/webpack/server-production/0.pack"), "utf8") };
+      mkdirSync(path.join(cwd, ".next"), { recursive: true });
+      writeFileSync(path.join(cwd, ".next/BUILD_ID"), "new-build");
+      return { code: 0, signal: null };
+    } });
+    assert.equal(seen.cwd, path.join(root, ".build-work", "source"));
+    assert.equal(seen.cache, "cache");
+    assert.equal(existsSync(path.join(root, ".build-work", "source")), false);
+    // The live cache stayed with the previous build; the new build brought its own.
+    assert.equal(readFileSync(path.join(root, ".next.previous/cache/webpack/server-production/0.pack"), "utf8"), "cache");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

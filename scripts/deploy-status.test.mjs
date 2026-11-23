@@ -7,15 +7,11 @@ import { backupProblem, packageMismatches, readLastBackup, recoveryLines } from 
 
 function site() {
   const root = mkdtempSync(path.join(tmpdir(), "deploy-status-"));
+  // As on the host: the database package is pinned, the rest are ranges that npm there resolves to newer versions.
   writeFileSync(path.join(root, "package.json"), JSON.stringify({
-    dependencies: { "@olaine/database": "npm:@dantol29/database@0.1.4", next: "16.0.0" },
-    devDependencies: { typescript: "5.0.0" },
+    dependencies: { "@olaine/database": "npm:@dantol29/database@0.1.4", "lucide-react": "^1.40.0", next: "16.3.4" },
+    devDependencies: { eslint: "^9", typescript: "^5" },
   }));
-  writeFileSync(path.join(root, "package-lock.json"), JSON.stringify({ packages: {
-    "node_modules/@olaine/database": { version: "0.1.4" },
-    "node_modules/next": { version: "16.0.0" },
-    "node_modules/typescript": { version: "5.0.0" },
-  } }));
   const install = (name, version) => {
     mkdirSync(path.join(root, "node_modules", name), { recursive: true });
     writeFileSync(path.join(root, "node_modules", name, "package.json"), JSON.stringify({ version }));
@@ -23,17 +19,15 @@ function site() {
   return { root, install };
 }
 
-test("packages that differ from package-lock.json, or are missing, are named", () => {
+test("only the shared database package is checked: a wrong or missing version is named", () => {
   const { root, install } = site();
   try {
+    assert.deepEqual(packageMismatches(root), ["@olaine/database: installed nothing, package.json pins 0.1.4"]);
     install("@olaine/database", "0.1.3");
-    install("next", "16.0.0");
-    assert.deepEqual(packageMismatches(root), [
-      "@olaine/database: installed 0.1.3, package-lock.json has 0.1.4",
-      "typescript: installed nothing, package-lock.json has 5.0.0",
-    ]);
+    assert.deepEqual(packageMismatches(root), ["@olaine/database: installed 0.1.3, package.json pins 0.1.4"]);
+    // Other packages may differ or be missing, as on the host: next pinned to 16.3.4 but absent, lucide-react newer.
     install("@olaine/database", "0.1.4");
-    install("typescript", "5.0.0");
+    install("lucide-react", "1.48.0");
     assert.deepEqual(packageMismatches(root), []);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
