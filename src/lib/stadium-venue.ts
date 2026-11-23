@@ -5,7 +5,7 @@ export function normalizeVenue(value: string) {
   return aliases.includes(normalized) ? "olaines-pilsetas-stadions" : normalized;
 }
 
-/** Select bookings at a venue that overlap or start on the requested Riga day. */
+/** Select bookings at a venue that overlap the requested Riga days (one day, or every day of a multi-day event). */
 export function bookingsForVenueOnDay<T extends { uid: string; location: string | null; start: Date; end: Date }>(
   events: T[], location: string, dayStart: Date, dayEnd: Date, exclude: string | null,
 ): T[] {

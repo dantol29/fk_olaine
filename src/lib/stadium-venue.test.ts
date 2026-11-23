@@ -16,3 +16,16 @@ test("venue availability includes overnight FK bookings, respects aliases and ex
   ];
   assert.deepEqual(bookingsForVenueOnDay(events, "Olaines stadions", start, end, "edited").map((event) => event.uid), ["overnight"]);
 });
+
+test("venue availability over several days covers every day of the range, not only the first", () => {
+  // 12.–14.12.2026 in Riga (UTC+2): from 11.12. 22:00 UTC to 14.12. 22:00 UTC.
+  const from = new Date("2026-12-11T22:00:00Z");
+  const to = new Date("2026-12-14T22:00:00Z");
+  const events = [
+    booking("game-on-day-two", "2026-12-13T12:00:00Z", "2026-12-13T14:00:00Z"),
+    booking("training-on-last-day", "2026-12-14T16:00:00Z", "2026-12-14T17:30:00Z"),
+    booking("day-after", "2026-12-15T10:00:00Z", "2026-12-15T11:00:00Z"),
+    booking("event-7@2026-12-13", "2026-12-12T22:00:00Z", "2026-12-13T22:00:00Z"),
+  ];
+  assert.deepEqual(bookingsForVenueOnDay(events, "Olaines stadions", from, to, "event-7").map((event) => event.uid), ["game-on-day-two", "training-on-last-day"]);
+});
