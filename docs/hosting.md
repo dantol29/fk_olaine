@@ -85,15 +85,17 @@ source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd ~/repositori
   in `.build-work`, installs the new `.next` only after success and a clean log, keeps the previous build in
   `.next.previous` (`npm run build:rollback`) and restarts Passenger through `tmp/restart.txt`.
 - **One build at a time on the whole account.** Both developers deploy to it, and two builds (or a build while the
-  other site is busy) do not fit into the 2 GB. Before building, check that no build runs:
-  `ps -u "$USER" -o pid,etime,args | grep -E 'build-hosting|next build' | grep -v grep` must print nothing.
+  other site is busy) do not fit into the 2 GB. On the host `build:hosting` stops, changing nothing, when another build
+  of either site runs (this script or `next build`; it lists them). To look yourself:
+  `ps -u "$USER" -o pid,etime,args | grep -E 'build-hosting|next build' | grep -v grep`.
 - **Run it in the background**, so a closed or reloaded terminal page does not cut it off, and follow the output:
 
   ```bash
-  nohup npm run build:hosting > ~/deploy-<site>.out 2>&1 & sleep 2; tail -f ~/deploy-<site>.out
+  nohup npm run build:hosting > ~/deploy-<site>.out 2>&1 & sleep 2; tail --pid=$! -f ~/deploy-<site>.out
   ```
 
-  Ctrl+C stops only `tail`; `tail -40 ~/deploy-<site>.out` shows the result later.
+  The output stops by itself when the build ends (`--pid`); Ctrl+C stops only the output, not the build;
+  `tail -40 ~/deploy-<site>.out` shows the result later.
 - **Memory settings.** Both sites' `next.config.ts` use the same low-memory profile (`cpus: 1`,
   `webpackMemoryOptimizations`, `webpackBuildWorker`, `staticGenerationMaxConcurrency: 1`,
   `staticGenerationMinPagesPerWorker: 50`) and turn Webpack's filesystem cache off when `NEXT_LOW_MEMORY_BUILD=1`, which
