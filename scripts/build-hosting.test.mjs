@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
-import { buildForHosting, findLogErrors, rollbackBuild } from "./build-hosting.mjs";
+import { buildForHosting, findLogErrors, otherBuilds, rollbackBuild } from "./build-hosting.mjs";
 
 function fixture() {
   const root = mkdtempSync(path.join(tmpdir(), "hosting-build-"));
@@ -165,13 +165,13 @@ test("on the host a build needs a fresh backup, unless BUILD_WITHOUT_BACKUP is s
     return { code: 0, signal: null };
   };
   try {
-    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => null, allowNoBackup: false, runBuild: build }),
+    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, findBuilds: () => [], readBackup: () => null, allowNoBackup: false, runBuild: build }),
       /No database backup[\s\S]*bash scripts\/backup-db\.sh/);
     assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "working-build");
     const old = { ts: "20261124-070000", ageMinutes: 300, restoreDatabase: "cp -p b a", restorePhotos: null };
-    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => old, allowNoBackup: false, runBuild: build }),
+    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, findBuilds: () => [], readBackup: () => old, allowNoBackup: false, runBuild: build }),
       /300 minutes old/);
-    await buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => null, allowNoBackup: true, runBuild: build });
+    await buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, findBuilds: () => [], readBackup: () => null, allowNoBackup: true, runBuild: build });
     assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "new-build");
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
@@ -194,4 +194,32 @@ test("the build copy has a fixed path and starts with the live build's Webpack c
     // The live cache stayed with the previous build; the new build brought its own.
     assert.equal(readFileSync(path.join(root, ".next.previous/cache/webpack/server-production/0.pack"), "utf8"), "cache");
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("on the host a build stops when another build runs on the account", async () => {
+  const root = fixture();
+  const onHost = () => ({ onHost: true, database: "file:/home/site-data/app.db" });
+  const fresh = { ts: "20261124-140000", ageMinutes: 1, restoreDatabase: "cp -p b a", restorePhotos: null };
+  let built = false;
+  const build = async () => { built = true; return { code: 0, signal: null }; };
+  const otherSite = [{ pid: 4242, elapsed: "02:10", args: "node /home/site/fk/node_modules/next/dist/bin/next build" }];
+  try {
+    await assert.rejects(buildForHosting({ root, logDir: path.join(root, "logs"), checkEnv: onHost, readBackup: () => fresh, findBuilds: () => otherSite, runBuild: build }),
+      /Another build is running[\s\S]*4242 \(running 02:10\)/);
+    assert.equal(built, false);
+    assert.equal(existsSync(path.join(root, ".build-work", "lock")), false);
+    assert.equal(readFileSync(path.join(root, ".next/BUILD_ID"), "utf8"), "working-build");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("otherBuilds finds builds of either site but not this build or unrelated processes", () => {
+  const processes = [
+    { pid: 10, elapsed: "00:05", args: "sh -c node scripts/build-hosting.mjs" },
+    { pid: 11, elapsed: "00:05", args: "node scripts/build-hosting.mjs" },
+    { pid: 20, elapsed: "03:00", args: "node scripts/build-hosting.mjs --rollback" },
+    { pid: 21, elapsed: "03:00", args: "node /home/site/fk/node_modules/next/dist/bin/next build" },
+    { pid: 30, elapsed: "5-01:00:00", args: "Passenger NodeApp: /home/site/repositories/afa_olaine" },
+    { pid: 31, elapsed: "00:01", args: "node --test scripts/build-hosting.test.mjs" },
+  ];
+  assert.deepEqual(otherBuilds({ list: () => processes, self: [11, 10] }).map(({ pid }) => pid), [20, 21]);
 });

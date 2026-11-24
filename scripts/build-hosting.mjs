@@ -16,8 +16,11 @@
 // and, on the host, when no database backup was made in the last two hours (`bash scripts/backup-db.sh`;
 // BUILD_WITHOUT_BACKUP=1 builds anyway). After a build, and after a rollback, it prints how to undo the deploy: the
 // build, the database and the packages (scripts/deploy-status.mjs).
+//
+// Both sites share one hosting account and its memory, and two builds at once do not fit: on the host it also stops
+// when another build (of either site, through this script or plain `next build`) is already running.
 
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { cpSync, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
@@ -31,10 +34,24 @@ const excluded = new Set([".git", ".codex", ".agents", ".aws", ".impeccable", ".
 /** Lines that mean a page was built from a broken database or crashed while being built. */
 export const BUILD_LOG_ERRORS = /no such column|no such table|SQLITE|Error/;
 const MATCHES_SHOWN = 10;
+/** A process that is a build: this script (also its rollback) or Next.js's own `next build`. */
+const BUILD_PROCESS = /build-hosting\.mjs|next build\b/;
 /** Webpack's incremental cache inside a build. It names files by absolute path, so the build copy always has the same
  *  path (.build-work/source) and starts with the live build's cache: only what changed is compiled again. A site that
  *  turns the cache off for the hosting build (FK's next.config.ts under NEXT_LOW_MEMORY_BUILD) has none to reuse. */
 const WEBPACK_CACHE = path.join(".next", "cache", "webpack");
+
+/** This account's processes as `{ pid, elapsed, args }`, from `ps`. */
+function listProcesses() {
+  const output = execFileSync("ps", ["-u", String(process.getuid()), "-o", "pid=,etime=,args="], { encoding: "utf8" });
+  return output.split("\n").map((line) => line.trim().match(/^(\d+)\s+(\S+)\s+(.+)$/)).filter(Boolean)
+    .map(([, pid, elapsed, args]) => ({ pid: Number(pid), elapsed, args }));
+}
+
+/** Builds already running on the account, other than this one (its own process and the `sh -c` npm started it with). */
+export function otherBuilds({ list = listProcesses, self = [process.pid, process.ppid] } = {}) {
+  return list().filter(({ pid, args }) => !self.includes(pid) && BUILD_PROCESS.test(args));
+}
 
 function lockBuild(root) {
   const work = path.join(root, ".build-work");
@@ -118,6 +135,7 @@ export async function buildForHosting({
   checkPackages = packageMismatches,
   readBackup = readLastBackup,
   allowNoBackup = process.env.BUILD_WITHOUT_BACKUP === "1",
+  findBuilds = otherBuilds,
 } = {}) {
   const heap = Number(heapMb);
   if (!Number.isInteger(heap) || heap < 256 || heap > 4096) throw new Error("BUILD_HEAP_MB must be an integer between 256 and 4096.");
@@ -136,6 +154,12 @@ export async function buildForHosting({
       + `(it must be less than ${BACKUP_MAX_AGE_MINUTES} minutes old), or BUILD_WITHOUT_BACKUP=1 npm run build:hosting to build anyway.`);
   }
   if (backup) console.log(`Last backup: ${backup.ts} (${backup.ageMinutes} min ago).`);
+  const running = onHost ? findBuilds() : [];
+  if (running.length > 0) {
+    throw new Error("Another build is running on this hosting account; both sites share its memory, so nothing has been "
+      + `built or changed:\n${running.map(({ pid, elapsed, args }) => `  ${pid} (running ${elapsed}) ${args}`).join("\n")}\n`
+      + "Wait until it ends, then run npm run build:hosting again.");
+  }
   const { work, release } = lockBuild(root);
   let staging;
   try {
