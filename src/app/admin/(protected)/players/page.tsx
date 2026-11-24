@@ -1,6 +1,6 @@
 import { Pencil, UserRound } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
@@ -30,12 +30,12 @@ export default async function AdminPlayersPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-black">Spēlētāji</h1>
-        <Link
+        <AdminLink
           href="/admin/players/new"
           className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
-        </Link>
+        </AdminLink>
       </div>
       <AdminSearch placeholder="Meklēt spēlētājus…" />
 
@@ -84,14 +84,14 @@ export default async function AdminPlayersPage() {
                       </p>
                       <p className="text-xs text-black/45">{player.birthdate}</p>
                       <div className="mt-3 flex items-center justify-end gap-2 border-t border-black/10 pt-2">
-                        <Link
+                        <AdminLink
                           href={`/admin/players/${player.id}`}
                           aria-label={`Rediģēt spēlētāju "${player.name}"`}
                           title="Rediģēt"
                           className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                         >
                           <Pencil className="h-4 w-4" />
-                        </Link>
+                        </AdminLink>
                         <DeleteButton
                           action={deletePlayer.bind(null, player.id)}
                           confirmMessage={`Dzēst spēlētāju "${player.name}"?`}

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 import { useEffect, useRef, useState } from "react";
 
 type Booking = { uid: string; title: string; start: string; end: string };
@@ -65,7 +65,7 @@ export function StadiumAvailability({ exclude }: { exclude?: string }) {
   const end = input.end ? wallTime(multiDay ? input.endDate : input.date, input.end) : NaN;
   const clashes = result?.events.filter((event) => start < new Date(event.end).getTime() && new Date(event.start).getTime() < end) ?? [];
   return <div ref={ref} className="mt-5 border border-black/15 bg-white p-4 text-sm" aria-live="polite">
-    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Vietas noslodze</h2><Link href="/admin/calendar" target="_blank" rel="noopener noreferrer" className="underline">Atvērt kalendāru</Link></div>
+    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Vietas noslodze</h2><AdminLink href="/admin/calendar" target="_blank" rel="noopener noreferrer" className="underline">Atvērt kalendāru</AdminLink></div>
     <p className="mt-2 text-black/55">Tiek pārbaudītas tikai FK Olaine rezervācijas.</p>
     {!input.date || !input.location.trim() ? <p className="mt-2 text-black/55">Izvēlies datumu un vietu, lai pārbaudītu rezervācijas.</p> : status === "loading" || status === "idle" ? <p className="mt-2 text-black/55">Pārbauda rezervācijas…</p> : status === "error" ? <p className="mt-2 text-amber-800">Pieejamību nevar pārbaudīt. Pārbaudi kalendāru pirms saglabāšanas.</p> : <>
       {input.start && input.end && end <= start && <p className="mt-2 text-club-red">Beigu laikam jābūt pēc sākuma laika.</p>}
