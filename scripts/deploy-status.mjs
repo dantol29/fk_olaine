@@ -1,5 +1,5 @@
-// What a deploy on the cPanel host needs to know before and after it changes anything: whether the installed packages
-// match package-lock.json, the last backup made by scripts/backup-db.sh (with the commands that restore it), and the
+// What a deploy on the cPanel host needs to know before and after it changes anything: whether the shared database
+// package is installed in the version package.json pins, the last backup made by scripts/backup-db.sh (with the commands that restore it), and the
 // commit to go back to. Shared by AFA Olaine and FK Olaine (same file in both repositories); see docs/hosting.md.
 
 import { execFileSync } from "node:child_process";
@@ -15,21 +15,26 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, "utf8"));
 }
 
-/** "name: installed 0.1.3, package-lock.json has 0.1.4" for every direct dependency that differs or is missing. A
- *  build with such packages would compile against the wrong versions (the database package is built into the site). */
+/** The packages whose installed version must be the one package.json pins. Only the shared database package: it is
+ *  built into the site, its schema must match the migrated database, and its releases are ours. The host's npm
+ *  (CloudLinux) resolves everything else on its own (newer versions in range, package-lock.json ignored, some dev
+ *  tools left out), and the sites have always run like that, so other packages are not checked. */
+export const CHECKED_PACKAGES = ["@olaine/database"];
+/** "0.1.4" from "0.1.4" or "npm:@dantol29/database@0.1.4". */
+const EXACT_VERSION = /^(?:npm:(?:@[^/@]+\/)?[^@]+@)?(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)$/;
+
+/** "name: installed 0.1.3, package.json pins 0.1.4" for a checked package (CHECKED_PACKAGES) that is installed in
+ *  another version or not at all. A build with it would compile against the wrong database schema. */
 export function packageMismatches(root) {
-  const lockFile = path.join(root, "package-lock.json");
-  if (!existsSync(lockFile)) return [];
   const manifest = readJson(path.join(root, "package.json"));
-  const locked = readJson(lockFile).packages ?? {};
-  const names = Object.keys({ ...manifest.dependencies, ...manifest.devDependencies });
+  const specs = { ...manifest.dependencies, ...manifest.devDependencies };
   const problems = [];
-  for (const name of names) {
-    const wanted = locked[`node_modules/${name}`]?.version;
-    if (!wanted) continue;
+  for (const name of CHECKED_PACKAGES) {
+    const pinned = EXACT_VERSION.exec(String(specs[name] ?? ""))?.[1];
+    if (!pinned) continue;
     const installedFile = path.join(root, "node_modules", name, "package.json");
     const installed = existsSync(installedFile) ? readJson(installedFile).version : null;
-    if (installed !== wanted) problems.push(`${name}: installed ${installed ?? "nothing"}, package-lock.json has ${wanted}`);
+    if (installed !== pinned) problems.push(`${name}: installed ${installed ?? "nothing"}, package.json pins ${pinned}`);
   }
   return problems;
 }

@@ -18,7 +18,7 @@
 // build, the database and the packages (scripts/deploy-status.mjs).
 
 import { spawn } from "node:child_process";
-import { cpSync, createWriteStream, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -31,6 +31,10 @@ const excluded = new Set([".git", ".codex", ".agents", ".aws", ".impeccable", ".
 /** Lines that mean a page was built from a broken database or crashed while being built. */
 export const BUILD_LOG_ERRORS = /no such column|no such table|SQLITE|Error/;
 const MATCHES_SHOWN = 10;
+/** Webpack's incremental cache inside a build. It names files by absolute path, so the build copy always has the same
+ *  path (.build-work/source) and starts with the live build's cache: only what changed is compiled again. A site that
+ *  turns the cache off for the hosting build (FK's next.config.ts under NEXT_LOW_MEMORY_BUILD) has none to reuse. */
+const WEBPACK_CACHE = path.join(".next", "cache", "webpack");
 
 function lockBuild(root) {
   const work = path.join(root, ".build-work");
@@ -135,7 +139,10 @@ export async function buildForHosting({
   const { work, release } = lockBuild(root);
   let staging;
   try {
-    staging = mkdtempSync(path.join(work, "source-"));
+    // Whatever an interrupted build left here is stale; the lock above guarantees no build is using it.
+    staging = path.join(work, "source");
+    rmSync(staging, { recursive: true, force: true });
+    mkdirSync(staging);
     for (const first of readdirSync(root)) {
       if (excluded.has(first) || first.startsWith(".next") || first.startsWith("node_modules")
         || first.endsWith(".tsbuildinfo") || first.endsWith(".log") || /^local\.db(?:-|$)/.test(first) || first === "tmp") continue;
@@ -156,7 +163,11 @@ export async function buildForHosting({
     mkdirSync(logDir, { recursive: true });
     const logFile = path.join(logDir, logFileName(now));
     writeFileSync(logFile, "");
-    console.log(`Hosting build: ${heap} MB JavaScript heap per compiler process; one worker; Webpack cache disabled.`);
+    const liveCache = path.join(root, WEBPACK_CACHE);
+    const reusesCache = existsSync(liveCache);
+    if (reusesCache) cpSync(liveCache, path.join(staging, WEBPACK_CACHE), { recursive: true });
+    console.log(`Hosting build: ${heap} MB JavaScript heap per compiler process; one worker; `
+      + (reusesCache ? "Webpack cache copied from the live build." : "no Webpack cache to reuse (a full build)."));
     console.log("Building separately; the live .next folder will only be replaced after success.");
     console.log(`Build log: ${logFile}`);
     const result = await runBuild({ cwd: staging, env, nextCli: path.join(root, "node_modules/next/dist/bin/next"), logFile });

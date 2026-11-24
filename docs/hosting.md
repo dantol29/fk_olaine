@@ -71,14 +71,24 @@ source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd ~/repositori
 - Normal noise in the build output on this host: `GLIBC_2.29 not found` and `invalid ELF header` (the native compiler
   cannot load; Next.js falls back to WASM, so builds take 5–10 minutes), "multiple lockfiles" (the separate build
   copy), "Retrying 1/3…", "Retrying 2/3…" and `write EPIPE` (a build worker hit the account's limits and was retried).
-- Before building it stops, changing nothing, when the installed packages differ from `package-lock.json` (it names
-  them; run `npm install`) or, on the host, when no database backup was made in the last two hours (run
+- Before building it stops, changing nothing, when the shared database package is not installed in the version
+  `package.json` pins (run `npm install`) or, on the host, when no database backup was made in the last two hours (run
   `bash scripts/backup-db.sh`; `BUILD_WITHOUT_BACKUP=1 npm run build:hosting` builds anyway). It prints the database,
   the commit it builds and the last backup.
-- `npm run build:hosting` does not install packages. Run `npm install` after `git pull` when `package-lock.json`
-  changed (`git diff --stat HEAD@{1} -- package-lock.json` shows it); the check above stops the build otherwise. The
-  database package is built into the site (`transpilePackages`), so installing a new one does not affect the running
-  build; a new Next.js or React would, until the new build is installed.
+- Only the database package is checked. *Checked* on 2026-11-24: the host's npm (CloudLinux) ignores
+  `package-lock.json`: it installs the newest versions `package.json` allows (AFA had `lucide-react` 1.48.0 against
+  1.40.0 in the lockfile, FK built with Next.js 16.3.8) and leaves some dev tools out (`eslint`). The sites always ran
+  like that, so comparing every package with the lockfile stopped every build.
+- `npm run build:hosting` does not install packages. Run `npm install` after `git pull` when `package.json` or
+  `package-lock.json` changed (`git diff --stat HEAD@{1} -- package.json package-lock.json` shows it). The database
+  package is built into the site (`transpilePackages`), so installing a new one does not affect the running build; a
+  new Next.js or React would, until the new build is installed.
+- Build time: the build copy is always `.build-work/source` and starts with the live build's Webpack cache, so AFA
+  recompiles only what changed. FK turns the cache off for this build (`next.config.ts`, to save memory), so FK
+  always compiles everything (about 4 minutes plus checks, *checked* 2026-11-24).
+- One site at a time. Both sites run under one hosting account and share its memory and process limits: while one
+  site builds, the other can answer 500 for moments (*seen* 2026-11-24 on AFA during FK's build). Deploy at a quiet
+  time, finish and check one site, then start the other.
 
 ## Backups
 
