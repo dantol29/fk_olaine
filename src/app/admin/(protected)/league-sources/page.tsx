@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { Pencil } from "lucide-react";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
@@ -53,12 +53,12 @@ export default async function AdminLeagueSourcesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-black">Līgu avoti</h1>
-        <Link
+        <AdminLink
           href="/admin/league-sources/new"
           className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
-        </Link>
+        </AdminLink>
       </div>
       <div className="mb-6 rounded-none border border-black/15 bg-white p-4 shadow-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -127,36 +127,36 @@ export default async function AdminLeagueSourcesPage() {
               <td className="max-w-xs truncate p-4 text-black/55">{source.url}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
-                  <Link
+                  <AdminLink
                     href={`/admin/league-sources/${source.id}/import`}
                     className="text-sm font-semibold text-club-red hover:underline"
                   >
                     Ielādēt spēles
-                  </Link>
+                  </AdminLink>
                   {source.standingsUrl && (
-                    <Link
+                    <AdminLink
                       href={`/admin/league-sources/${source.id}/test-standings`}
                       className="text-sm font-semibold text-black hover:underline"
                     >
                       Testēt tabulu
-                    </Link>
+                    </AdminLink>
                   )}
                   {source.topScorersUrl && (
-                    <Link
+                    <AdminLink
                       href={`/admin/league-sources/${source.id}/sync-top-scorers`}
                       className="text-sm font-semibold text-black hover:underline"
                     >
                       Sinhronizēt vārtu guvējus
-                    </Link>
+                    </AdminLink>
                   )}
-                  <Link
+                  <AdminLink
                     href={`/admin/league-sources/${source.id}`}
                     aria-label={`Rediģēt līgas avotu "${source.label}"`}
                     title="Rediģēt"
                     className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
-                  </Link>
+                  </AdminLink>
                   <DeleteButton
                     action={deleteLeagueSource.bind(null, source.id)}
                     confirmMessage={`Dzēst līgas avotu "${source.label}"?`}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
@@ -52,7 +52,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div>
-        <Link href="/admin" onClick={onNavigate} className="flex items-center gap-3">
+        <AdminLink href="/admin" onClick={onNavigate} className="flex items-center gap-3">
           <Image
             src="/fk-olaine-crest-v2.png"
             alt="FK Olaine"
@@ -61,13 +61,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             className="h-14 w-auto"
           />
           <span><span className="block text-xl font-semibold">FK OLAINE</span><span className="mt-1 block text-[10px] uppercase tracking-wider text-white/45">Administrācija</span></span>
-        </Link>
+        </AdminLink>
         <nav aria-label="Administrācijas navigācija" className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
             return (
-              <Link
+              <AdminLink
                 key={item.href}
                 href={item.href}
                 onClick={onNavigate}
@@ -81,7 +81,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 {item.label}
-              </Link>
+              </AdminLink>
             );
           })}
         </nav>
@@ -105,7 +105,7 @@ export function AdminSidebar() {
   return (
     <>
       <div className="flex items-center justify-between bg-black px-5 py-3 text-white lg:hidden">
-        <Link href="/admin" className="flex items-center gap-3"><Image src="/fk-olaine-crest-v2.png" alt="" width={48} height={50} className="h-10 w-auto" /><span className="text-lg font-semibold">FK OLAINE</span></Link>
+        <AdminLink href="/admin" className="flex items-center gap-3"><Image src="/fk-olaine-crest-v2.png" alt="" width={48} height={50} className="h-10 w-auto" /><span className="text-lg font-semibold">FK OLAINE</span></AdminLink>
         <button type="button" onClick={() => setOpen(true)} aria-label="Atvērt izvēlni" className="flex size-11 items-center justify-center focus-visible:outline-white"><Menu className="size-7" /></button>
       </div>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col justify-between overflow-y-auto bg-black p-5 text-white lg:flex">

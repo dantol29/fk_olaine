@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { Pencil } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
@@ -68,12 +68,12 @@ export default async function AdminGamesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-black">Spēles</h1>
-        <Link
+        <AdminLink
           href="/admin/games/new"
           className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
-        </Link>
+        </AdminLink>
       </div>
       <AdminSearch placeholder="Meklēt spēles…" />
 
@@ -110,14 +110,14 @@ export default async function AdminGamesPage() {
               <td className="p-4 text-black/55">{game.location}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
-                  <Link
+                  <AdminLink
                     href={`/admin/games/${game.id}`}
                     aria-label={`Rediģēt spēli "${game.homeTeam} – ${game.awayTeam}"`}
                     title="Rediģēt"
                     className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
-                  </Link>
+                  </AdminLink>
                   <DeleteButton
                     action={deleteGame.bind(null, game.id)}
                     confirmMessage={`Dzēst spēli "${game.homeTeam} – ${game.awayTeam}"?`}

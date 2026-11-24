@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
@@ -17,12 +17,12 @@ export default async function AdminPollsPage() {
     <div>
       <div className="mb-2 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-black">Aptaujas</h1>
-        <Link
+        <AdminLink
           href="/admin/aptaujas/new"
           className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
-        </Link>
+        </AdminLink>
       </div>
       <p className="mb-6 text-sm text-black/45">
         Sākumlapā rāda pirmās 3 aptaujas pēc izveides secības.
@@ -51,14 +51,14 @@ export default async function AdminPollsPage() {
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Link
+                    <AdminLink
                       href={`/admin/aptaujas/${poll.id}`}
                       aria-label={`Rediģēt aptauju "${poll.question}"`}
                       title="Rediģēt"
                       className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                     >
                       <Pencil className="h-4 w-4" />
-                    </Link>
+                    </AdminLink>
                     <DeleteButton
                       action={deletePoll.bind(null, poll.id)}
                       confirmMessage={`Dzēst aptauju "${poll.question}"?`}

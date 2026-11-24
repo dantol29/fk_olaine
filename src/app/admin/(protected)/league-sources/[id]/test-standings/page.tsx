@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import Image from "next/image";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db/client";
@@ -26,9 +26,9 @@ export default async function AdminLeagueSourceTestStandingsPage({
         </h1>
         <p className="text-sm text-black/45">
           Šim līgas avotam nav norādīts tabulas URL.{" "}
-          <Link href={`/admin/league-sources/${source.id}`} className="text-club-red hover:underline">
+          <AdminLink href={`/admin/league-sources/${source.id}`} className="text-club-red hover:underline">
             Pievieno to rediģēšanas formā.
-          </Link>
+          </AdminLink>
         </p>
       </div>
     );

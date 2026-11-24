@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import Link from "next/link";
+import { AdminLink } from "@/components/admin/admin-link";
 
 import { DeleteButton } from "@/components/admin/delete-button";
 import { AdminSearch } from "@/components/admin/admin-search";
@@ -29,18 +29,18 @@ export default async function AdminTrainingsPage({ searchParams }: { searchParam
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-black">Treniņi</h1>
-        <Link
+        <AdminLink
           href="/admin/trainings/new"
           className="rounded-none bg-club-red px-4 py-2 text-sm font-semibold text-white hover:bg-club-red-dark"
         >
           + Pievienot
-        </Link>
+        </AdminLink>
       </div>
       <nav aria-label="Treniņu saraksts" className="mb-4 flex gap-4 text-sm">
-        <Link href="/admin/trainings" aria-current={!archived ? "page" : undefined}
-          className={!archived ? "font-semibold text-club-red underline" : "text-black/55 hover:text-black"}>Aktuālie treniņi</Link>
-        <Link href="/admin/trainings?view=archive" aria-current={archived ? "page" : undefined}
-          className={archived ? "font-semibold text-club-red underline" : "text-black/55 hover:text-black"}>Arhīvs</Link>
+        <AdminLink href="/admin/trainings" aria-current={!archived ? "page" : undefined}
+          className={!archived ? "font-semibold text-club-red underline" : "text-black/55 hover:text-black"}>Aktuālie treniņi</AdminLink>
+        <AdminLink href="/admin/trainings?view=archive" aria-current={archived ? "page" : undefined}
+          className={archived ? "font-semibold text-club-red underline" : "text-black/55 hover:text-black"}>Arhīvs</AdminLink>
       </nav>
       <AdminSearch placeholder="Meklēt treniņus…" />
 
@@ -69,14 +69,14 @@ export default async function AdminTrainingsPage({ searchParams }: { searchParam
               <td className="p-4 text-black/55">{training.location}</td>
               <td className="p-4 text-right">
                 <div className="flex items-center justify-end gap-4">
-                  <Link
+                  <AdminLink
                     href={`/admin/trainings/${training.id}`}
                     aria-label={`Rediģēt treniņu ${training.date}`}
                     title="Rediģēt"
                     className="flex h-8 w-8 items-center justify-center rounded-none text-black transition hover:bg-[#f5f5f5]"
                   >
                     <Pencil className="h-4 w-4" />
-                  </Link>
+                  </AdminLink>
                   <DeleteButton
                     action={deleteTraining.bind(null, training.id)}
                     confirmMessage="Dzēst šo treniņu?"
