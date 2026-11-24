@@ -24,7 +24,7 @@ const PAST_PAGE_SIZE = 12;
 function EventRow({ event }: { event: EventListItem }) {
   return (
     <li>
-      <Link href={event.path} className="group block border border-white/12 bg-club-navy-light p-5 transition-colors hover:border-white/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:p-6">
+      <Link href={event.path} className="group block rounded-3xl border border-white/10 bg-club-navy-light p-5 transition-colors hover:border-white/30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:p-6">
         <p className="flex items-center gap-2 text-sm font-semibold text-white/70 tabular-nums">
           <CalendarDays className="size-4 shrink-0" aria-hidden="true" />
           {formatEventSpan(event.date, event.startTime, event.endDate, event.endTime)}
@@ -44,7 +44,8 @@ export function EventsDirectory({ upcoming, past }: { upcoming: EventListItem[];
   const [shownPast, setShownPast] = useState(PAST_PAGE_SIZE);
 
   return (
-    <div className="mx-auto max-w-[1000px]">
+    // Same width as the page title above and the other list pages (Spēles, Jaunumi).
+    <div className="mx-auto max-w-[1920px]">
       <section aria-labelledby="upcoming-events">
         <h2 id="upcoming-events" className="text-3xl font-semibold uppercase sm:text-4xl">Gaidāmie</h2>
         {upcoming.length > 0 ? (
@@ -59,7 +60,7 @@ export function EventsDirectory({ upcoming, past }: { upcoming: EventListItem[];
           <h2 id="past-events" className="text-3xl font-semibold uppercase sm:text-4xl">Aizvadītie</h2>
           <ul className="mt-6 grid gap-4">{past.slice(0, shownPast).map((event) => <EventRow key={event.id} event={event} />)}</ul>
           {past.length > shownPast && (
-            <button type="button" onClick={() => setShownPast((count) => count + PAST_PAGE_SIZE)} className="mt-8 inline-flex min-h-12 items-center border border-white/40 px-6 text-sm font-semibold uppercase hover:border-white">
+            <button type="button" onClick={() => setShownPast((count) => count + PAST_PAGE_SIZE)} className="motion-action mt-8 inline-flex min-h-11 items-center rounded-xl border border-white/30 px-5 text-sm font-semibold text-white hover:bg-white/10">
               Rādīt vairāk
             </button>
           )}
