@@ -500,13 +500,13 @@
 
 .home-hero-frame { min-height: max(640px, 100svh); }
 .home-page-hero-frame {
-  height: clamp(360px, 48vh, 560px);
-  height: clamp(360px, 48dvh, 560px);
+  height: clamp(450px, 60vh, 690px);
+  height: clamp(450px, 60dvh, 690px);
   min-height: 0;
 }
 .home-page-hero-frame > .home-hero-news { min-height: 0; }
 @media (max-width: 639px) {
-  .home-page-hero-frame { height: clamp(300px, 42dvh, 400px); }
+  .home-page-hero-frame { height: clamp(370px, 52dvh, 495px); }
   .home-hero-frame.home-hero-news { min-height: clamp(480px, 75svh, 620px); }
 }
 .home-hero-news > .hero-news-slide {
