@@ -40,7 +40,7 @@ Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`, `SITE
 
 CloudLinux Node.js Selector keeps dependencies in its virtual environment and links them into the application as `node_modules`. The deployment uses `npm_config_include=dev cloudlinux-selector install-modules --interpreter nodejs --app-root repositories/fk_olaine_code` to let Selector manage the link and install build dependencies even in production mode. Do not replace this with `npm ci`, which removes the existing `node_modules` before installing. Ordinary npm installations can also replace the link; use Selector's installer on this host.
 
-If **Run NPM Install** reports that the application must not contain a `node_modules` folder/file, check it in File Manager or with `ls -ld node_modules`. If it is an ordinary directory rather than a symlink, move it to a backup location outside the application directory. Then use **Run NPM Install** in **Setup Node.js App** to recreate the Selector-managed link and dependencies. Leave an existing symlink in place. The deployment automates this recovery: ordinary folders/files are moved to `/home3/afaolain/fk_olaine-data/node_modules-backup-TIMESTAMP` before calling Selector; symlinks are preserved.
+If **Run NPM Install** reports that the application must not contain a `node_modules` folder/file, check it in File Manager or with `ls -ld node_modules`. If it is an ordinary directory rather than a symlink, move it to a backup location outside the application directory. Then use **Run NPM Install** in **Setup Node.js App** to recreate the Selector-managed link and dependencies. Leave an existing symlink in place. The deployment automates this recovery: ordinary folders/files are moved to `~/fk_olaine-data/node_modules-backup-TIMESTAMP` before calling Selector; symlinks are preserved.
 
 `SITE_URL` should be the real public domain (`https://fkolaine.com`, no trailing slash) — `robots.txt` and `sitemap.xml` build their absolute links from it.
 
@@ -64,7 +64,7 @@ cd ~/repositories/fk_olaine_code
 bash scripts/backup-db.sh          # database copy and photo archive with the date and time; prints the restore commands
 cat .next/BUILD_ID; echo           # the running build, to compare with afterwards
 git status -sb                     # local changes on the server (package-lock.json) must be stashed before the pull
-git stash                          # only if git status lists modified tracked files
+git stash                          # only if git pull refuses because of local changes to tracked files
 git pull
 ```
 
@@ -73,11 +73,12 @@ git pull
 Install dependencies through Node.js Selector only if `package.json` or `package-lock.json` changed, and run `npm run db:migrate` only if the `@olaine/database` version changed (it needs the production database settings; see "Shared database package"). Then:
 
 ```bash
-npm run build:hosting; echo "EXIT=$?"
+ps -u "$USER" -o pid,etime,args | grep -E 'build-hosting|next build' | grep -v grep   # must print nothing: one build at a time on the account
+nohup npm run build:hosting > ~/deploy-fk.out 2>&1 & sleep 2; tail -f ~/deploy-fk.out   # Ctrl+C stops only tail
 cat .next/BUILD_ID; echo; ls -l --time-style=long-iso .next/BUILD_ID .next.previous/BUILD_ID
 ```
 
-A successful run ends with "Build installed; … Passenger restart requested", `EXIT=0` and a new `BUILD_ID` with today's time; the previous build stays in `.next.previous` for `npm run build:rollback`. `scripts/backup-db.sh` copies the SQLite file (and any `-journal`, `-wal` or `-shm` file next to it) into `~/fk_olaine-backups` with the date and time in each name, e.g. `app.db.20261112-153045`, and packs the uploaded photos (`public/uploads`) into `uploads.<date-time>.tar.gz` there. It keeps the newest 100 database copies and the newest 10 photo archives (`KEEP_DB_BACKUPS`, `KEEP_UPLOADS_BACKUPS`) and deletes older ones only after the new copies are made. It prints the `TS` value and the commands to restore the database and the photos. Set `DATA_DIR`, `BACKUP_DIR` or `UPLOADS_SRC` if those point elsewhere. To roll the data back, stop the app in **Setup Node.js App**, copy the backup over `app.db` with `cp -p`, and start the app again.
+Both sites share the account's memory, so two builds at once do not fit; running the build with `nohup` keeps it going if the terminal page is closed or reloaded (see `docs/hosting.md`). A successful run ends with "Build installed; … Passenger restart requested" and a new `BUILD_ID` with today's time; the previous build stays in `.next.previous` for `npm run build:rollback`. `scripts/backup-db.sh` copies the SQLite file (and any `-journal`, `-wal` or `-shm` file next to it) into `~/fk_olaine-backups` with the date and time in each name, e.g. `app.db.20261112-153045`, and packs the uploaded photos (`public/uploads`) into `uploads.<date-time>.tar.gz` there. It keeps the newest 100 database copies and the newest 10 photo archives (`KEEP_DB_BACKUPS`, `KEEP_UPLOADS_BACKUPS`) and deletes older ones only after the new copies are made. It prints the `TS` value and the commands to restore the database and the photos. Set `DATA_DIR`, `BACKUP_DIR` or `UPLOADS_SRC` if those point elsewhere. To roll the data back, stop the app in **Setup Node.js App**, copy the backup over `app.db` with `cp -p`, and start the app again.
 
 For an existing database, run `node src/db/add-header-links.mjs` against the production database when deploying the editable header stripe buttons. It adds the six name/link columns with the current button defaults and preserves existing settings. The buttons can then be edited under **Iestatījumi → Galvenes joslas pogas**.
 
