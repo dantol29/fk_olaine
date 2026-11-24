@@ -117,10 +117,10 @@ source ~/nodevenv/repositories/fk_olaine_code/24/bin/activate && cd ~/repositori
   1.40.0 in the lockfile, FK built with Next.js 16.3.8) and leaves some dev tools out (`eslint`). The sites always ran
   like that, so comparing every package with the lockfile stopped every build.
 - `npm run build:hosting` does not install packages. Install them after `git pull` when `package.json` or
-  `package-lock.json` changed (`git diff --stat HEAD@{1} -- package.json package-lock.json` shows it). On 2026-11-23
-  `npm install` worked for both sites; FK's README recommends Node.js Selector's installer instead (**Run NPM Install**
-  or `cloudlinux-selector install-modules`) because plain npm may replace the `node_modules` link — *to confirm with
-  the FK developer which one to use*. The database package is built into the site (`transpilePackages`), so
+  `package-lock.json` changed (`git diff --stat HEAD@{1} -- package.json package-lock.json` shows it), with
+  `npm install` in the terminal (activated environment): the FK developer installs this way, and it worked for both
+  sites on 2026-11-23. Do not use `npm ci` (it removes `node_modules` first) or the **Run NPM Install** button in
+  Setup Node.js App (it hangs on this host). The database package is built into the site (`transpilePackages`), so
   installing a new one does not affect the running build; a new Next.js or React would, until the new build is
   installed.
 - If "Another build or rollback holds .build-work/lock" appears and no build is running (the `ps` command above),

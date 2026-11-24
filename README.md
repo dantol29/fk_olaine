@@ -38,9 +38,7 @@ This app is deployed via cPanel's "Setup Node.js App" (Phusion Passenger), runni
 
 Set both env vars (plus `SESSION_SECRET`, `ADMIN_PASSWORD`, `CRON_SECRET`, `SITE_URL`, and the `SMTP_*` vars below) in the Node.js App's environment variable UI, then run `npm run db:push` once against production to create the schema.
 
-CloudLinux Node.js Selector keeps dependencies in its virtual environment and links them into the application as `node_modules`. The deployment uses `npm_config_include=dev cloudlinux-selector install-modules --interpreter nodejs --app-root repositories/fk_olaine_code` to let Selector manage the link and install build dependencies even in production mode. Do not replace this with `npm ci`, which removes the existing `node_modules` before installing. Ordinary npm installations can also replace the link; use Selector's installer on this host.
-
-If **Run NPM Install** reports that the application must not contain a `node_modules` folder/file, check it in File Manager or with `ls -ld node_modules`. If it is an ordinary directory rather than a symlink, move it to a backup location outside the application directory. Then use **Run NPM Install** in **Setup Node.js App** to recreate the Selector-managed link and dependencies. Leave an existing symlink in place. The deployment automates this recovery: ordinary folders/files are moved to `~/fk_olaine-data/node_modules-backup-TIMESTAMP` before calling Selector; symlinks are preserved.
+CloudLinux Node.js Selector keeps dependencies in its virtual environment (`~/nodevenv/repositories/fk_olaine_code/24`) and links them into the application as `node_modules`. Install them from the cPanel terminal with `npm install` in the activated environment: that is what the FK developer uses, and it worked for both sites on 2026-11-23. Do not use `npm ci`, which removes `node_modules` before installing. The **Run NPM Install** button in **Setup Node.js App** hangs on this host and stops the installation; do not use it.
 
 `SITE_URL` should be the real public domain (`https://fkolaine.com`, no trailing slash) — `robots.txt` and `sitemap.xml` build their absolute links from it.
 
@@ -70,7 +68,7 @@ git pull
 
 `build:hosting` and `db:migrate` first run `scripts/check-hosting-env.mjs`: on the host they stop if no environment or another site's environment is active (Node gets the settings of the activated environment, not of the current folder) and print the database they will use. See `docs/hosting.md` for the server layout, the settings and the normal build noise.
 
-Install dependencies through Node.js Selector only if `package.json` or `package-lock.json` changed, and run `npm run db:migrate` only if the `@olaine/database` version changed (it needs the production database settings; see "Shared database package"). Then:
+Run `npm install` only if `package.json` or `package-lock.json` changed, and run `npm run db:migrate` only if the `@olaine/database` version changed (it needs the production database settings; see "Shared database package"). Then:
 
 ```bash
 ps -u "$USER" -o pid,etime,args | grep -E 'build-hosting|next build' | grep -v grep   # must print nothing: one build at a time on the account
